@@ -12,24 +12,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const id = Number((await params).id);
   if (Number.isNaN(id)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
   const body = await req.json();
-  const project = await prisma.project.update({
+  const item = await prisma.tagline.update({
     where: { id },
     data: {
-      ...(body.name != null && { name: String(body.name) }),
-      ...(body.tagline != null && { tagline: String(body.tagline) }),
-      ...(body.description != null && { description: String(body.description) }),
-      ...(body.techStack != null && { techStack: String(body.techStack) }),
-      ...(body.link != null && { link: body.link ? String(body.link) : null }),
-      ...(body.githubUrl != null && { githubUrl: body.githubUrl ? String(body.githubUrl) : null })
+      ...(body.text != null && { text: String(body.text) }),
+      ...(body.sortOrder != null && { sortOrder: Number(body.sortOrder) || 0 })
     }
   });
-  return NextResponse.json(project);
+  return NextResponse.json(item);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await isEditAuth())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const id = Number((await params).id);
   if (Number.isNaN(id)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
-  await prisma.project.delete({ where: { id } });
+  await prisma.tagline.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

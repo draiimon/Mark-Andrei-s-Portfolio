@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   const resume = await prisma.resume.findFirst({ orderBy: { updatedAt: "desc" } });
@@ -13,7 +15,10 @@ export async function GET() {
   return new NextResponse(pdfBuffer, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${resume.fileName}"`
+      "Content-Disposition": `inline; filename="${resume.fileName}"`,
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      Pragma: "no-cache",
+      Expires: "0"
     }
   });
 }

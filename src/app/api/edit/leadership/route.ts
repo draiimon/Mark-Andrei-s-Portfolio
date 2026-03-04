@@ -9,22 +9,20 @@ async function isEditAuth() {
 
 export async function GET() {
   if (!(await isEditAuth())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const projects = await prisma.project.findMany({ orderBy: { createdAt: "desc" } });
-  return NextResponse.json(projects);
+  const items = await prisma.leadership.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] });
+  return NextResponse.json(items);
 }
 
 export async function POST(req: NextRequest) {
   if (!(await isEditAuth())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
-  const project = await prisma.project.create({
+  const item = await prisma.leadership.create({
     data: {
-      name: String(body.name ?? ""),
-      tagline: String(body.tagline ?? ""),
-      description: String(body.description ?? ""),
-      techStack: String(body.techStack ?? ""),
-      link: body.link ? String(body.link) : null,
-      githubUrl: body.githubUrl ? String(body.githubUrl) : null
+      org: String(body.org ?? ""),
+      role: String(body.role ?? ""),
+      period: String(body.period ?? ""),
+      sortOrder: Number(body.sortOrder ?? 0) || 0
     }
   });
-  return NextResponse.json(project);
+  return NextResponse.json(item);
 }

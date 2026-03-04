@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 async function isEditAuth() {
   const cookieStore = await cookies();
-  return cookieStore.get("andei_admin")?.value === "true";
+  return cookieStore.get("portfolio_admin")?.value === "true";
 }
 
 export async function GET() {
@@ -23,9 +23,14 @@ export async function POST(req: NextRequest) {
     email: String(body.email ?? ""),
     phone: String(body.phone ?? ""),
     github: String(body.github ?? ""),
+    linkedinUrl: body.linkedinUrl ? String(body.linkedinUrl) : null,
+    facebookUrl: body.facebookUrl ? String(body.facebookUrl) : null,
     objective: String(body.objective ?? ""),
     about: String(body.about ?? ""),
-    skills: String(body.skills ?? "")
+    skills: String(body.skills ?? ""),
+    availability: body.availability ? String(body.availability) : null,
+    brandName: body.brandName ? String(body.brandName) : null,
+    heroTagline: body.heroTagline ? String(body.heroTagline) : null
   };
   const existing = await prisma.profile.findFirst();
   const profile = existing

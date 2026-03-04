@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 async function isEditAuth() {
   const cookieStore = await cookies();
-  return cookieStore.get("andei_admin")?.value === "true";
+  return cookieStore.get("portfolio_admin")?.value === "true";
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

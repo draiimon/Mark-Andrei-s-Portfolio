@@ -59,3 +59,40 @@ model Resume {
   content   Bytes
   updatedAt DateTime @updatedAt
 }
+
+model Experience {
+  id        Int      @id @default(autoincrement())
+  role      String
+  company   String
+  period    String
+  summary   String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Leadership {
+  id        Int      @id @default(autoincrement())
+  org       String
+  role      String
+  period    String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Achievement {
+  id        Int      @id @default(autoincrement())
+  text      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tagline {
+  id        Int      @id @default(autoincrement())
+  text      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

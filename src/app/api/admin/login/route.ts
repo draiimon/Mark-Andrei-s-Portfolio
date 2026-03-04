@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
+  const { username, password } = await req.json();
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminUsername = process.env.ADMIN_USERNAME || "draiimon";
+  const adminPassword = process.env.ADMIN_PASSWORD || "Mason@0905";
 
-  if (email === adminEmail && password === adminPassword) {
+  if (username === adminUsername && password === adminPassword) {
     // Very simple, cookie-based flag for this portfolio (not production auth)
     const res = NextResponse.json({ ok: true });
-    res.cookies.set("andei_admin", "true", {
+    res.cookies.set("portfolio_admin", "true", {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
