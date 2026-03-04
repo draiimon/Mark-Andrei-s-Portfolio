@@ -13,10 +13,15 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     if (!file || file.size === 0) return NextResponse.json({ error: "No file" }, { status: 400 });
-    if (file.type !== "application/pdf") return NextResponse.json({ error: "Only PDF allowed" }, { status: 400 });
+    const fileName = file.name || "resume.pdf";
+    const mime = (file.type || "").toLowerCase();
+    const isPdfMime = mime === "application/pdf" || mime === "application/x-pdf" || mime === "application/octet-stream";
+    const isPdfName = fileName.toLowerCase().endsWith(".pdf");
+    if (!isPdfMime && !isPdfName) {
+      return NextResponse.json({ error: "Only PDF allowed" }, { status: 400 });
+    }
     const buffer = Buffer.from(await file.arrayBuffer());
     const existing = await prisma.resume.findFirst();
-    const fileName = file.name || "resume.pdf";
     if (existing) {
       await prisma.resume.update({
         where: { id: existing.id },

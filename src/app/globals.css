@@ -4,6 +4,10 @@
 
 body {
   @apply bg-black text-white;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 153, 0, 0.15), transparent 35%),
+    radial-gradient(circle at 80% 10%, rgba(49, 120, 198, 0.2), transparent 30%),
+    radial-gradient(circle at 50% 80%, rgba(19, 26, 34, 0.9), rgba(10, 12, 16, 1) 60%);
 }
 
 ::selection {
@@ -18,3 +22,105 @@ body {
   @apply bg-awsOrange/70 rounded-full;
 }
 
+.glass-card {
+  background: linear-gradient(
+    160deg,
+    rgba(35, 47, 62, 0.7) 0%,
+    rgba(19, 26, 34, 0.75) 45%,
+    rgba(10, 14, 20, 0.85) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.cloud-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(36px);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: drift 14s ease-in-out infinite;
+}
+
+.cloud-blob.orange {
+  background: rgba(255, 153, 0, 0.55);
+}
+
+.cloud-blob.blue {
+  background: rgba(76, 134, 211, 0.55);
+}
+
+.cloud-blob.slate {
+  background: rgba(89, 113, 140, 0.45);
+}
+
+.floating-card {
+  animation: floaty 6s ease-in-out infinite;
+}
+
+.fade-rise {
+  animation: fadeRise 0.8s ease both;
+}
+
+.ticker-word {
+  display: inline-block;
+  animation: ticker 8s infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(14px, -12px) scale(1.08);
+  }
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fadeRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ticker {
+  0%,
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  25%,
+  45% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  50%,
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75%,
+  95% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

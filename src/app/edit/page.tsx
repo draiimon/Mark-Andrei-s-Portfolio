@@ -46,6 +46,7 @@ export default function EditPage() {
   const [newImage, setNewImage] = useState({ title: "", url: "" });
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [resumeSuccess, setResumeSuccess] = useState(false);
+  const [resumeError, setResumeError] = useState("");
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
   const [editProjectForm, setEditProjectForm] = useState({ name: "", tagline: "", description: "", techStack: "", link: "", githubUrl: "" });
 
@@ -176,12 +177,18 @@ export default function EditPage() {
     if (!resumeFile) return;
     setSaving(true);
     setResumeSuccess(false);
+    setResumeError("");
     const formData = new FormData();
     formData.append("file", resumeFile);
     const res = await fetch("/api/edit/resume", { method: "POST", body: formData });
     setSaving(false);
-    setResumeFile(null);
-    if (res.ok) setResumeSuccess(true);
+    if (res.ok) {
+      setResumeFile(null);
+      setResumeSuccess(true);
+      return;
+    }
+    const data = await res.json().catch(() => ({ error: "Upload failed" }));
+    setResumeError(data.error ?? "Upload failed");
   }
 
   if (auth === null) {
@@ -249,7 +256,11 @@ export default function EditPage() {
               <input
                 type="file"
                 accept=".pdf,application/pdf"
-                onChange={(e) => { setResumeFile(e.target.files?.[0] ?? null); setResumeSuccess(false); }}
+                onChange={(e) => {
+                  setResumeFile(e.target.files?.[0] ?? null);
+                  setResumeSuccess(false);
+                  setResumeError("");
+                }}
                 className="block w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
               />
             </label>
@@ -258,6 +269,7 @@ export default function EditPage() {
             </button>
           </form>
           {resumeSuccess && <p className="mt-2 text-xs text-green-400">Resume updated. Visit /api/resume to view.</p>}
+          {resumeError && <p className="mt-2 text-xs text-red-400">{resumeError}</p>}
         </section>
 
         <section>

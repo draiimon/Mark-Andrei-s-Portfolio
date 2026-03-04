@@ -8,8 +8,9 @@ export async function GET() {
   if (!resume) {
     return new NextResponse("Resume not uploaded yet. Add one at /edit.", { status: 404 });
   }
-  const pdf = Buffer.from(resume.content);
-  return new NextResponse(pdf, {
+  const bytes = new Uint8Array(resume.content);
+  const pdfBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  return new NextResponse(pdfBuffer, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="${resume.fileName}"`
