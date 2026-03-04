@@ -55,6 +55,7 @@ CITE Department Student Council: Mentee – Sponsorship & Marketing Head (2021�
 UPHSD SHS Alumni Association: Public Information Officer (2024–2027)
 
 Focus your answers on why he is a strong Cloud / DevOps / AI candidate, using concrete details from above.
+Use Markdown for readability: **bold** for emphasis, *italic* for terms, and line breaks or short bullet lists where helpful. Keep replies complete; do not cut off mid-sentence.
 `;
 
 export async function POST(req: NextRequest) {
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
           { role: "user", content: userMessage }
         ],
         temperature: 0.5,
-        max_tokens: 300
+        max_tokens: 1024
       })
     });
 

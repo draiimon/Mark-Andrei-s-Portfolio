@@ -2,8 +2,8 @@ import "@/app/globals.css";
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Mark Andrei Castillo | Cloud DevOps Portfolio",
-  description: "Minimalist cloud-native portfolio of Mark Andrei R. Castillo"
+  title: "To the clouds. — Mark Andrei Castillo",
+  description: "To the clouds. Cloud & DevOps portfolio. Mark Andrei builds in the cloud. Philippines. Available for work."
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

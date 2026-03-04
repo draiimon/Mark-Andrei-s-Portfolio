@@ -1,10 +1,40 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
 import Chatbot from "@/components/Chatbot";
+import { Cloud, ExternalLink, Github } from "lucide-react";
+
+const DEFAULT_PROJECTS = [
+  {
+    id: 0,
+    name: "PanicSense PH",
+    tagline: "AI disaster detection platform",
+    description: "Real-time disaster monitoring using multilingual sentiment analysis (mBERT, Bi-GRU, LSTM) to prioritize high-distress areas in the Philippines.",
+    techStack: "Python · NLP · React · AWS",
+    link: "https://panicsenseph.ct.ws/",
+    githubUrl: null
+  },
+  {
+    id: -1,
+    name: "Oaktree Platform",
+    tagline: "Cloud-ready DevOps",
+    description: "End-to-end DevOps platform deploying a full-stack app via Docker, Terraform, and AWS ECS. CI/CD with GitHub Actions.",
+    techStack: "Docker · Terraform · AWS ECS · GitHub Actions",
+    link: null,
+    githubUrl: "https://github.com/draiimon"
+  },
+  {
+    id: -2,
+    name: "SmartSort",
+    tagline: "AI waste segregation",
+    description: "YOLOv8-based system to classify waste into biodegradable and non-biodegradable for better waste management.",
+    techStack: "Python · YOLOv8 · OpenCV",
+    link: null,
+    githubUrl: "https://github.com/draiimon/Waste-Detection-Non-Bio-and-Bio-Project-Using-Yolov8"
+  }
+];
 
 export default async function Home() {
   const profile = await prisma.profile.findFirst();
-  const projects = await prisma.project.findMany({
+  const dbProjects = await prisma.project.findMany({
     orderBy: { createdAt: "desc" }
   });
   const gallery = await prisma.galleryImage.findMany({
@@ -12,247 +42,138 @@ export default async function Home() {
     take: 6
   });
 
+  const projects = dbProjects.length > 0 ? dbProjects : DEFAULT_PROJECTS;
+
   return (
-    <main className="min-h-screen relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,153,0,0.18),_transparent_55%)]" />
-
-      <div className="relative z-10 max-w-5xl mx-auto px-6 py-10 space-y-20">
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-awsOrange to-awsGray shadow-glow flex items-center justify-center text-xs font-semibold">
-              MC
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-awsOrange">
-                Cloud DevOps | AI
-              </p>
-              <p className="text-sm text-neutral-400">
-                {profile?.fullName ?? "Mark Andrei R. Castillo"}
-              </p>
-            </div>
-          </div>
-
-          <nav className="flex gap-6 text-xs text-neutral-300">
-            <a href="#projects" className="hover:text-awsOrange transition-colors">
-              Projects
+    <main className="min-h-screen bg-black text-white antialiased">
+      <div className="max-w-2xl mx-auto px-6 py-16 md:py-24">
+        {/* Header — brand + nav */}
+        <header className="flex items-center justify-between mb-20 md:mb-28">
+          <a href="#" className="flex items-center gap-2 text-white font-medium tracking-tight">
+            <Cloud className="h-5 w-5 text-awsOrange" />
+            <span>To the clouds.</span>
+          </a>
+          <nav className="flex gap-6 text-sm text-neutral-400">
+            <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-awsOrange transition-colors">
+              Resume
             </a>
-            <a href="#gallery" className="hover:text-awsOrange transition-colors">
-              Gallery
+            <a href="https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/" target="_blank" rel="noopener noreferrer" className="hover:text-awsOrange transition-colors">
+              LinkedIn
             </a>
-            <a href="#about" className="hover:text-awsOrange transition-colors">
-              About
+            <a href="https://github.com/draiimon" target="_blank" rel="noopener noreferrer" className="hover:text-awsOrange transition-colors">
+              Github
             </a>
           </nav>
         </header>
 
-        <section className="grid md:grid-cols-[1.3fr,1fr] gap-12 items-center">
-          <div className="space-y-6">
-            <p className="inline-flex items-center gap-2 rounded-full border border-awsGray/60 bg-awsGray/40 px-3 py-1 text-xs text-neutral-200 shadow-lg shadow-black/40">
-              <span className="h-1.5 w-1.5 rounded-full bg-awsOrange animate-pulse" />
-              Open to Cloud / DevOps & AI roles
-            </p>
-
-            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
-              Building <span className="text-awsOrange">cloud-native</span> systems
-              <br />
-              with DevOps and AI.
-            </h1>
-
-            <p className="text-sm md:text-base text-neutral-300 max-w-xl">
-              {profile?.objective ??
-                "Self-driven Computer Science graduate with hands-on experience in AWS, Docker, CI/CD, and AI/ML, focused on shipping reliable, scalable platforms."}
-            </p>
-
-            <div className="flex flex-wrap gap-3 text-xs">
-              {["AWS", "Docker", "CI/CD", "Terraform", "Python", "Next.js", "YOLOv8", "MediaPipe"].map(
-                (tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-awsGray bg-awsGray/40 px-3 py-1 text-neutral-200 hover:border-awsOrange/80 hover:text-awsOrange transition-colors"
-                  >
-                    {tag}
-                  </span>
-                )
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Link
-                href="mailto:andreicastillofficial@gmail.com"
-                className="inline-flex items-center gap-2 rounded-md bg-awsOrange px-4 py-2 text-sm font-medium text-awsBlack shadow-glow hover:brightness-110 transition-all"
-              >
-                Contact Me
-              </Link>
-              <Link
-                href="https://github.com/draiimon"
-                target="_blank"
-                className="inline-flex items-center gap-2 rounded-md border border-awsGray px-4 py-2 text-sm text-neutral-200 hover:border-awsOrange hover:text-awsOrange transition-colors"
-              >
-                GitHub
-              </Link>
-              <Link
-                href="https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/"
-                target="_blank"
-                className="inline-flex items-center gap-2 rounded-md border border-awsGray px-4 py-2 text-sm text-neutral-200 hover:border-awsOrange hover:text-awsOrange transition-colors"
-              >
-                LinkedIn
-              </Link>
-              <Link
-                href="https://www.facebook.com/masoncalix/"
-                target="_blank"
-                className="inline-flex items-center gap-2 rounded-md border border-awsGray px-4 py-2 text-sm text-neutral-200 hover:border-awsOrange hover:text-awsOrange transition-colors"
-              >
-                Facebook
-              </Link>
-            </div>
-
-            <p className="text-xs text-neutral-500 pt-2">
-              Currently exploring: cloud-native DevOps, observability, and AI-driven automation.
-            </p>
-          </div>
-
-          <div className="relative rounded-2xl border border-awsGray bg-gradient-to-b from-awsGray/70 to-awsBlack/80 p-5 shadow-2xl shadow-black/60">
-            <div className="flex justify-between items-center mb-4 text-xs text-neutral-300">
-              <span className="font-medium text-awsOrange">Cloud Timeline</span>
-              <span className="text-neutral-500">2021 – 2025</span>
-            </div>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span>AWS Cloud DevOps Intern – Oaktree Innovations</span>
-                <span className="text-neutral-500">2025</span>
-              </div>
-              <p className="text-neutral-400">
-                Deployed and operated full-stack apps with ECS, Docker, GitHub Actions and Terraform.
-              </p>
-
-              <div className="flex justify-between pt-2">
-                <span>PanicSense PH – AI Disaster Intel</span>
-              </div>
-              <p className="text-neutral-400">
-                Real-time sentiment and emotion analysis pipeline for prioritizing high-distress areas.
-              </p>
-
-              <div className="grid grid-cols-3 gap-2 pt-3 text-[11px]">
-                <span className="rounded-md bg-awsBlack/80 border border-awsGray/80 px-2 py-2 text-neutral-300">
-                  <span className="block text-[9px] text-neutral-500">Cloud</span>
-                  AWS · ECS · S3 · Lambda
-                </span>
-                <span className="rounded-md bg-awsBlack/80 border border-awsGray/80 px-2 py-2 text-neutral-300">
-                  <span className="block text-[9px] text-neutral-500">DevOps</span>
-                  Docker · GitHub Actions
-                </span>
-                <span className="rounded-md bg-awsBlack/80 border border-awsGray/80 px-2 py-2 text-neutral-300">
-                  <span className="block text-[9px] text-neutral-500">AI/ML</span>
-                  YOLOv8 · NLP · LLMs
-                </span>
-              </div>
-            </div>
-          </div>
+        {/* Hero — brand: To the clouds. */}
+        <section className="mb-20 md:mb-32">
+          <p className="text-sm font-medium text-awsOrange uppercase tracking-[0.2em] mb-4">
+            To the clouds.
+          </p>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1]">
+            Mark Andrei
+            <br />
+            <span className="text-awsOrange">builds in the cloud.</span>
+          </h1>
+          <p className="mt-6 text-lg text-neutral-400 max-w-lg">
+            {profile?.about ??
+              "Cloud & DevOps. I ship systems that scale and run reliably—from AWS to AI."}
+          </p>
+          <p className="mt-4 text-sm text-neutral-500">
+            Available for work · Philippines
+          </p>
         </section>
 
-        <section id="projects" className="space-y-5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Selected projects</h2>
-            <span className="text-xs text-neutral-500">
-              Cloud, DevOps, AI/ML, and accessibility
-            </span>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-5">
+        {/* Development Stuff. */}
+        <section id="projects" className="mb-20 md:mb-32">
+          <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-8">
+            Development stuff.
+          </h2>
+          <div className="space-y-10">
             {projects.map((project) => (
-              <article
-                key={project.id}
-                className="group rounded-xl border border-awsGray bg-awsGray/40 p-4 text-sm cursor-default transition-all hover:border-awsOrange/80 hover:shadow-glow"
-              >
-                <div className="flex justify-between items-start gap-3">
-                  <div>
-                    <h3 className="font-medium group-hover:text-awsOrange transition-colors">
-                      {project.name}
-                    </h3>
-                    <p className="text-xs text-neutral-400">{project.tagline}</p>
-                  </div>
-                  {project.link && (
-                    <Link
-                      href={project.link}
-                      target="_blank"
-                      className="text-[11px] text-awsOrange hover:underline"
-                    >
-                      View
-                    </Link>
-                  )}
-                </div>
-                <p className="mt-2 text-neutral-300 text-xs">{project.description}</p>
-                <p className="mt-3 text-[11px] text-neutral-400">
+              <article key={project.id} className="group">
+                <h3 className="text-xl font-semibold text-white group-hover:text-awsOrange transition-colors">
+                  {project.name}
+                </h3>
+                <p className="text-sm text-neutral-500 mt-1">
                   {project.techStack}
                 </p>
+                <p className="mt-2 text-neutral-400 text-sm leading-relaxed">
+                  {project.description}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-4">
+                  {project.link && (
+                    <a
+                      href={project.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-awsOrange hover:underline"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Live Demo
+                    </a>
+                  )}
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-awsOrange hover:underline"
+                    >
+                      <Github className="h-3.5 w-3.5" />
+                      Read More
+                    </a>
+                  )}
+                </div>
               </article>
             ))}
           </div>
         </section>
 
-        <section id="gallery" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Gallery</h2>
-            <span className="text-xs text-neutral-500">
-              Snapshots from projects, events, and talks
-            </span>
-          </div>
+        {/* Gallery — only if there are images */}
+        {gallery.length > 0 && (
+          <section className="mb-20 md:mb-32">
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-8">
+              Gallery.
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              {gallery.map((image) => (
+                <div key={image.id} className="aspect-[4/3] rounded overflow-hidden bg-neutral-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={image.url}
+                    alt={image.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {gallery.map((image) => (
-              <div
-                key={image.id}
-                className="relative overflow-hidden rounded-lg border border-awsGray/80 bg-awsGray/40 aspect-[4/3] group hover:scale-[1.02] transition-transform"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={image.url}
-                  alt={image.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="absolute bottom-2 left-2 text-[11px] text-neutral-200">
-                  {image.title}
-                </span>
-              </div>
-            ))}
-          </div>
+        {/* Say hi — portfolio standard */}
+        <section className="mb-20 md:mb-24">
+          <p className="text-sm text-neutral-500">
+            Say hi —{" "}
+            <a href="mailto:andreicastillofficial@gmail.com" className="text-awsOrange hover:underline">
+              andreicastillofficial@gmail.com
+            </a>
+          </p>
         </section>
 
-        <section id="about" className="space-y-4 pb-10">
-          <h2 className="text-lg font-semibold">About & leadership</h2>
-          <div className="grid md:grid-cols-2 gap-8 text-sm text-neutral-300">
-            <div className="space-y-3">
-              <p>
-                {profile?.about ??
-                  "I&apos;m Mark Andrei, a Computer Science graduate with strong experience in DevOps, AI/ML, and full-stack development. I enjoy building cloud-native systems, automating workflows, and turning ideas into reliable products."}
-              </p>
-              <p>
-                I&apos;ve worked across{" "}
-                <span className="text-awsOrange">
-                  AWS, Docker, GitHub Actions, Terraform, YOLOv8, MediaPipe, and modern NLP
-                </span>
-                , and I love combining infrastructure and intelligence to solve real problems.
-              </p>
-            </div>
-            <div className="space-y-2 text-xs text-neutral-400">
-              <p className="text-neutral-300 font-medium">
-                Leadership highlights
-              </p>
-              <ul className="space-y-1 list-disc list-inside">
-                <li>Microsoft Student Community – TSMP & Communications, LORSO Rep</li>
-                <li>AWS Cloud Club – Vice-Chief Relations Officer</li>
-                <li>ICONS – Treasurer, Public Relations Officer, Communications Head</li>
-                <li>League of Recognized Student Organizations – Assistant Secretary & PM</li>
-                <li>UPHSD SHS Alumni Association – Public Information Officer</li>
-              </ul>
-            </div>
-          </div>
-        </section>
+        {/* Footer — To the clouds. branding (no edit link in UI; use /edit to manage) */}
+        <footer className="pt-8 border-t border-neutral-800 text-sm text-neutral-500 flex flex-wrap items-center justify-between gap-4">
+          <span className="flex items-center gap-1.5">
+            <Cloud className="h-4 w-4 text-awsOrange/70" />
+            To the clouds.
+          </span>
+          <span>© {new Date().getFullYear()} Mark Andrei R. Castillo.</span>
+          <span className="text-neutral-600">That&apos;s all for now.</span>
+        </footer>
       </div>
 
       <Chatbot />
     </main>
   );
 }
-

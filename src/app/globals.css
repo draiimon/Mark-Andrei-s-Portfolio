@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 body {
-  @apply bg-awsBlack text-white;
+  @apply bg-black text-white;
+}
+
+::selection {
+  @apply bg-awsOrange/30 text-white;
 }
 
 ::-webkit-scrollbar {
