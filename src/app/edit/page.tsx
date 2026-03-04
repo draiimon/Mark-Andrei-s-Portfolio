@@ -84,7 +84,7 @@ type DragItem = {
 } | null;
 
 async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, init);
+  const res = await fetch(url, { ...init, credentials: "include" });
   if (!res.ok) {
     let message = `Request failed (${res.status})`;
     try {
@@ -181,7 +181,7 @@ export default function EditPage() {
 
   useEffect(() => {
     // Force re-login every time /edit loads (including browser refresh).
-    fetch("/api/admin/logout", { method: "POST" })
+    fetch("/api/admin/logout", { method: "POST", credentials: "include" })
       .finally(() => setAuth(false));
   }, []);
 
@@ -418,11 +418,17 @@ export default function EditPage() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as ApiError;
         setLoginError(data.error || "Invalid credentials");
+        return;
+      }
+      const me = await fetch("/api/edit/me", { credentials: "include" });
+      if (!me.ok) {
+        setLoginError("Login session was not created. Try again.");
         return;
       }
       setAuth(true);
@@ -596,7 +602,7 @@ export default function EditPage() {
               void withSave(async () => {
                 const formData = new FormData();
                 formData.append("file", resumeFile);
-                const res = await fetch("/api/edit/resume", { method: "POST", body: formData });
+                const res = await fetch("/api/edit/resume", { method: "POST", body: formData, credentials: "include" });
                 if (!res.ok) {
                   const data = (await res.json().catch(() => ({}))) as ApiError;
                   throw new Error(data.error || `Upload failed (${res.status})`);
