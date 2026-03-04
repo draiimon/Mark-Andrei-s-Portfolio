@@ -178,11 +178,25 @@ export default function EditPage() {
   const [newTagline, setNewTagline] = useState({ text: "" });
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [socialPreviewFile, setSocialPreviewFile] = useState<File | null>(null);
+  const [mediaStatus, setMediaStatus] = useState<{ hasFavicon: boolean; hasSocial: boolean }>({
+    hasFavicon: false,
+    hasSocial: false
+  });
 
   useEffect(() => {
-    // Force re-login every time /edit loads (including browser refresh).
-    fetch("/api/admin/logout", { method: "POST", credentials: "include" })
-      .finally(() => setAuth(false));
+    // Validate existing edit session on load.
+    fetch("/api/edit/me", { credentials: "include" })
+      .then((res) => {
+        if (res.ok) {
+          setAuth(true);
+          void loadData();
+          return;
+        }
+        setAuth(false);
+      })
+      .catch(() => setAuth(false));
   }, []);
 
   async function loadData() {
@@ -195,12 +209,14 @@ export default function EditPage() {
         apiJson<Achievement[]>("/api/edit/achievements"),
         apiJson<Tagline[]>("/api/edit/taglines")
       ]);
+      const media = await apiJson<{ hasFavicon: boolean; hasSocial: boolean }>("/api/edit/site-media");
       setProfile(p);
       setProjects(proj || []);
       setExperience(exp || []);
       setLeadership(lead || []);
       setAchievements(ach || []);
       setTaglines(tgs || []);
+      setMediaStatus({ hasFavicon: !!media?.hasFavicon, hasSocial: !!media?.hasSocial });
       if (p) {
         setProfileForm({
           fullName: p.fullName || "",
@@ -232,7 +248,13 @@ export default function EditPage() {
       }
       setError("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load data");
+      const message = e instanceof Error ? e.message : "Failed to load data";
+      if (message.toLowerCase().includes("unauthorized")) {
+        setAuth(false);
+        setError("Session expired. Please sign in again.");
+        return;
+      }
+      setError(message);
     }
   }
 
@@ -245,7 +267,13 @@ export default function EditPage() {
       setSuccess(message);
       await loadData();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
+      const message = e instanceof Error ? e.message : "Save failed";
+      if (message.toLowerCase().includes("unauthorized")) {
+        setAuth(false);
+        setError("Session expired. Please sign in again.");
+      } else {
+        setError(message);
+      }
     } finally {
       setSaving(false);
     }
@@ -710,65 +738,234 @@ export default function EditPage() {
 
               <div className="rounded-xl border border-white/10 bg-black/25 p-4">
                 <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-400">Links and Bio</p>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Email</span>
-                    <input
-                      type="email"
-                      value={profileForm.email}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, email: e.target.value }))}
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">LinkedIn URL</span>
-                    <input
-                      type="url"
-                      value={profileForm.linkedinUrl}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, linkedinUrl: e.target.value }))}
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Tab Title</span>
-                    <input
-                      type="text"
-                      value={profileForm.tabTitle}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, tabTitle: e.target.value }))}
-                      placeholder="To the clouds. - Mark Andrei"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1 sm:col-span-2">
-                    <span className="text-xs text-neutral-400">Favicon URL (PNG/SVG)</span>
-                    <input
-                      type="url"
-                      value={profileForm.faviconUrl}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, faviconUrl: e.target.value }))}
-                      placeholder="https://.../logo.png"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1 sm:col-span-2">
-                    <span className="text-xs text-neutral-400">Linked Preview Image URL (OpenGraph/Twitter)</span>
-                    <input
-                      type="url"
-                      value={profileForm.socialImageUrl}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, socialImageUrl: e.target.value }))}
-                      placeholder="https://.../preview.jpg"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1 sm:col-span-2">
-                    <span className="text-xs text-neutral-400">GitHub URL</span>
-                    <input
-                      type="url"
-                      value={profileForm.github}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, github: e.target.value }))}
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1 sm:col-span-2">
+                <div className="mb-4">
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-500">Primary Links</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Email</span>
+                      <input
+                        type="email"
+                        value={profileForm.email}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, email: e.target.value }))}
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">LinkedIn URL</span>
+                      <input
+                        type="url"
+                        value={profileForm.linkedinUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, linkedinUrl: e.target.value }))}
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1 md:col-span-2">
+                      <span className="text-xs text-neutral-400">GitHub URL</span>
+                      <input
+                        type="url"
+                        value={profileForm.github}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, github: e.target.value }))}
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-500">Browser and Share Meta</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Tab Title</span>
+                      <input
+                        type="text"
+                        value={profileForm.tabTitle}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, tabTitle: e.target.value }))}
+                        placeholder="To the clouds. - Mark Andrei"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Contact Label</span>
+                      <input
+                        type="text"
+                        value={profileForm.contactLabel}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, contactLabel: e.target.value }))}
+                        placeholder="Say hi -"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1 md:col-span-2">
+                      <span className="text-xs text-neutral-400">Favicon URL (PNG/SVG)</span>
+                      <input
+                        type="url"
+                        value={profileForm.faviconUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, faviconUrl: e.target.value }))}
+                        placeholder="https://.../logo.png"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1 md:col-span-2">
+                      <span className="text-xs text-neutral-400">Linked Preview Image URL (OpenGraph/Twitter)</span>
+                      <input
+                        type="url"
+                        value={profileForm.socialImageUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, socialImageUrl: e.target.value }))}
+                        placeholder="https://.../preview.jpg"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <div className="rounded-lg border border-white/10 bg-black/35 p-3 md:col-span-2">
+                      <p className="mb-2 text-xs text-neutral-300">Upload images (saved in database)</p>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <form
+                          className="space-y-2"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (!faviconFile) return;
+                            void withSave(async () => {
+                              const formData = new FormData();
+                              formData.append("key", "favicon");
+                              formData.append("file", faviconFile);
+                              const res = await fetch("/api/edit/site-media", {
+                                method: "POST",
+                                body: formData,
+                                credentials: "include"
+                              });
+                              if (!res.ok) {
+                                const data = (await res.json().catch(() => ({}))) as ApiError;
+                                throw new Error(data.error || "Failed to upload favicon");
+                              }
+                              setFaviconFile(null);
+                            }, "Favicon uploaded.");
+                          }}
+                        >
+                          <label className="block space-y-1">
+                            <span className="text-xs text-neutral-400">Icon Upload (PNG recommended)</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
+                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+                            />
+                          </label>
+                          <p className="text-[11px] text-neutral-500">
+                            Current: {mediaStatus.hasFavicon ? "DB image set" : "not set"}
+                          </p>
+                          <button type="submit" disabled={saving || !faviconFile} className="rounded-lg bg-awsOrange px-3 py-2 text-xs font-medium text-black disabled:opacity-60">
+                            Upload icon
+                          </button>
+                        </form>
+                        <form
+                          className="space-y-2"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (!socialPreviewFile) return;
+                            void withSave(async () => {
+                              const formData = new FormData();
+                              formData.append("key", "social");
+                              formData.append("file", socialPreviewFile);
+                              const res = await fetch("/api/edit/site-media", {
+                                method: "POST",
+                                body: formData,
+                                credentials: "include"
+                              });
+                              if (!res.ok) {
+                                const data = (await res.json().catch(() => ({}))) as ApiError;
+                                throw new Error(data.error || "Failed to upload social preview");
+                              }
+                              setSocialPreviewFile(null);
+                            }, "Linked preview image uploaded.");
+                          }}
+                        >
+                          <label className="block space-y-1">
+                            <span className="text-xs text-neutral-400">Linked Preview Upload</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setSocialPreviewFile(e.target.files?.[0] ?? null)}
+                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+                            />
+                          </label>
+                          <p className="text-[11px] text-neutral-500">
+                            Current: {mediaStatus.hasSocial ? "DB image set" : "not set"}
+                          </p>
+                          <button type="submit" disabled={saving || !socialPreviewFile} className="rounded-lg bg-awsOrange px-3 py-2 text-xs font-medium text-black disabled:opacity-60">
+                            Upload preview
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="mb-2 text-[10px] uppercase tracking-[0.14em] text-neutral-500">Homepage Labels</p>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Featured Section Title</span>
+                      <input
+                        type="text"
+                        value={profileForm.featuredLabel}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, featuredLabel: e.target.value }))}
+                        placeholder="Featured Work"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Experience Section Title</span>
+                      <input
+                        type="text"
+                        value={profileForm.experienceTitle}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, experienceTitle: e.target.value }))}
+                        placeholder="Experience Snapshot"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1 md:col-span-2">
+                      <span className="text-xs text-neutral-400">Leadership Section Title</span>
+                      <input
+                        type="text"
+                        value={profileForm.leadershipTitle}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, leadershipTitle: e.target.value }))}
+                        placeholder="Leadership and Community Activities"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Achievements Section Title</span>
+                      <input
+                        type="text"
+                        value={profileForm.achievementsTitle}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, achievementsTitle: e.target.value }))}
+                        placeholder="Achievements"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Footer Center Text</span>
+                      <input
+                        type="text"
+                        value={profileForm.footerCenterText}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, footerCenterText: e.target.value }))}
+                        placeholder="@2026 draiimon"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1 md:col-span-2">
+                      <span className="text-xs text-neutral-400">Footer Right Text</span>
+                      <input
+                        type="text"
+                        value={profileForm.footerRightText}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, footerRightText: e.target.value }))}
+                        placeholder="Thank you!"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="space-y-1 md:col-span-2">
                     <span className="text-xs text-neutral-400">About</span>
                     <textarea
                       value={profileForm.about}
@@ -777,77 +974,7 @@ export default function EditPage() {
                       className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                     />
                   </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Featured Section Title</span>
-                    <input
-                      type="text"
-                      value={profileForm.featuredLabel}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, featuredLabel: e.target.value }))}
-                      placeholder="Featured Work"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Experience Section Title</span>
-                    <input
-                      type="text"
-                      value={profileForm.experienceTitle}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, experienceTitle: e.target.value }))}
-                      placeholder="Experience Snapshot"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1 sm:col-span-2">
-                    <span className="text-xs text-neutral-400">Leadership Section Title</span>
-                    <input
-                      type="text"
-                      value={profileForm.leadershipTitle}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, leadershipTitle: e.target.value }))}
-                      placeholder="Leadership and Community Activities"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Achievements Section Title</span>
-                    <input
-                      type="text"
-                      value={profileForm.achievementsTitle}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, achievementsTitle: e.target.value }))}
-                      placeholder="Achievements"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Contact Label</span>
-                    <input
-                      type="text"
-                      value={profileForm.contactLabel}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, contactLabel: e.target.value }))}
-                      placeholder="Say hi -"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Footer Center Text</span>
-                    <input
-                      type="text"
-                      value={profileForm.footerCenterText}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, footerCenterText: e.target.value }))}
-                      placeholder="@2026 draiimon"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-xs text-neutral-400">Footer Right Text</span>
-                    <input
-                      type="text"
-                      value={profileForm.footerRightText}
-                      onChange={(e) => setProfileForm((p) => ({ ...p, footerRightText: e.target.value }))}
-                      placeholder="Thank you!"
-                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                    />
-                  </label>
-                  <label className="space-y-1 sm:col-span-2">
+                  <label className="space-y-1 md:col-span-2">
                     <span className="text-xs text-neutral-400">AI Behavior Instructions</span>
                     <textarea
                       value={profileForm.aiBehaviorPrompt}
