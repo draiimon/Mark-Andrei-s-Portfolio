@@ -101,6 +101,20 @@ export default async function Home() {
               >
                 GitHub
               </Link>
+              <Link
+                href="https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/"
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-md border border-awsGray px-4 py-2 text-sm text-neutral-200 hover:border-awsOrange hover:text-awsOrange transition-colors"
+              >
+                LinkedIn
+              </Link>
+              <Link
+                href="https://www.facebook.com/masoncalix/"
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-md border border-awsGray px-4 py-2 text-sm text-neutral-200 hover:border-awsOrange hover:text-awsOrange transition-colors"
+              >
+                Facebook
+              </Link>
             </div>
 
             <p className="text-xs text-neutral-500 pt-2">

@@ -8,7 +8,9 @@ Name: Mark Andrei R. Castillo
 Location: #30 Coconut Street, Wood Estate Village 2, Molino 3, Bacoor City, Cavite
 Phone: +63 953 852 1829
 Email: andreicastillofficial@gmail.com
-GitHub: github.com/draiimon
+GitHub: https://github.com/draiimon
+LinkedIn: https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/
+Facebook: https://www.facebook.com/masoncalix/
 
 Objective:
 Self-driven Computer Science graduate with strong leadership experience and hands-on expertise in DevOps, full-stack development, and AI/ML. Passionate about building impactful digital solutions and eager to contribute to transformative tech projects while continuing to grow professionally.
