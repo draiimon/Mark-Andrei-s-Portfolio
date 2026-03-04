@@ -14,30 +14,11 @@ export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-        "Hi, I am Andrei's assistant. I can help with his skills, experience, projects, resume, and contact links."
+      content: "Hi! Ask me anything about Mark Andrei's skills, projects, experience, or contact."
     }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const suggestions = [
-    { label: "Open resume", link: "/api/resume" },
-    { label: "Skills summary", query: "Give me a short skills summary for Mark Andrei." },
-    { label: "Project highlights", query: "What are Mark Andrei's best project highlights?" },
-    { label: "Experience", query: "What is Mark Andrei's education and work experience?" },
-    { label: "Contact links", query: "How can I contact Mark Andrei and where can I find his profiles?" }
-  ];
-
-  function handleSuggestion(item: (typeof suggestions)[0]) {
-    if ("link" in item && item.link) {
-      window.open(item.link, "_blank");
-      return;
-    }
-    if ("query" in item && item.query) {
-      setInput(item.query);
-    }
-  }
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
@@ -74,13 +55,13 @@ export default function Chatbot() {
   return (
     <div className="fixed bottom-5 right-5 z-50">
       {open && (
-        <div className="glass-card mb-3 flex max-h-[34rem] w-[23rem] flex-col overflow-hidden rounded-2xl shadow-2xl shadow-black/70">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-            <span className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-100">
-              <Bot className="h-4 w-4 text-awsOrange" />
-              Andrei Assistant
+        <div className="mb-3 flex max-h-[34rem] w-[23rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-400/20">
+          <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800">
+              <Bot className="h-4 w-4 text-amber-600" />
+              Ask my AI
             </span>
-            <button onClick={() => setOpen(false)} className="rounded p-1 text-neutral-300 transition hover:text-awsOrange" aria-label="Close chat">
+            <button onClick={() => setOpen(false)} className="rounded p-1 text-slate-400 transition hover:text-amber-600" aria-label="Close chat">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -91,47 +72,31 @@ export default function Chatbot() {
                 <div
                   className={`max-w-[92%] rounded-xl px-3 py-2.5 ${
                     m.role === "user"
-                      ? "bg-awsOrange text-awsBlack"
-                      : "border border-white/10 bg-white/5 text-neutral-100"
+                      ? "bg-amber-500 text-slate-900"
+                      : "border border-slate-200 bg-slate-50 text-slate-700"
                   }`}
                 >
                   {m.role === "user" ? (
                     <span className="whitespace-pre-wrap break-words">{m.content}</span>
                   ) : (
-                    <div className="prose prose-invert prose-sm max-w-none [&>*]:my-1 [&_strong]:text-awsOrange [&_ul]:pl-4">
+                    <div className="prose prose-sm max-w-none [&>*]:my-1 [&_strong]:text-amber-700 [&_ul]:pl-4">
                       <ReactMarkdown>{m.content}</ReactMarkdown>
                     </div>
                   )}
                 </div>
               </div>
             ))}
-            {loading && <p className="text-xs text-neutral-400">Thinking...</p>}
-
-            <div className="space-y-2 pt-2">
-              <p className="text-[11px] uppercase tracking-wider text-neutral-400">Quick actions</p>
-              <div className="flex flex-wrap gap-1.5">
-                {suggestions.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => handleSuggestion(item)}
-                    className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1.5 text-[11px] text-neutral-200 transition hover:border-awsOrange/70 hover:text-awsOrange"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {loading && <p className="text-xs text-slate-400">Thinking...</p>}
           </div>
 
-          <form onSubmit={sendMessage} className="flex items-center gap-2 border-t border-white/10 px-4 py-3">
+          <form onSubmit={sendMessage} className="flex items-center gap-2 border-t border-slate-200 px-4 py-3">
             <input
-              className="flex-1 rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-awsOrange"
-              placeholder="Ask about skills, projects, resume..."
+              className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              placeholder="Ask anything about Mark Andrei..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <button type="submit" disabled={loading} className="rounded-lg bg-awsOrange px-4 py-2 text-sm font-medium text-awsBlack transition hover:brightness-110 disabled:opacity-60">
+            <button type="submit" disabled={loading} className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-slate-900 transition hover:brightness-110 disabled:opacity-60">
               Send
             </button>
           </form>
@@ -140,10 +105,10 @@ export default function Chatbot() {
 
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 rounded-full bg-awsOrange px-4 py-2.5 text-sm font-semibold text-awsBlack shadow-lg shadow-awsOrange/30 transition hover:brightness-110"
+        className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-900 shadow-lg shadow-amber-300/60 transition hover:brightness-105"
       >
         <MessageCircle className="h-5 w-5" />
-        <span>Ask Andrei AI</span>
+        <span>Ask my AI</span>
       </button>
     </div>
   );
