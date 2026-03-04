@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
@@ -25,11 +25,22 @@ export default function OpenGraphImage() {
           color: "#ffffff"
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div style={{ fontSize: 72, fontWeight: 900, lineHeight: 1.05 }}>
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            border: "1px solid rgba(255,255,255,0.14)",
+            borderRadius: 32,
+            padding: "26px 30px",
+            background: "rgba(255,255,255,0.04)"
+          }}
+        >
+          <div style={{ fontSize: 68, fontWeight: 900, lineHeight: 1.04 }}>
             Mark Andrei,
-            <div style={{ fontSize: 44, fontWeight: 700, color: "#ff9900", marginTop: 14 }}>
-              To the clouds.
+            <div style={{ fontSize: 36, fontWeight: 700, color: "#ff9900", marginTop: 14 }}>
+              DevOps & Software Developer
             </div>
           </div>
           <div
@@ -49,17 +60,27 @@ export default function OpenGraphImage() {
             MA
           </div>
         </div>
-        <div style={{ fontSize: 29, color: "#d5d9e0", marginTop: 28, maxWidth: "88%", lineHeight: 1.36 }}>
-          Entry-level DevOps and Software Developer focused on building practical applications and reliable systems.
+        <div style={{ fontSize: 28, color: "#e4e8ef", marginTop: 24, maxWidth: "90%", lineHeight: 1.36 }}>
+          Entry-level DevOps and Software Developer focused on practical applications, reliable systems, and continuous growth through hands-on work.
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-          <div style={{ fontSize: 22, color: "#ffcc84", fontWeight: 600 }}>
-            Leadership • DevOps • Software Development
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            borderTop: "1px solid rgba(255,255,255,0.12)",
+            paddingTop: 20
+          }}
+        >
+          <div style={{ fontSize: 21, color: "#ffcc84", fontWeight: 600 }}>
+            To the clouds. - Portfolio
           </div>
-          <div style={{ fontSize: 22, color: "#c9ced6" }}>mark-andrei-portfolio.onrender.com</div>
+          <div style={{ fontSize: 20, color: "#c9ced6" }}>mark-andrei-portfolio.onrender.com</div>
         </div>
       </div>
     ),
     size
   );
 }
+

@@ -1,4 +1,4 @@
-import Chatbot from "@/components/Chatbot";
+﻿import Chatbot from "@/components/Chatbot";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
@@ -72,17 +72,17 @@ export default function Home() {
           <h1 className="font-display text-4xl font-black leading-[1.05] sm:text-5xl md:text-7xl">
             <strong>Mark Andrei,</strong>
           </h1>
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-amber-400">
+          <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
+            <p className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.06em] text-amber-400 sm:gap-2 sm:text-sm sm:tracking-[0.18em]">
               <span className="h-2 w-2 rounded-full bg-amber-400" />
               Available for work
             </p>
-            <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.12em] text-slate-200">
+            <p className="inline-flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.03em] text-slate-200 sm:gap-2 sm:text-sm sm:tracking-[0.12em]">
               <span className="h-2 w-2 rounded-full bg-slate-200" />
               Graduated With Honor Distinction
             </p>
           </div>
-          <p className="mt-2 text-xl font-semibold text-white sm:text-2xl md:text-3xl">
+          <p className="mt-2 w-full overflow-hidden text-xl font-semibold text-white sm:text-2xl md:text-3xl">
             <TypewriterTagline />
           </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">
@@ -183,7 +183,7 @@ export default function Home() {
         <footer className="mt-3 border-t border-white/10 pt-6 text-[11px] text-slate-300 sm:text-sm md:text-base">
           <div className="mt-2 grid grid-cols-3 items-center gap-2">
             <span className="text-left">To the clouds.</span>
-            <span className="text-center">© 2026 Mark Andrei R. Castillo.</span>
+            <span className="text-center">@2026 draiimon</span>
             <span className="text-right">Thank you!</span>
           </div>
         </footer>
@@ -193,3 +193,6 @@ export default function Home() {
     </main>
   );
 }
+
+
+

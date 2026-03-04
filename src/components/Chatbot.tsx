@@ -9,6 +9,12 @@ type Message = {
   content: string;
 };
 
+function normalizeAssistantMarkdown(text: string) {
+  return text
+    .replace(/^[•●◦]\s?/gm, "- ")
+    .replace(/\r\n/g, "\n");
+}
+
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -79,8 +85,8 @@ export default function Chatbot() {
                   {m.role === "user" ? (
                     <span className="whitespace-pre-wrap break-words">{m.content}</span>
                   ) : (
-                    <div className="prose prose-sm max-w-none [&>*]:my-1 [&_strong]:text-amber-700 [&_ul]:pl-4">
-                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                    <div className="prose prose-sm max-w-none text-slate-700 [&>*]:my-1 [&_strong]:text-amber-700 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:my-0.5 [&_p]:leading-relaxed">
+                      <ReactMarkdown>{normalizeAssistantMarkdown(m.content)}</ReactMarkdown>
                     </div>
                   )}
                 </div>

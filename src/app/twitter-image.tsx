@@ -1,4 +1,4 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
@@ -54,7 +54,7 @@ export default function TwitterImage() {
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
           <div style={{ fontSize: 20, color: "#ffcc84", fontWeight: 600 }}>
-            DevOps • Software Developer • Leadership
+            DevOps - Software Developer - Leadership
           </div>
           <div style={{ fontSize: 20, color: "#c9ced6" }}>Portfolio Preview</div>
         </div>
@@ -63,3 +63,4 @@ export default function TwitterImage() {
     size
   );
 }
+

@@ -75,6 +75,9 @@ Output style:
 - For "who are you?" style prompts, reply in 2-4 lines friendly tone.
 - For career questions, include "best next 3 steps" whenever useful.
 - Default to saying "based in the Philippines" for location unless user explicitly asks for city.
+- Use plain markdown lists with "-" or numbered "1. 2. 3." only.
+- Avoid markdown tables unless user explicitly asks for a table.
+- For job-search questions, group channels by category and include short reason + next step.
 `;
 
 export async function POST(req: NextRequest) {

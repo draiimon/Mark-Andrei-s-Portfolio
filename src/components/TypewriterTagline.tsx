@@ -3,15 +3,11 @@
 import { useEffect, useState } from "react";
 
 const TAGLINES = [
-  "builds reliable DevOps workflows.",
+  "builds practical DevOps workflows.",
   "ships clean full-stack applications.",
-  "leads teams with service.",
-  "improves systems through practical automation.",
-  "turns ideas into usable web solutions.",
-  "learns fast and applies feedback quickly.",
-  "delivers projects with consistency and ownership.",
-  "focuses on reliability, clarity, and impact.",
-  "supports teams with communication and execution."
+  "creates reliable software systems.",
+  "leads teams with service and focus.",
+  "improves delivery through automation."
 ];
 
 export default function TypewriterTagline() {
@@ -47,7 +43,7 @@ export default function TypewriterTagline() {
 
   return (
     <span className="typewriter-shell" aria-live="polite">
-      <span className="typewriter-reserve">supports teams with communication and execution.</span>
+      <span className="typewriter-reserve">improves delivery through automation.</span>
       <span className="typewriter-wrap">
         {text}
         <span className="type-caret" />
