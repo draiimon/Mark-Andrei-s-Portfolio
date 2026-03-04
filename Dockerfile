@@ -1,11 +1,7 @@
-# Build stage: install deps, run migrations, build Next
+# Build stage: install deps and build Next
 FROM node:20-alpine AS builder
 
 WORKDIR /app
-
-# Render passes env vars at build; Docker needs them as build-args
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
 
 COPY package.json package-lock.json* ./
 RUN npm install
