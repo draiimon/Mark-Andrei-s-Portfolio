@@ -3,6 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Render passes env vars at build; Docker needs them as build-args
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 COPY package.json package-lock.json* ./
 RUN npm install
 
@@ -11,7 +15,6 @@ RUN npx prisma generate
 
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-# DATABASE_URL required for migrate; set at build time on Render
 RUN npx prisma migrate deploy && npm run build
 
 # Run stage: serve with Node
