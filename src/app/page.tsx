@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Chatbot from "@/components/Chatbot";
 
@@ -19,12 +18,7 @@ export default async function Home() {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-10 space-y-20">
         <header className="flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center gap-3"
-          >
+          <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-full bg-gradient-to-br from-awsOrange to-awsGray shadow-glow flex items-center justify-center text-xs font-semibold">
               MC
             </div>
@@ -36,7 +30,7 @@ export default async function Home() {
                 {profile?.fullName ?? "Mark Andrei R. Castillo"}
               </p>
             </div>
-          </motion.div>
+          </div>
 
           <nav className="flex gap-6 text-xs text-neutral-300">
             <a href="#projects" className="hover:text-awsOrange transition-colors">
@@ -52,12 +46,7 @@ export default async function Home() {
         </header>
 
         <section className="grid md:grid-cols-[1.3fr,1fr] gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="space-y-6"
-          >
+          <div className="space-y-6">
             <p className="inline-flex items-center gap-2 rounded-full border border-awsGray/60 bg-awsGray/40 px-3 py-1 text-xs text-neutral-200 shadow-lg shadow-black/40">
               <span className="h-1.5 w-1.5 rounded-full bg-awsOrange animate-pulse" />
               Open to Cloud / DevOps & AI roles
@@ -120,14 +109,9 @@ export default async function Home() {
             <p className="text-xs text-neutral-500 pt-2">
               Currently exploring: cloud-native DevOps, observability, and AI-driven automation.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 15 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
-            className="relative rounded-2xl border border-awsGray bg-gradient-to-b from-awsGray/70 to-awsBlack/80 p-5 shadow-2xl shadow-black/60"
-          >
+          <div className="relative rounded-2xl border border-awsGray bg-gradient-to-b from-awsGray/70 to-awsBlack/80 p-5 shadow-2xl shadow-black/60">
             <div className="flex justify-between items-center mb-4 text-xs text-neutral-300">
               <span className="font-medium text-awsOrange">Cloud Timeline</span>
               <span className="text-neutral-500">2021 – 2025</span>
@@ -163,7 +147,7 @@ export default async function Home() {
                 </span>
               </div>
             </div>
-          </motion.div>
+          </div>
         </section>
 
         <section id="projects" className="space-y-5">
@@ -176,9 +160,8 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-2 gap-5">
             {projects.map((project) => (
-              <motion.article
+              <article
                 key={project.id}
-                whileHover={{ y: -4 }}
                 className="group rounded-xl border border-awsGray bg-awsGray/40 p-4 text-sm cursor-default transition-all hover:border-awsOrange/80 hover:shadow-glow"
               >
                 <div className="flex justify-between items-start gap-3">
@@ -202,7 +185,7 @@ export default async function Home() {
                 <p className="mt-3 text-[11px] text-neutral-400">
                   {project.techStack}
                 </p>
-              </motion.article>
+              </article>
             ))}
           </div>
         </section>
@@ -217,10 +200,9 @@ export default async function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {gallery.map((image) => (
-              <motion.div
+              <div
                 key={image.id}
-                whileHover={{ scale: 1.02 }}
-                className="relative overflow-hidden rounded-lg border border-awsGray/80 bg-awsGray/40 aspect-[4/3] group"
+                className="relative overflow-hidden rounded-lg border border-awsGray/80 bg-awsGray/40 aspect-[4/3] group hover:scale-[1.02] transition-transform"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -232,7 +214,7 @@ export default async function Home() {
                 <span className="absolute bottom-2 left-2 text-[11px] text-neutral-200">
                   {image.title}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
