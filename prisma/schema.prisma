@@ -29,6 +29,8 @@ model Profile {
   availability  String?  /// e.g. "Available for work · Philippines"
   brandName     String?  /// e.g. "To the clouds."
   heroTagline   String?  /// e.g. "builds in the cloud."
+  tabTitle      String?
+  faviconUrl    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -96,3 +98,4 @@ model Tagline {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+

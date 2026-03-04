@@ -19,6 +19,8 @@ type Profile = {
   availability: string | null;
   brandName: string | null;
   heroTagline: string | null;
+  tabTitle: string | null;
+  faviconUrl: string | null;
   updatedAt?: string;
 } | null;
 
@@ -121,7 +123,9 @@ export default function EditPage() {
     skills: "",
     availability: "",
     brandName: "",
-    heroTagline: ""
+    heroTagline: "",
+    tabTitle: "",
+    faviconUrl: ""
   });
 
   const [newProject, setNewProject] = useState({
@@ -194,7 +198,9 @@ export default function EditPage() {
           skills: p.skills || "",
           availability: p.availability || "",
           brandName: p.brandName || "",
-          heroTagline: p.heroTagline || ""
+          heroTagline: p.heroTagline || "",
+          tabTitle: p.tabTitle || "",
+          faviconUrl: p.faviconUrl || ""
         });
       }
       setError("");
@@ -609,7 +615,9 @@ export default function EditPage() {
                     facebookUrl: profileForm.facebookUrl || null,
                     availability: profileForm.availability || null,
                     brandName: profileForm.brandName || null,
-                    heroTagline: profileForm.heroTagline || null
+                    heroTagline: profileForm.heroTagline || null,
+                    tabTitle: profileForm.tabTitle || null,
+                    faviconUrl: profileForm.faviconUrl || null
                   })
                 });
               }, "Profile updated.");
@@ -676,6 +684,26 @@ export default function EditPage() {
                       type="url"
                       value={profileForm.linkedinUrl}
                       onChange={(e) => setProfileForm((p) => ({ ...p, linkedinUrl: e.target.value }))}
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Tab Title</span>
+                    <input
+                      type="text"
+                      value={profileForm.tabTitle}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, tabTitle: e.target.value }))}
+                      placeholder="To the clouds. - Mark Andrei"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1 sm:col-span-2">
+                    <span className="text-xs text-neutral-400">Favicon URL (PNG/SVG)</span>
+                    <input
+                      type="url"
+                      value={profileForm.faviconUrl}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, faviconUrl: e.target.value }))}
+                      placeholder="https://.../logo.png"
                       className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                     />
                   </label>

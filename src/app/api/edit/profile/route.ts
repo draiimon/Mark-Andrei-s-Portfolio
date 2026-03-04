@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
     skills: String(body.skills ?? ""),
     availability: body.availability ? String(body.availability) : null,
     brandName: body.brandName ? String(body.brandName) : null,
-    heroTagline: body.heroTagline ? String(body.heroTagline) : null
+    heroTagline: body.heroTagline ? String(body.heroTagline) : null,
+    tabTitle: body.tabTitle ? String(body.tabTitle) : null,
+    faviconUrl: body.faviconUrl ? String(body.faviconUrl) : null
   };
   const existing = await prisma.profile.findFirst();
   const profile = existing

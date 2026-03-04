@@ -2,6 +2,7 @@ import "@/app/globals.css";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Manrope, Sora } from "next/font/google";
+import ClientTabMeta from "@/components/ClientTabMeta";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -54,7 +55,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${bodyFont.variable} ${displayFont.variable} font-body antialiased`}>{children}</body>
+      <body className={`${bodyFont.variable} ${displayFont.variable} font-body antialiased`}>
+        <ClientTabMeta />
+        {children}
+      </body>
     </html>
   );
 }
