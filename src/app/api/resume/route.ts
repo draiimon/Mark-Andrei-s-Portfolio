@@ -6,7 +6,8 @@ export async function GET() {
   if (!resume) {
     return new NextResponse("Resume not uploaded yet. Add one at /edit.", { status: 404 });
   }
-  return new NextResponse(resume.content, {
+  const pdf = new Blob([resume.content], { type: "application/pdf" });
+  return new NextResponse(pdf, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="${resume.fileName}"`
