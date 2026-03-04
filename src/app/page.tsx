@@ -5,6 +5,9 @@ import TypewriterTagline from "@/components/TypewriterTagline";
 import { prisma } from "@/lib/prisma";
 import { ExternalLink, Github } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   const [profile, projects, experience, leadership, achievements, taglines] = await Promise.all([
     prisma.profile.findFirst(),
