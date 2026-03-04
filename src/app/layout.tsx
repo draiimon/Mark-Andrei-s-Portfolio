@@ -19,12 +19,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "To the clouds. - Mark Andrei Castillo",
   description:
-    "Entry-level Cloud and Developer portfolio of Mark Andrei Castillo focused on reliable systems and practical applications.",
+    "Entry-level DevOps and Software Developer portfolio of Mark Andrei Castillo focused on practical applications and reliable systems.",
   openGraph: {
-    title: "Mark Andrei - To the clouds.",
+    title: "Mark Andrei, To the clouds.",
     description:
-      "Entry-level Cloud and Developer portfolio focused on practical projects, DevOps growth, and reliable delivery.",
-    url: "/",
+      "Entry-level DevOps and Software Developer focused on practical applications, reliable systems, and continuous learning.",
+    url: siteUrl,
     siteName: "Mark Andrei Portfolio",
     images: [
       {
@@ -39,9 +39,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mark Andrei - To the clouds.",
+    title: "Mark Andrei, To the clouds.",
     description:
-      "Entry-level Cloud and Developer portfolio focused on practical projects, DevOps growth, and reliable delivery.",
+      "Entry-level DevOps and Software Developer portfolio focused on practical applications and reliable systems.",
     images: ["/twitter-image"]
   },
   icons: {

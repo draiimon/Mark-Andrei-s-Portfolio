@@ -17,22 +17,46 @@ export default function TwitterImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          alignItems: "stretch",
+          justifyContent: "space-between",
           padding: "72px",
           background:
-            "radial-gradient(circle at 80% 24%, rgba(255,153,0,0.26), transparent 34%), linear-gradient(165deg, #080a0e 0%, #121722 100%)",
+            "radial-gradient(circle at 78% 18%, rgba(255,153,0,0.3), transparent 36%), radial-gradient(circle at 18% 82%, rgba(255,255,255,0.1), transparent 34%), linear-gradient(165deg, #080a0e 0%, #121722 100%)",
           color: "#ffffff"
         }}
       >
-        <div style={{ fontSize: 68, fontWeight: 900, lineHeight: 1.06 }}>
-          Mark Andrei
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div style={{ fontSize: 66, fontWeight: 900, lineHeight: 1.06 }}>
+            Mark Andrei,
+            <div style={{ fontSize: 38, fontWeight: 700, color: "#ff9900", marginTop: 12 }}>
+              To the clouds.
+            </div>
+          </div>
+          <div
+            style={{
+              width: 128,
+              height: 128,
+              borderRadius: 28,
+              border: "2px solid rgba(255,153,0,0.58)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#ff9900",
+              fontSize: 58,
+              fontWeight: 900
+            }}
+          >
+            MA
+          </div>
         </div>
-        <div style={{ fontSize: 40, fontWeight: 700, color: "#ff9900", marginTop: 12 }}>
-          Cloud + Dev Portfolio
+        <div style={{ fontSize: 28, color: "#d5d9e0", marginTop: 24, lineHeight: 1.36, maxWidth: "88%" }}>
+          Entry-level DevOps and Software Developer focused on practical applications, reliable systems, and continuous growth.
         </div>
-        <div style={{ fontSize: 28, color: "#d5d9e0", marginTop: 24 }}>
-          Practical projects, strong growth mindset, and reliable delivery.
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div style={{ fontSize: 20, color: "#ffcc84", fontWeight: 600 }}>
+            DevOps • Software Developer • Leadership
+          </div>
+          <div style={{ fontSize: 20, color: "#c9ced6" }}>Portfolio Preview</div>
         </div>
       </div>
     ),

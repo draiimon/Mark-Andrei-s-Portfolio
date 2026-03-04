@@ -53,9 +53,9 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-50">
+    <div className="fixed bottom-3 right-3 z-50 sm:bottom-5 sm:right-5">
       {open && (
-        <div className="mb-3 flex max-h-[34rem] w-[23rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-400/20">
+        <div className="mb-3 flex max-h-[34rem] w-[min(23rem,calc(100vw-1.25rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-400/20">
           <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800">
               <Bot className="h-4 w-4 text-amber-600" />

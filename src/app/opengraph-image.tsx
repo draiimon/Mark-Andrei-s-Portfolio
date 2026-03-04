@@ -17,22 +17,46 @@ export default function OpenGraphImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          alignItems: "stretch",
+          justifyContent: "space-between",
           padding: "72px",
           background:
-            "radial-gradient(circle at 85% 20%, rgba(255,153,0,0.28), transparent 34%), radial-gradient(circle at 20% 85%, rgba(255,255,255,0.12), transparent 40%), linear-gradient(170deg, #050608 0%, #0f131a 100%)",
+            "radial-gradient(circle at 82% 18%, rgba(255,153,0,0.3), transparent 34%), radial-gradient(circle at 14% 84%, rgba(255,255,255,0.14), transparent 38%), linear-gradient(170deg, #050608 0%, #0f141d 100%)",
           color: "#ffffff"
         }}
       >
-        <div style={{ fontSize: 72, fontWeight: 900, lineHeight: 1.05 }}>
-          Mark Andrei
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div style={{ fontSize: 72, fontWeight: 900, lineHeight: 1.05 }}>
+            Mark Andrei,
+            <div style={{ fontSize: 44, fontWeight: 700, color: "#ff9900", marginTop: 14 }}>
+              To the clouds.
+            </div>
+          </div>
+          <div
+            style={{
+              width: 136,
+              height: 136,
+              borderRadius: 30,
+              border: "2px solid rgba(255,153,0,0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#ff9900",
+              fontSize: 64,
+              fontWeight: 900
+            }}
+          >
+            MA
+          </div>
         </div>
-        <div style={{ fontSize: 44, fontWeight: 700, color: "#ff9900", marginTop: 14 }}>
-          To the clouds.
+        <div style={{ fontSize: 29, color: "#d5d9e0", marginTop: 28, maxWidth: "88%", lineHeight: 1.36 }}>
+          Entry-level DevOps and Software Developer focused on building practical applications and reliable systems.
         </div>
-        <div style={{ fontSize: 30, color: "#d5d9e0", marginTop: 26, maxWidth: "88%" }}>
-          Entry-level Cloud and Developer building reliable systems and practical applications.
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div style={{ fontSize: 22, color: "#ffcc84", fontWeight: 600 }}>
+            Leadership • DevOps • Software Development
+          </div>
+          <div style={{ fontSize: 22, color: "#c9ced6" }}>mark-andrei-portfolio.onrender.com</div>
         </div>
       </div>
     ),

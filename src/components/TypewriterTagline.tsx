@@ -3,9 +3,15 @@
 import { useEffect, useState } from "react";
 
 const TAGLINES = [
-  "builds in the cloud.",
-  "ships clean full-stack apps.",
-  "keeps learning every release."
+  "builds reliable DevOps workflows.",
+  "ships clean full-stack applications.",
+  "leads teams with service.",
+  "improves systems through practical automation.",
+  "turns ideas into usable web solutions.",
+  "learns fast and applies feedback quickly.",
+  "delivers projects with consistency and ownership.",
+  "focuses on reliability, clarity, and impact.",
+  "supports teams with communication and execution."
 ];
 
 export default function TypewriterTagline() {
@@ -40,9 +46,12 @@ export default function TypewriterTagline() {
   }, [text, deleting, lineIndex]);
 
   return (
-    <span className="typewriter-wrap">
-      {text}
-      <span className="type-caret" />
+    <span className="typewriter-shell" aria-live="polite">
+      <span className="typewriter-reserve">supports teams with communication and execution.</span>
+      <span className="typewriter-wrap">
+        {text}
+        <span className="type-caret" />
+      </span>
     </span>
   );
 }
