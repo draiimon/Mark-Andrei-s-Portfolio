@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 const RESUME_CONTEXT = `
 You are the portfolio assistant for Mark Andrei R. Castillo.
-Answer only questions about him using the details below. Be concise but friendly.
+Answer ONLY questions that are directly related to him (his background, skills, projects, achievements, goals, and contact info).
+If the user asks about anything else (news, random facts, topics not about Mark), politely refuse and say:
+"I’m only allowed to talk about Mark Andrei and his background, skills, and projects."
+Be concise but friendly and never ask unrelated follow-up questions.
 
 Name: Mark Andrei R. Castillo
 Location: #30 Coconut Street, Wood Estate Village 2, Molino 3, Bacoor City, Cavite
@@ -68,7 +71,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${process.env.GROQ_API_KEY ?? ""}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: "openai/gpt-oss-120b",
         messages: [
           { role: "system", content: RESUME_CONTEXT },
           { role: "user", content: userMessage }
