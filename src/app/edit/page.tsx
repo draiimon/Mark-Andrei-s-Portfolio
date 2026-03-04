@@ -44,6 +44,10 @@ export default function EditPage() {
   const [profileForm, setProfileForm] = useState({ fullName: "", headline: "", location: "", email: "", phone: "", github: "", objective: "", about: "", skills: "" });
   const [newProject, setNewProject] = useState({ name: "", tagline: "", description: "", techStack: "", link: "", githubUrl: "" });
   const [newImage, setNewImage] = useState({ title: "", url: "" });
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumeSuccess, setResumeSuccess] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+  const [editProjectForm, setEditProjectForm] = useState({ name: "", tagline: "", description: "", techStack: "", link: "", githubUrl: "" });
 
   useEffect(() => {
     fetch("/api/edit/me")
@@ -119,6 +123,37 @@ export default function EditPage() {
     if (!confirm("Delete this project?")) return;
     await fetch(`/api/edit/projects/${id}`, { method: "DELETE" });
     loadData();
+    setEditingProjectId(null);
+  }
+
+  function startEditProject(p: Project) {
+    setEditingProjectId(p.id);
+    setEditProjectForm({
+      name: p.name,
+      tagline: p.tagline,
+      description: p.description,
+      techStack: p.techStack,
+      link: p.link ?? "",
+      githubUrl: p.githubUrl ?? ""
+    });
+  }
+
+  async function saveProjectEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (editingProjectId == null) return;
+    setSaving(true);
+    await fetch(`/api/edit/projects/${editingProjectId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...editProjectForm,
+        link: editProjectForm.link || null,
+        githubUrl: editProjectForm.githubUrl || null
+      })
+    });
+    setSaving(false);
+    setEditingProjectId(null);
+    loadData();
   }
 
   async function addImage(e: React.FormEvent) {
@@ -134,6 +169,19 @@ export default function EditPage() {
     if (!confirm("Remove this image?")) return;
     await fetch(`/api/edit/gallery/${id}`, { method: "DELETE" });
     loadData();
+  }
+
+  async function uploadResume(e: React.FormEvent) {
+    e.preventDefault();
+    if (!resumeFile) return;
+    setSaving(true);
+    setResumeSuccess(false);
+    const formData = new FormData();
+    formData.append("file", resumeFile);
+    const res = await fetch("/api/edit/resume", { method: "POST", body: formData });
+    setSaving(false);
+    setResumeFile(null);
+    if (res.ok) setResumeSuccess(true);
   }
 
   if (auth === null) {
@@ -193,6 +241,26 @@ export default function EditPage() {
         </header>
 
         <section>
+          <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-4">Resume (PDF)</h2>
+          <p className="text-xs text-neutral-500 mb-3">Re-upload to replace the current resume. Site links to this file.</p>
+          <form onSubmit={uploadResume} className="flex flex-wrap items-end gap-3 text-sm">
+            <label className="flex-1 min-w-[200px]">
+              <span className="sr-only">Choose PDF</span>
+              <input
+                type="file"
+                accept=".pdf,application/pdf"
+                onChange={(e) => { setResumeFile(e.target.files?.[0] ?? null); setResumeSuccess(false); }}
+                className="block w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+              />
+            </label>
+            <button type="submit" disabled={saving || !resumeFile} className="rounded bg-awsOrange px-4 py-2 font-medium text-black disabled:opacity-60">
+              Upload resume
+            </button>
+          </form>
+          {resumeSuccess && <p className="mt-2 text-xs text-green-400">Resume updated. Visit /api/resume to view.</p>}
+        </section>
+
+        <section>
           <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-4">Profile</h2>
           <form onSubmit={saveProfile} className="space-y-3 text-sm">
             {(["fullName", "headline", "location", "email", "phone", "github"] as const).map((key) => (
@@ -236,14 +304,32 @@ export default function EditPage() {
           <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-4">Projects</h2>
           <div className="space-y-4">
             {projects.map((p) => (
-              <div key={p.id} className="rounded border border-neutral-800 p-4 flex justify-between items-start gap-4">
-                <div>
-                  <p className="font-medium text-white">{p.name}</p>
-                  <p className="text-xs text-neutral-500">{p.techStack}</p>
-                </div>
-                <button type="button" onClick={() => deleteProject(p.id)} className="text-xs text-red-400 hover:underline">
-                  Delete
-                </button>
+              <div key={p.id} className="rounded border border-neutral-800 p-4">
+                {editingProjectId === p.id ? (
+                  <form onSubmit={saveProjectEdit} className="space-y-2 text-sm">
+                    <input value={editProjectForm.name} onChange={(e) => setEditProjectForm((f) => ({ ...f, name: e.target.value }))} placeholder="Name" className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-white" />
+                    <input value={editProjectForm.tagline} onChange={(e) => setEditProjectForm((f) => ({ ...f, tagline: e.target.value }))} placeholder="Tagline" className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-white" />
+                    <textarea value={editProjectForm.description} onChange={(e) => setEditProjectForm((f) => ({ ...f, description: e.target.value }))} placeholder="Description" rows={2} className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-white" />
+                    <input value={editProjectForm.techStack} onChange={(e) => setEditProjectForm((f) => ({ ...f, techStack: e.target.value }))} placeholder="Tech stack" className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-white" />
+                    <input value={editProjectForm.link} onChange={(e) => setEditProjectForm((f) => ({ ...f, link: e.target.value }))} placeholder="Live demo URL" className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-white" />
+                    <input value={editProjectForm.githubUrl} onChange={(e) => setEditProjectForm((f) => ({ ...f, githubUrl: e.target.value }))} placeholder="GitHub URL" className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-white" />
+                    <div className="flex gap-2">
+                      <button type="submit" disabled={saving} className="rounded bg-awsOrange px-3 py-1.5 text-sm font-medium text-black">Save</button>
+                      <button type="button" onClick={() => setEditingProjectId(null)} className="rounded border border-neutral-600 px-3 py-1.5 text-sm text-neutral-400">Cancel</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <p className="font-medium text-white">{p.name}</p>
+                      <p className="text-xs text-neutral-500">{p.techStack}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => startEditProject(p)} className="text-xs text-awsOrange hover:underline">Edit</button>
+                      <button type="button" onClick={() => deleteProject(p.id)} className="text-xs text-red-400 hover:underline">Delete</button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

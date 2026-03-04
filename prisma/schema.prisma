@@ -14,18 +14,23 @@ datasource db {
 }
 
 model Profile {
-  id           Int      @id @default(autoincrement())
-  fullName     String
-  headline     String
-  location     String
-  email        String
-  phone        String
-  github       String
-  objective    String
-  about        String
-  skills       String   /// Comma-separated skills for quick display
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  fullName      String
+  headline      String
+  location      String
+  email         String
+  phone         String
+  github        String
+  linkedinUrl   String?
+  facebookUrl   String?
+  objective     String
+  about         String
+  skills        String
+  availability  String?  /// e.g. "Available for work · Philippines"
+  brandName     String?  /// e.g. "To the clouds."
+  heroTagline   String?  /// e.g. "builds in the cloud."
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Project {
@@ -46,4 +51,11 @@ model GalleryImage {
   title     String
   url       String
   createdAt DateTime @default(now())
+}
+
+model Resume {
+  id        Int      @id @default(autoincrement())
+  fileName  String   @default("resume.pdf")
+  content   Bytes
+  updatedAt DateTime @updatedAt
 }

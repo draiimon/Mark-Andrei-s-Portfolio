@@ -21,7 +21,7 @@ export default function Chatbot() {
   const [loading, setLoading] = useState(false);
 
   const suggestions = [
-    { label: "View resume", link: "/resume.pdf" },
+    { label: "View resume", link: "/api/resume" },
     { label: "What are his skills?", query: "What are Mark Andrei's technical skills and tools?" },
     { label: "Tell me about his projects", query: "Tell me about Mark Andrei's projects, especially PanicSense and DevOps work." },
     { label: "How to contact him?", query: "How can I contact Mark Andrei Castillo?" },

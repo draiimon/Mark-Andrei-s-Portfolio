@@ -54,7 +54,7 @@ export default async function Home() {
             <span>To the clouds.</span>
           </a>
           <nav className="flex gap-6 text-sm text-neutral-400">
-            <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-awsOrange transition-colors">
+            <a href="/api/resume" target="_blank" rel="noopener noreferrer" className="hover:text-awsOrange transition-colors">
               Resume
             </a>
             <a href="https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/" target="_blank" rel="noopener noreferrer" className="hover:text-awsOrange transition-colors">
