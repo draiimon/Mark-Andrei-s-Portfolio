@@ -32,7 +32,16 @@ export async function POST(req: NextRequest) {
     brandName: body.brandName ? String(body.brandName) : null,
     heroTagline: body.heroTagline ? String(body.heroTagline) : null,
     tabTitle: body.tabTitle ? String(body.tabTitle) : null,
-    faviconUrl: body.faviconUrl ? String(body.faviconUrl) : null
+    faviconUrl: body.faviconUrl ? String(body.faviconUrl) : null,
+    socialImageUrl: body.socialImageUrl ? String(body.socialImageUrl) : null,
+    featuredLabel: body.featuredLabel ? String(body.featuredLabel) : null,
+    experienceTitle: body.experienceTitle ? String(body.experienceTitle) : null,
+    leadershipTitle: body.leadershipTitle ? String(body.leadershipTitle) : null,
+    achievementsTitle: body.achievementsTitle ? String(body.achievementsTitle) : null,
+    contactLabel: body.contactLabel ? String(body.contactLabel) : null,
+    footerCenterText: body.footerCenterText ? String(body.footerCenterText) : null,
+    footerRightText: body.footerRightText ? String(body.footerRightText) : null,
+    aiBehaviorPrompt: body.aiBehaviorPrompt ? String(body.aiBehaviorPrompt) : null
   };
   const existing = await prisma.profile.findFirst();
   const profile = existing

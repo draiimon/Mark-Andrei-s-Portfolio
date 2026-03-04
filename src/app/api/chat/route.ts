@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 const RESUME_CONTEXT = `
 You are the portfolio assistant for Mark Andrei R. Castillo.
@@ -86,6 +87,18 @@ export async function POST(req: NextRequest) {
     const messages = body.messages as { role: string; content: string }[];
     const userMessage = messages?.[messages.length - 1]?.content ?? "";
 
+    let aiBehaviorPrompt: string | null = null;
+    try {
+      const profile = await prisma.profile.findFirst({ select: { aiBehaviorPrompt: true } });
+      aiBehaviorPrompt = profile?.aiBehaviorPrompt || null;
+    } catch {
+      aiBehaviorPrompt = null;
+    }
+
+    const systemPrompt = aiBehaviorPrompt
+      ? `${RESUME_CONTEXT}\n\nCustom behavior overrides from portfolio owner:\n${aiBehaviorPrompt}`
+      : RESUME_CONTEXT;
+
     const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -95,7 +108,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: "openai/gpt-oss-120b",
         messages: [
-          { role: "system", content: RESUME_CONTEXT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: userMessage }
         ],
         temperature: 0.35,

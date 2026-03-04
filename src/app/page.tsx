@@ -28,6 +28,13 @@ export default async function Home() {
   const availability = profile?.availability || "Available for work";
   const email = profile?.email || "andreicastillofficial@gmail.com";
   const brandName = profile?.brandName || "To the clouds.";
+  const featuredLabel = profile?.featuredLabel || "Featured Work";
+  const experienceTitle = profile?.experienceTitle || "Experience Snapshot";
+  const leadershipTitle = profile?.leadershipTitle || "Leadership and Community Activities";
+  const achievementsTitle = profile?.achievementsTitle || "Achievements";
+  const contactLabel = profile?.contactLabel || "Say hi -";
+  const footerCenterText = profile?.footerCenterText || "@2026 draiimon";
+  const footerRightText = profile?.footerRightText || "Thank you!";
 
   return (
     <main className="site-shell min-h-screen text-white antialiased">
@@ -65,7 +72,7 @@ export default async function Home() {
         {featured && (
           <ScrollReveal className="mb-14" delayMs={40}>
             <section id="featured" className="feature-card">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">Featured Work</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">{featuredLabel}</p>
               <h2 className="mt-1 text-2xl font-bold">{featured.name}</h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-300 md:text-base">{featured.description}</p>
               <p className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-400">{featured.techStack}</p>
@@ -99,7 +106,7 @@ export default async function Home() {
 
         {experience.length > 0 && (
           <section id="experience" className="mb-14">
-            <h2 className="mb-4 text-2xl font-bold">Experience Snapshot</h2>
+            <h2 className="mb-4 text-2xl font-bold">{experienceTitle}</h2>
             <div className="grid gap-3 md:grid-cols-2">
               {experience.map((item, idx) => (
                 <ScrollReveal key={item.id} delayMs={70 + idx * 60}>
@@ -117,7 +124,7 @@ export default async function Home() {
 
         {leadership.length > 0 && (
           <section id="leadership" className="mb-14">
-            <h2 className="mb-4 text-2xl font-bold">Leadership and Community Activities</h2>
+            <h2 className="mb-4 text-2xl font-bold">{leadershipTitle}</h2>
             <div className="space-y-4 border-l border-white/20 pl-4 md:pl-6">
               {leadership.map((item, idx) => (
                 <ScrollReveal key={item.id} className="pb-2" delayMs={90 + idx * 45}>
@@ -135,7 +142,7 @@ export default async function Home() {
         {achievements.length > 0 && (
           <ScrollReveal className="mb-14" delayMs={120}>
             <section id="achievements">
-              <h2 className="mb-4 text-2xl font-bold">Achievements</h2>
+              <h2 className="mb-4 text-2xl font-bold">{achievementsTitle}</h2>
               <div className="space-y-3 border-l border-white/20 pl-4 md:pl-6">
                 {achievements.map((item, idx) => (
                   <ScrollReveal key={item.id} delayMs={140 + idx * 35}>
@@ -151,7 +158,7 @@ export default async function Home() {
         )}
 
         <p className="text-sm text-slate-300 md:text-base">
-          Say hi -{" "}
+          {contactLabel}{" "}
           <a href={`mailto:${email}`} className="text-amber-400 hover:underline">
             {email}
           </a>
@@ -160,8 +167,8 @@ export default async function Home() {
         <footer className="mt-3 border-t border-white/10 pt-6 text-[11px] text-slate-300 sm:text-sm md:text-base">
           <div className="mt-2 grid grid-cols-3 items-center gap-2">
             <span className="text-left">{brandName}</span>
-            <span className="text-center">@2026 draiimon</span>
-            <span className="text-right">Thank you!</span>
+            <span className="text-center">{footerCenterText}</span>
+            <span className="text-right">{footerRightText}</span>
           </div>
         </footer>
       </div>

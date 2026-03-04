@@ -21,6 +21,15 @@ type Profile = {
   heroTagline: string | null;
   tabTitle: string | null;
   faviconUrl: string | null;
+  socialImageUrl: string | null;
+  featuredLabel: string | null;
+  experienceTitle: string | null;
+  leadershipTitle: string | null;
+  achievementsTitle: string | null;
+  contactLabel: string | null;
+  footerCenterText: string | null;
+  footerRightText: string | null;
+  aiBehaviorPrompt: string | null;
   updatedAt?: string;
 } | null;
 
@@ -125,7 +134,16 @@ export default function EditPage() {
     brandName: "",
     heroTagline: "",
     tabTitle: "",
-    faviconUrl: ""
+    faviconUrl: "",
+    socialImageUrl: "",
+    featuredLabel: "",
+    experienceTitle: "",
+    leadershipTitle: "",
+    achievementsTitle: "",
+    contactLabel: "",
+    footerCenterText: "",
+    footerRightText: "",
+    aiBehaviorPrompt: ""
   });
 
   const [newProject, setNewProject] = useState({
@@ -200,7 +218,16 @@ export default function EditPage() {
           brandName: p.brandName || "",
           heroTagline: p.heroTagline || "",
           tabTitle: p.tabTitle || "",
-          faviconUrl: p.faviconUrl || ""
+          faviconUrl: p.faviconUrl || "",
+          socialImageUrl: p.socialImageUrl || "",
+          featuredLabel: p.featuredLabel || "",
+          experienceTitle: p.experienceTitle || "",
+          leadershipTitle: p.leadershipTitle || "",
+          achievementsTitle: p.achievementsTitle || "",
+          contactLabel: p.contactLabel || "",
+          footerCenterText: p.footerCenterText || "",
+          footerRightText: p.footerRightText || "",
+          aiBehaviorPrompt: p.aiBehaviorPrompt || ""
         });
       }
       setError("");
@@ -617,7 +644,16 @@ export default function EditPage() {
                     brandName: profileForm.brandName || null,
                     heroTagline: profileForm.heroTagline || null,
                     tabTitle: profileForm.tabTitle || null,
-                    faviconUrl: profileForm.faviconUrl || null
+                    faviconUrl: profileForm.faviconUrl || null,
+                    socialImageUrl: profileForm.socialImageUrl || null,
+                    featuredLabel: profileForm.featuredLabel || null,
+                    experienceTitle: profileForm.experienceTitle || null,
+                    leadershipTitle: profileForm.leadershipTitle || null,
+                    achievementsTitle: profileForm.achievementsTitle || null,
+                    contactLabel: profileForm.contactLabel || null,
+                    footerCenterText: profileForm.footerCenterText || null,
+                    footerRightText: profileForm.footerRightText || null,
+                    aiBehaviorPrompt: profileForm.aiBehaviorPrompt || null
                   })
                 });
               }, "Profile updated.");
@@ -708,6 +744,16 @@ export default function EditPage() {
                     />
                   </label>
                   <label className="space-y-1 sm:col-span-2">
+                    <span className="text-xs text-neutral-400">Linked Preview Image URL (OpenGraph/Twitter)</span>
+                    <input
+                      type="url"
+                      value={profileForm.socialImageUrl}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, socialImageUrl: e.target.value }))}
+                      placeholder="https://.../preview.jpg"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1 sm:col-span-2">
                     <span className="text-xs text-neutral-400">GitHub URL</span>
                     <input
                       type="url"
@@ -722,6 +768,86 @@ export default function EditPage() {
                       value={profileForm.about}
                       onChange={(e) => setProfileForm((p) => ({ ...p, about: e.target.value }))}
                       rows={4}
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Featured Section Title</span>
+                    <input
+                      type="text"
+                      value={profileForm.featuredLabel}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, featuredLabel: e.target.value }))}
+                      placeholder="Featured Work"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Experience Section Title</span>
+                    <input
+                      type="text"
+                      value={profileForm.experienceTitle}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, experienceTitle: e.target.value }))}
+                      placeholder="Experience Snapshot"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1 sm:col-span-2">
+                    <span className="text-xs text-neutral-400">Leadership Section Title</span>
+                    <input
+                      type="text"
+                      value={profileForm.leadershipTitle}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, leadershipTitle: e.target.value }))}
+                      placeholder="Leadership and Community Activities"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Achievements Section Title</span>
+                    <input
+                      type="text"
+                      value={profileForm.achievementsTitle}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, achievementsTitle: e.target.value }))}
+                      placeholder="Achievements"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Contact Label</span>
+                    <input
+                      type="text"
+                      value={profileForm.contactLabel}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, contactLabel: e.target.value }))}
+                      placeholder="Say hi -"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Footer Center Text</span>
+                    <input
+                      type="text"
+                      value={profileForm.footerCenterText}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, footerCenterText: e.target.value }))}
+                      placeholder="@2026 draiimon"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="text-xs text-neutral-400">Footer Right Text</span>
+                    <input
+                      type="text"
+                      value={profileForm.footerRightText}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, footerRightText: e.target.value }))}
+                      placeholder="Thank you!"
+                      className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                    />
+                  </label>
+                  <label className="space-y-1 sm:col-span-2">
+                    <span className="text-xs text-neutral-400">AI Behavior Instructions</span>
+                    <textarea
+                      value={profileForm.aiBehaviorPrompt}
+                      onChange={(e) => setProfileForm((p) => ({ ...p, aiBehaviorPrompt: e.target.value }))}
+                      rows={4}
+                      placeholder="Set how your portfolio AI should behave..."
                       className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                     />
                   </label>
