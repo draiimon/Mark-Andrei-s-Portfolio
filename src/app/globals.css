@@ -733,13 +733,32 @@ body {
   }
 
   .music-speaker-pill {
-    width: 1.58rem;
-    height: 1.58rem;
+    width: 2.3rem;
+    height: 2.3rem;
+    transform: none !important;
+    transition: none !important;
   }
 
-  .music-edge-button {
-    width: 1.42rem;
-    height: 1.42rem;
+  .music-speaker-pill.is-playing,
+  .music-speaker-pill:hover,
+  .music-speaker-pill:active {
+    transform: none !important;
+    scale: 1 !important;
+    width: 2.3rem;
+    height: 2.3rem;
+  }
+
+  .speaker-pill-bars {
+    height: 12px;
+  }
+
+  .speaker-pill-bar {
+    width: 2px;
+  }
+
+  .music-edge-button,
+  .music-edge-volume {
+    display: none !important;
   }
 
   .music-edge-volume {
