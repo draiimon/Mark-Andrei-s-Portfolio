@@ -31,6 +31,18 @@ export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps)
   }, [phase, onDone]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    if (phase === "hidden") {
+      root.removeAttribute("data-pre-intro");
+    } else {
+      root.setAttribute("data-pre-intro", "active");
+    }
+    return () => {
+      root.removeAttribute("data-pre-intro");
+    };
+  }, [phase]);
+
+  useEffect(() => {
     if (phase !== "loading") return;
     const fadeTimer = window.setTimeout(() => setPhase("fade"), 900);
     return () => window.clearTimeout(fadeTimer);

@@ -1316,6 +1316,13 @@ body {
   transition: transform 180ms ease-out;
 }
 
+:root[data-pre-intro="active"] .music-edge-controller,
+:root[data-pre-intro="active"] .ask-ai-wrap {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .ask-ai-fab {
   position: relative;
   isolation: isolate;
@@ -1433,6 +1440,7 @@ body {
   .hero-cloud-wave .hero-letter,
   .music-reactive-brand,
   .music-reactive-brand .brand-letter {
+    transform: none !important;
     filter: none !important;
     text-shadow: none !important;
     transition-duration: 120ms;
@@ -1463,6 +1471,10 @@ body {
   .ask-ai-panel,
   .ask-ai-fab {
     transform: none !important;
+  }
+
+  .ask-ai-wrap {
+    display: none !important;
   }
 
   .ask-ai-fab {
