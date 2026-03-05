@@ -168,12 +168,21 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     const updateMobileFlag = () => {
       isMobileRef.current = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
       const mem = typeof navigator !== "undefined" && "deviceMemory" in navigator ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8 : 8;
-      lowPowerRef.current = isMobileRef.current || mem <= 4;
+      const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency || 8 : 8;
+      const ua = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
+      const isAndroid = ua.includes("android");
+      lowPowerRef.current = isAndroid && (mem <= 6 || cores <= 6);
+      if (lowPowerRef.current) {
+        document.documentElement.setAttribute("data-mobile-lite", "true");
+      } else {
+        document.documentElement.removeAttribute("data-mobile-lite");
+      }
     };
     updateMobileFlag();
     window.addEventListener("resize", updateMobileFlag);
     return () => {
       window.removeEventListener("resize", updateMobileFlag);
+      document.documentElement.removeAttribute("data-mobile-lite");
     };
   }, []);
 
@@ -366,18 +375,13 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
 
   return (
     <aside className={`music-edge-controller ${isPlaying ? "is-playing" : ""}`}>
-      <button
-        type="button"
-        onClick={() => void togglePlay()}
-        className={`music-speaker-pill ${isPlaying ? "is-playing" : ""}`}
-        aria-label={isPlaying ? "Pause music" : "Play music"}
-      >
+      <div className={`music-speaker-pill ${isPlaying ? "is-playing" : ""}`} aria-hidden="true">
         <span className="speaker-pill-bars" aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className={`speaker-pill-bar ${isPlaying ? "is-playing" : ""}`} style={{ animationDelay: `${i * 0.08}s` }} />
           ))}
         </span>
-      </button>
+      </div>
 
       <button
         type="button"

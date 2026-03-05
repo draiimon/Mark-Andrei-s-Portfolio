@@ -736,7 +736,12 @@ body {
     max-width: calc(100vw - 1.2rem);
   }
 
-  .music-speaker-pill {
+  .music-speaker-pill,
+  .music-edge-volume {
+    display: none !important;
+  }
+
+  .music-edge-button {
     width: 2.3rem;
     height: 2.3rem;
     transform: scale(1);
@@ -744,41 +749,15 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
 
-  .music-speaker-pill.is-playing,
-  .music-speaker-pill:hover,
-  .music-speaker-pill:active {
-    transform: scale(1.06);
-    width: 2.3rem;
-    height: 2.3rem;
-  }
-
-  .music-speaker-pill:active {
+  .music-edge-button:active {
     transform: scale(1.1);
   }
 
-  .speaker-pill-bars {
-    height: 12px;
-  }
-
-  .speaker-pill-bar {
-    width: 2px;
-  }
-
-  .music-edge-button,
-  .music-edge-volume {
-    display: none !important;
-  }
-
-  .music-edge-volume {
-    flex-direction: row;
-    gap: 0.32rem;
-  }
-
-  .music-edge-volume input[type="range"] {
-    writing-mode: horizontal-tb;
-    direction: ltr;
-    width: 96px;
-    height: auto;
+  .music-edge-button.is-playing,
+  .music-edge-button:hover,
+  .music-edge-button:active {
+    width: 2.3rem;
+    height: 2.3rem;
   }
 
   :root[data-pre-intro="active"] .music-edge-controller {
