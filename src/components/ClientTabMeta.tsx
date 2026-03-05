@@ -72,12 +72,10 @@ export default function ClientTabMeta() {
         clearTick();
         runTypingLoop(data.tabTitle?.trim() || document.title || "To the clouds.");
 
-        if (data.faviconUrl && data.faviconUrl.trim()) {
-          const href = data.faviconUrl.trim();
-          upsertIcon("icon", href);
-          upsertIcon("shortcut icon", href);
-          upsertIcon("apple-touch-icon", href);
-        }
+        const href = data.faviconUrl?.trim() || "/icon";
+        upsertIcon("icon", href);
+        upsertIcon("shortcut icon", href);
+        upsertIcon("apple-touch-icon", href);
       } catch {
         clearTick();
         runTypingLoop(document.title || "To the clouds.");

@@ -318,6 +318,20 @@ export default function EditPage() {
     return data.url || "";
   }
 
+  function applyFaviconNow(href: string) {
+    if (!href) return;
+    const rels = ["icon", "shortcut icon", "apple-touch-icon"];
+    for (const rel of rels) {
+      let link = document.querySelector<HTMLLinkElement>(`link[rel='${rel}']`);
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = rel;
+        document.head.appendChild(link);
+      }
+      link.href = href;
+    }
+  }
+
   function startEditProject(p: Project) {
     setEditingProjectId(p.id);
     setEditProjectForm({
@@ -706,6 +720,63 @@ export default function EditPage() {
           </form>
         </section>
 
+        <section id="site-media" className="feature-card edit-section space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Site Media Uploads</h2>
+          <p className="text-xs text-neutral-500">Uploads are saved in database and applied to tab icon + social preview.</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <form
+              className="space-y-2 rounded-xl border border-white/10 bg-black/25 p-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!faviconFile) return;
+                void withSave(async () => {
+                  const url = await uploadSiteMedia("favicon", faviconFile);
+                  setFaviconFile(null);
+                  setProfileForm((p) => ({ ...p, faviconUrl: url }));
+                  applyFaviconNow(url);
+                }, "Favicon uploaded.");
+              }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-400">Favicon</p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
+                className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+              />
+              <p className="truncate text-xs text-neutral-500">{profileForm.faviconUrl || "No favicon uploaded yet."}</p>
+              <button type="submit" disabled={saving || !faviconFile} className="rounded-lg bg-awsOrange px-3 py-1.5 text-xs font-medium text-black disabled:opacity-60">
+                Upload favicon
+              </button>
+            </form>
+
+            <form
+              className="space-y-2 rounded-xl border border-white/10 bg-black/25 p-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!socialFile) return;
+                void withSave(async () => {
+                  const url = await uploadSiteMedia("social", socialFile);
+                  setSocialFile(null);
+                  setProfileForm((p) => ({ ...p, socialImageUrl: url }));
+                }, "Social preview uploaded.");
+              }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-400">Social Preview</p>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSocialFile(e.target.files?.[0] ?? null)}
+                className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+              />
+              <p className="truncate text-xs text-neutral-500">{profileForm.socialImageUrl || "No social image uploaded yet."}</p>
+              <button type="submit" disabled={saving || !socialFile} className="rounded-lg bg-awsOrange px-3 py-1.5 text-xs font-medium text-black disabled:opacity-60">
+                Upload social image
+              </button>
+            </form>
+          </div>
+        </section>
+
         <section id="profile" className="feature-card edit-section space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
@@ -908,64 +979,6 @@ export default function EditPage() {
                         className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                       />
                     </label>
-                    <div className="rounded-lg border border-white/10 bg-black/25 p-3 md:col-span-2">
-                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
-                        Upload Meta Images (saved in DB)
-                      </p>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <form
-                          className="space-y-2"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            if (!faviconFile) return;
-                            void withSave(async () => {
-                              const url = await uploadSiteMedia("favicon", faviconFile);
-                              setFaviconFile(null);
-                              setProfileForm((p) => ({ ...p, faviconUrl: url }));
-                            }, "Favicon uploaded.");
-                          }}
-                        >
-                          <label className="space-y-1">
-                            <span className="text-xs text-neutral-400">Favicon Image</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
-                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
-                            />
-                          </label>
-                          <button type="submit" disabled={saving || !faviconFile} className="rounded-lg bg-awsOrange px-3 py-1.5 text-xs font-medium text-black disabled:opacity-60">
-                            Upload favicon
-                          </button>
-                        </form>
-
-                        <form
-                          className="space-y-2"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            if (!socialFile) return;
-                            void withSave(async () => {
-                              const url = await uploadSiteMedia("social", socialFile);
-                              setSocialFile(null);
-                              setProfileForm((p) => ({ ...p, socialImageUrl: url }));
-                            }, "Social preview uploaded.");
-                          }}
-                        >
-                          <label className="space-y-1">
-                            <span className="text-xs text-neutral-400">Social Preview Image</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setSocialFile(e.target.files?.[0] ?? null)}
-                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
-                            />
-                          </label>
-                          <button type="submit" disabled={saving || !socialFile} className="rounded-lg bg-awsOrange px-3 py-1.5 text-xs font-medium text-black disabled:opacity-60">
-                            Upload social image
-                          </button>
-                        </form>
-                      </div>
-                    </div>
                     <label className="space-y-1">
                       <span className="text-xs text-neutral-400">Contact Label</span>
                       <input

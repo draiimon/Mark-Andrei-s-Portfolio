@@ -14,8 +14,21 @@ async function isEditAuth() {
   return cookieStore.get("portfolio_admin")?.value === "true";
 }
 
+async function ensureSiteMediaTable() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "SiteMedia" (
+      "id" SERIAL PRIMARY KEY,
+      "key" TEXT UNIQUE NOT NULL,
+      "contentType" TEXT NOT NULL,
+      "content" BYTEA NOT NULL,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+}
+
 export async function GET() {
   if (!(await isEditAuth())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  await ensureSiteMediaTable();
 
   const items = await prisma.siteMedia.findMany({
     where: { key: { in: ["favicon", "social"] } },
@@ -38,6 +51,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   if (!(await isEditAuth())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  await ensureSiteMediaTable();
 
   const form = await req.formData();
   const key = String(form.get("key") || "");
@@ -80,7 +94,8 @@ export async function POST(req: NextRequest) {
     where: { key },
     update: {
       contentType,
-      content: bytes
+      content: bytes,
+      updatedAt: new Date()
     },
     create: {
       key,
