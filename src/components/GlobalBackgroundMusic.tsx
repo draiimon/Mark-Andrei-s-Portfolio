@@ -15,7 +15,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
-  const freqDataRef = useRef<Uint8Array | null>(null);
+  const freqDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const analyserEnabledRef = useRef(false);
   const userGestureRef = useRef(false);
   const vibeRef = useRef(0);
@@ -66,7 +66,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       sourceNodeRef.current.connect(analyser);
       analyser.connect(ctx.destination);
       analyserRef.current = analyser;
-      freqDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+      freqDataRef.current = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
       analyserEnabledRef.current = true;
     } catch {
       analyserRef.current = null;
