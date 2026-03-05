@@ -21,15 +21,21 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const vibeRef = useRef(0);
   const beatRef = useRef(0);
   const prevBassRef = useRef(0);
+  const renderedVibeRef = useRef(0);
+  const renderedBeatRef = useRef(0);
+  const lastRenderTsRef = useRef(0);
+  const isMobileRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
 
   const setVibe = (value: number) => {
     const clamped = Math.max(0, Math.min(1, value));
+    renderedVibeRef.current = clamped;
     document.documentElement.style.setProperty("--music-vibe", clamped.toFixed(3));
   };
   const setBeat = (value: number) => {
     const clamped = Math.max(0, Math.min(1, value));
+    renderedBeatRef.current = clamped;
     document.documentElement.style.setProperty("--music-beat", clamped.toFixed(3));
   };
 
@@ -101,7 +107,14 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
 
   const startVibeLoop = () => {
     if (rafRef.current) return;
-    const loop = () => {
+    const loop = (ts: number) => {
+      const frameInterval = isMobileRef.current ? 34 : 16;
+      if (lastRenderTsRef.current && ts - lastRenderTsRef.current < frameInterval) {
+        rafRef.current = window.requestAnimationFrame(loop);
+        return;
+      }
+      lastRenderTsRef.current = ts;
+
       const audio = audioRef.current;
       const analyser = analyserRef.current;
       const freqData = freqDataRef.current;
@@ -124,13 +137,32 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         prevBassRef.current = prevBassRef.current * 0.58 + bass * 0.42;
       }
 
-      vibeRef.current = vibeRef.current * 0.82 + target * 0.18;
-      setVibe(vibeRef.current);
-      setBeat(beatRef.current);
+      const vibeSmooth = isMobileRef.current ? 0.9 : 0.82;
+      vibeRef.current = vibeRef.current * vibeSmooth + target * (1 - vibeSmooth);
+
+      const nextVibe = vibeRef.current;
+      const nextBeat = beatRef.current;
+      if (Math.abs(nextVibe - renderedVibeRef.current) > 0.008) {
+        setVibe(nextVibe);
+      }
+      if (Math.abs(nextBeat - renderedBeatRef.current) > 0.01) {
+        setBeat(nextBeat);
+      }
       rafRef.current = window.requestAnimationFrame(loop);
     };
     rafRef.current = window.requestAnimationFrame(loop);
   };
+
+  useEffect(() => {
+    const updateMobileFlag = () => {
+      isMobileRef.current = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+    };
+    updateMobileFlag();
+    window.addEventListener("resize", updateMobileFlag);
+    return () => {
+      window.removeEventListener("resize", updateMobileFlag);
+    };
+  }, []);
 
   useEffect(() => {
     if (!music || music.kind !== "audio") return;
@@ -212,6 +244,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       vibeRef.current = 0;
       beatRef.current = 0;
       prevBassRef.current = 0;
+      lastRenderTsRef.current = 0;
       setVibe(0);
       setBeat(0);
     };
@@ -237,6 +270,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       vibeRef.current = 0;
       beatRef.current = 0;
       prevBassRef.current = 0;
+      lastRenderTsRef.current = 0;
       setVibe(0);
       setBeat(0);
     };
@@ -257,6 +291,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     vibeRef.current = 0;
     beatRef.current = 0;
     prevBassRef.current = 0;
+    lastRenderTsRef.current = 0;
     setVibe(0);
     setBeat(0);
   }, [music]);
@@ -267,6 +302,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       vibeRef.current = 0;
       beatRef.current = 0;
       prevBassRef.current = 0;
+      lastRenderTsRef.current = 0;
       setVibe(0);
       setBeat(0);
       if (!audioRef.current) return;

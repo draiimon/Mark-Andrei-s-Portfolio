@@ -1413,4 +1413,71 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .site-shell::before,
+  .site-shell::after {
+    opacity: 0.22;
+    filter: blur(20px);
+    transition: none;
+  }
+
+  .cloud-light {
+    filter: blur(34px) saturate(108%);
+    opacity: 0.34;
+    animation: none;
+    transition: transform 260ms linear;
+  }
+
+  .music-reactive-hero,
+  .music-reactive-hero strong,
+  .hero-cloud-wave .hero-letter,
+  .music-reactive-brand,
+  .music-reactive-brand .brand-letter {
+    filter: none !important;
+    text-shadow: none !important;
+    transition-duration: 120ms;
+  }
+
+  .hero-cloud-wave .hero-letter,
+  .brand-letter,
+  .speaker-pill-bar,
+  .music-volume-icon,
+  .ask-ai-msg {
+    animation: none !important;
+  }
+
+  .music-edge-controller,
+  .music-edge-controller.is-playing,
+  .music-speaker-pill,
+  .music-speaker-pill.is-playing,
+  .music-edge-button.is-playing {
+    box-shadow: none !important;
+  }
+
+  .music-edge-controller::before,
+  .music-edge-controller::after {
+    display: none;
+  }
+
+  .ask-ai-wrap,
+  .ask-ai-panel,
+  .ask-ai-fab {
+    transform: none !important;
+  }
+
+  .ask-ai-fab {
+    box-shadow: 0 0 10px rgba(255, 153, 0, 0.3);
+  }
+
+  .ask-ai-fab::after {
+    animation-duration: 3.4s;
+    opacity: 0.7;
+  }
+
+  .ask-ai-scroll {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
 
