@@ -1431,10 +1431,31 @@ body {
 }
 
 @media (max-width: 768px) {
+  body {
+    background:
+      radial-gradient(circle at 16% 18%, rgba(255, 153, 0, 0.08), transparent 42%),
+      radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.04), transparent 38%),
+      linear-gradient(170deg, #020305 0%, #06080c 48%, #0a0d12 100%);
+  }
+
+  :root {
+    --music-vibe: calc(var(--music-vibe) * 0.8);
+    --music-beat: calc(var(--music-beat) * 0.58);
+  }
+
+  .feature-card,
+  .snap-card,
+  .ask-ai-panel,
+  .music-edge-controller,
+  .topbar {
+    background-color: rgba(5, 7, 10, 0.82) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
   .site-shell::before,
   .site-shell::after {
-    opacity: 0.3;
-    filter: blur(28px);
+    opacity: 0.24;
+    filter: blur(24px);
     transition: transform 260ms ease, opacity 260ms ease, filter 260ms ease;
   }
 
@@ -1456,8 +1477,8 @@ body {
   .music-edge-controller,
   .music-edge-controller.is-playing {
     box-shadow:
-      0 0 12px rgba(255, 153, 0, 0.18),
-      inset 0 0 10px rgba(255, 153, 0, 0.12);
+      0 0 8px rgba(255, 153, 0, 0.13),
+      inset 0 0 7px rgba(255, 153, 0, 0.09);
   }
 
   .music-speaker-pill,
@@ -1467,8 +1488,8 @@ body {
   .ask-ai-fab,
   .ask-ai-panel {
     box-shadow:
-      0 0 10px rgba(255, 153, 0, 0.2),
-      inset 0 0 6px rgba(255, 153, 0, 0.08);
+      0 0 7px rgba(255, 153, 0, 0.14),
+      inset 0 0 4px rgba(255, 153, 0, 0.06);
   }
 
   .ask-ai-wrap,
@@ -1499,7 +1520,7 @@ body {
   }
 
   .ask-ai-fab {
-    box-shadow: 0 0 12px rgba(255, 153, 0, 0.3);
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.22);
   }
 
   .ask-ai-fab::after {

@@ -110,12 +110,16 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const startVibeLoop = () => {
     if (rafRef.current) return;
     const loop = (ts: number) => {
-      const frameInterval = lowPowerRef.current ? 50 : isMobileRef.current ? 34 : 16;
+      const frameInterval = lowPowerRef.current ? 66 : isMobileRef.current ? 40 : 16;
       if (lastRenderTsRef.current && ts - lastRenderTsRef.current < frameInterval) {
         rafRef.current = window.requestAnimationFrame(loop);
         return;
       }
       lastRenderTsRef.current = ts;
+      if (document.hidden) {
+        rafRef.current = window.requestAnimationFrame(loop);
+        return;
+      }
 
       const audio = audioRef.current;
       const analyser = analyserRef.current;
@@ -125,7 +129,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       let target = 0;
       if (active && analyserEnabledRef.current && analyser && freqData) {
         sampleTickRef.current += 1;
-        if (lowPowerRef.current && sampleTickRef.current % 2 === 1) {
+        if (lowPowerRef.current && sampleTickRef.current % 3 !== 0) {
           rafRef.current = window.requestAnimationFrame(loop);
           return;
         }
@@ -139,7 +143,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
 
         const rise = bass - prevBassRef.current;
         const threshold = lowPowerRef.current ? 0.2 + (0.2 * (1 - volume)) : 0.13 + (0.24 * (1 - volume));
-        const hasPeak = bass > threshold && rise > 0.016;
+        const hasPeak = bass > threshold && rise > (lowPowerRef.current ? 0.026 : 0.016);
         beatRef.current = hasPeak ? 1 : beatRef.current * (lowPowerRef.current ? 0.95 : 0.92);
         prevBassRef.current = prevBassRef.current * 0.58 + bass * 0.42;
       }
