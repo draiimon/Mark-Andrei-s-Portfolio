@@ -1422,6 +1422,33 @@ body {
 
 @media (max-width: 768px) {
   .site-shell::before,
+  .site-shell::after,
+  .cloud-light {
+    display: none !important;
+  }
+
+  .topbar,
+  .pre-intro,
+  .music-edge-controller,
+  .ask-ai-panel {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .feature-card,
+  .snap-card,
+  .edit-page .feature-card.edit-section,
+  .control-deck,
+  .deck-link,
+  .music-edge-controller,
+  .music-speaker-pill,
+  .music-edge-button,
+  .ask-ai-panel,
+  .ask-ai-fab {
+    box-shadow: none !important;
+  }
+
+  .site-shell::before,
   .site-shell::after {
     opacity: 0.22;
     filter: blur(20px);
@@ -1489,6 +1516,18 @@ body {
   .ask-ai-scroll {
     -webkit-mask-image: none;
     mask-image: none;
+  }
+
+  .reveal {
+    filter: none;
+    transform: translateY(12px);
+    transition:
+      opacity 280ms ease,
+      transform 320ms ease;
+  }
+
+  .type-caret {
+    animation-duration: 1.4s;
   }
 }
 

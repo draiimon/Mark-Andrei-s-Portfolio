@@ -25,6 +25,8 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const renderedBeatRef = useRef(0);
   const lastRenderTsRef = useRef(0);
   const isMobileRef = useRef(false);
+  const lowPowerRef = useRef(false);
+  const sampleTickRef = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
 
@@ -67,8 +69,8 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       }
 
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 512;
-      analyser.smoothingTimeConstant = 0.82;
+      analyser.fftSize = lowPowerRef.current ? 128 : 512;
+      analyser.smoothingTimeConstant = lowPowerRef.current ? 0.9 : 0.82;
       sourceNodeRef.current.connect(analyser);
       analyser.connect(ctx.destination);
       analyserRef.current = analyser;
@@ -108,7 +110,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const startVibeLoop = () => {
     if (rafRef.current) return;
     const loop = (ts: number) => {
-      const frameInterval = isMobileRef.current ? 34 : 16;
+      const frameInterval = lowPowerRef.current ? 50 : isMobileRef.current ? 34 : 16;
       if (lastRenderTsRef.current && ts - lastRenderTsRef.current < frameInterval) {
         rafRef.current = window.requestAnimationFrame(loop);
         return;
@@ -122,8 +124,13 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
 
       let target = 0;
       if (active && analyserEnabledRef.current && analyser && freqData) {
+        sampleTickRef.current += 1;
+        if (lowPowerRef.current && sampleTickRef.current % 2 === 1) {
+          rafRef.current = window.requestAnimationFrame(loop);
+          return;
+        }
         analyser.getByteFrequencyData(freqData);
-        const bassBins = Math.max(1, Math.floor(freqData.length * 0.11));
+        const bassBins = Math.max(1, Math.floor(freqData.length * (lowPowerRef.current ? 0.08 : 0.11)));
         let sum = 0;
         for (let i = 0; i < bassBins; i += 1) sum += freqData[i];
         const bass = sum / bassBins / 255;
@@ -131,9 +138,9 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         target = Math.max(0.03, scaled);
 
         const rise = bass - prevBassRef.current;
-        const threshold = 0.13 + (0.24 * (1 - volume));
+        const threshold = lowPowerRef.current ? 0.2 + (0.2 * (1 - volume)) : 0.13 + (0.24 * (1 - volume));
         const hasPeak = bass > threshold && rise > 0.016;
-        beatRef.current = hasPeak ? 1 : beatRef.current * 0.92;
+        beatRef.current = hasPeak ? 1 : beatRef.current * (lowPowerRef.current ? 0.95 : 0.92);
         prevBassRef.current = prevBassRef.current * 0.58 + bass * 0.42;
       }
 
@@ -156,6 +163,8 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   useEffect(() => {
     const updateMobileFlag = () => {
       isMobileRef.current = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+      const mem = typeof navigator !== "undefined" && "deviceMemory" in navigator ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8 : 8;
+      lowPowerRef.current = isMobileRef.current || mem <= 4;
     };
     updateMobileFlag();
     window.addEventListener("resize", updateMobileFlag);
