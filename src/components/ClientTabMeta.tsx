@@ -33,7 +33,8 @@ export default function ClientTabMeta() {
       const text = rawTitle.trim();
       if (!text) return;
 
-      let index = 0;
+      const minIndex = text.length > 0 ? 1 : 0;
+      let index = minIndex;
       let deleting = false;
 
       const tick = () => {
@@ -42,7 +43,7 @@ export default function ClientTabMeta() {
         if (!deleting) {
           index = Math.min(index + 1, text.length);
         } else {
-          index = Math.max(index - 1, 0);
+          index = Math.max(index - 1, minIndex);
         }
 
         document.title = text.slice(0, index);
@@ -51,7 +52,7 @@ export default function ClientTabMeta() {
         if (!deleting && index === text.length) {
           deleting = true;
           delay = 700;
-        } else if (deleting && index === 0) {
+        } else if (deleting && index === minIndex) {
           deleting = false;
           delay = 320;
         }

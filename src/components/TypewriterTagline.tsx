@@ -14,6 +14,7 @@ export default function TypewriterTagline({ lines }: TypewriterTaglineProps) {
 
   useEffect(() => {
     const full = safeLines[lineIndex % safeLines.length];
+    const minChars = full.length > 0 ? 1 : 0;
     const delay = deleting ? 40 : 70;
 
     const timer = setTimeout(() => {
@@ -25,13 +26,14 @@ export default function TypewriterTagline({ lines }: TypewriterTaglineProps) {
         setTimeout(() => setDeleting(true), 800);
         return;
       }
-      if (deleting && text.length > 0) {
+      if (deleting && text.length > minChars) {
         setText(full.slice(0, text.length - 1));
         return;
       }
-      if (deleting && text.length === 0) {
+      if (deleting && text.length === minChars) {
         setDeleting(false);
         setLineIndex((prev) => (prev + 1) % safeLines.length);
+        setText(safeLines[(lineIndex + 1) % safeLines.length].slice(0, 1));
       }
     }, delay);
 

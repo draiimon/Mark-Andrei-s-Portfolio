@@ -1431,25 +1431,9 @@ body {
 }
 
 @media (max-width: 768px) {
-  body {
-    background:
-      radial-gradient(circle at 16% 18%, rgba(255, 153, 0, 0.08), transparent 42%),
-      radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.04), transparent 38%),
-      linear-gradient(170deg, #020305 0%, #06080c 48%, #0a0d12 100%);
-  }
-
   :root {
-    --music-vibe: calc(var(--music-vibe) * 0.8);
-    --music-beat: calc(var(--music-beat) * 0.58);
-  }
-
-  .feature-card,
-  .snap-card,
-  .ask-ai-panel,
-  .music-edge-controller,
-  .topbar {
-    background-color: rgba(5, 7, 10, 0.82) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    --music-vibe: calc(var(--music-vibe) * 0.9);
+    --music-beat: calc(var(--music-beat) * 0.72);
   }
 
   .site-shell::before,
