@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     }
   });
 
-  const mediaPath = `/api/public/site-media/${key}`;
+  const mediaPath = `/api/public/site-media/${key}?v=${Date.now()}`;
   if (key === "favicon") {
     const p = await prisma.profile.findFirst();
     if (p) {

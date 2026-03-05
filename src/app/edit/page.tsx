@@ -148,6 +148,8 @@ export default function EditPage() {
     brandName: "",
     heroTagline: "",
     tabTitle: "",
+    faviconUrl: "",
+    socialImageUrl: "",
     featuredLabel: "",
     experienceTitle: "",
     leadershipTitle: "",
@@ -190,6 +192,8 @@ export default function EditPage() {
   const [newTagline, setNewTagline] = useState({ text: "" });
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [socialFile, setSocialFile] = useState<File | null>(null);
 
   useEffect(() => {
     const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
@@ -252,6 +256,8 @@ export default function EditPage() {
           brandName: p.brandName || "",
           heroTagline: p.heroTagline || "",
           tabTitle: p.tabTitle || "",
+          faviconUrl: p.faviconUrl || "",
+          socialImageUrl: p.socialImageUrl || "",
           featuredLabel: p.featuredLabel || "",
           experienceTitle: p.experienceTitle || "",
           leadershipTitle: p.leadershipTitle || "",
@@ -293,6 +299,23 @@ export default function EditPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function uploadSiteMedia(key: "favicon" | "social", file: File) {
+    const formData = new FormData();
+    formData.append("key", key);
+    formData.append("file", file);
+    const res = await fetch("/api/edit/site-media", {
+      method: "POST",
+      body: formData,
+      credentials: "include"
+    });
+    if (!res.ok) {
+      const data = (await res.json().catch(() => ({}))) as ApiError;
+      throw new Error(data.error || `Upload failed (${res.status})`);
+    }
+    const data = (await res.json()) as { url?: string };
+    return data.url || "";
   }
 
   function startEditProject(p: Project) {
@@ -719,6 +742,8 @@ export default function EditPage() {
                     brandName: profileForm.brandName || null,
                     heroTagline: profileForm.heroTagline || null,
                     tabTitle: profileForm.tabTitle || null,
+                    faviconUrl: profileForm.faviconUrl || null,
+                    socialImageUrl: profileForm.socialImageUrl || null,
                     featuredLabel: profileForm.featuredLabel || null,
                     experienceTitle: profileForm.experienceTitle || null,
                     leadershipTitle: profileForm.leadershipTitle || null,
@@ -863,6 +888,84 @@ export default function EditPage() {
                         className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                       />
                     </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Favicon URL</span>
+                      <input
+                        type="text"
+                        value={profileForm.faviconUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, faviconUrl: e.target.value }))}
+                        placeholder="/api/public/site-media/favicon or https://..."
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1 md:col-span-2">
+                      <span className="text-xs text-neutral-400">Linked Preview Image URL (OpenGraph/Twitter)</span>
+                      <input
+                        type="text"
+                        value={profileForm.socialImageUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, socialImageUrl: e.target.value }))}
+                        placeholder="/api/public/site-media/social or https://..."
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <div className="rounded-lg border border-white/10 bg-black/25 p-3 md:col-span-2">
+                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                        Upload Meta Images (saved in DB)
+                      </p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <form
+                          className="space-y-2"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (!faviconFile) return;
+                            void withSave(async () => {
+                              const url = await uploadSiteMedia("favicon", faviconFile);
+                              setFaviconFile(null);
+                              setProfileForm((p) => ({ ...p, faviconUrl: url }));
+                            }, "Favicon uploaded.");
+                          }}
+                        >
+                          <label className="space-y-1">
+                            <span className="text-xs text-neutral-400">Favicon Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
+                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+                            />
+                          </label>
+                          <button type="submit" disabled={saving || !faviconFile} className="rounded-lg bg-awsOrange px-3 py-1.5 text-xs font-medium text-black disabled:opacity-60">
+                            Upload favicon
+                          </button>
+                        </form>
+
+                        <form
+                          className="space-y-2"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (!socialFile) return;
+                            void withSave(async () => {
+                              const url = await uploadSiteMedia("social", socialFile);
+                              setSocialFile(null);
+                              setProfileForm((p) => ({ ...p, socialImageUrl: url }));
+                            }, "Social preview uploaded.");
+                          }}
+                        >
+                          <label className="space-y-1">
+                            <span className="text-xs text-neutral-400">Social Preview Image</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => setSocialFile(e.target.files?.[0] ?? null)}
+                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
+                            />
+                          </label>
+                          <button type="submit" disabled={saving || !socialFile} className="rounded-lg bg-awsOrange px-3 py-1.5 text-xs font-medium text-black disabled:opacity-60">
+                            Upload social image
+                          </button>
+                        </form>
+                      </div>
+                    </div>
                     <label className="space-y-1">
                       <span className="text-xs text-neutral-400">Contact Label</span>
                       <input
