@@ -23,9 +23,16 @@ model Profile {
   github        String
   linkedinUrl   String?
   facebookUrl   String?
+  discordUrl    String?
+  instagramUrl  String?
+  spotifyUrl    String?
+  musicUrl      String?
+  cloudinaryCloudName String?
+  cloudinaryUploadPreset String?
   objective     String
   about         String
   skills        String
+  viewCount     Int      @default(0)
   availability  String?  /// e.g. "Available for work · Philippines"
   brandName     String?  /// e.g. "To the clouds."
   heroTagline   String?  /// e.g. "builds in the cloud."
@@ -40,6 +47,9 @@ model Profile {
   footerCenterText String?
   footerRightText String?
   aiBehaviorPrompt String?
+  accentRed      Int      @default(255)
+  accentGreen    Int      @default(153)
+  accentBlue     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -115,4 +125,5 @@ model SiteMedia {
   content     Bytes
   updatedAt   DateTime @updatedAt
 }
+
 

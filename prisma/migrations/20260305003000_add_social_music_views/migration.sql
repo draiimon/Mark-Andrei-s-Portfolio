@@ -1,0 +1,6 @@
+ALTER TABLE "Profile"
+ADD COLUMN "discordUrl" TEXT,
+ADD COLUMN "instagramUrl" TEXT,
+ADD COLUMN "spotifyUrl" TEXT,
+ADD COLUMN "musicUrl" TEXT,
+ADD COLUMN "viewCount" INTEGER NOT NULL DEFAULT 0;

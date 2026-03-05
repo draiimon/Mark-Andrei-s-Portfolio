@@ -13,9 +13,16 @@ type Profile = {
   github: string;
   linkedinUrl: string | null;
   facebookUrl: string | null;
+  discordUrl: string | null;
+  instagramUrl: string | null;
+  spotifyUrl: string | null;
+  musicUrl: string | null;
+  cloudinaryCloudName: string | null;
+  cloudinaryUploadPreset: string | null;
   objective: string;
   about: string;
   skills: string;
+  viewCount: number;
   availability: string | null;
   brandName: string | null;
   heroTagline: string | null;
@@ -127,15 +134,20 @@ export default function EditPage() {
     github: "",
     linkedinUrl: "",
     facebookUrl: "",
+    discordUrl: "",
+    instagramUrl: "",
+    spotifyUrl: "",
+    musicUrl: "",
+    cloudinaryCloudName: "",
+    cloudinaryUploadPreset: "",
     objective: "",
     about: "",
     skills: "",
+    viewCount: "0",
     availability: "",
     brandName: "",
     heroTagline: "",
     tabTitle: "",
-    faviconUrl: "",
-    socialImageUrl: "",
     featuredLabel: "",
     experienceTitle: "",
     leadershipTitle: "",
@@ -178,25 +190,26 @@ export default function EditPage() {
   const [newTagline, setNewTagline] = useState({ text: "" });
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [faviconFile, setFaviconFile] = useState<File | null>(null);
-  const [socialPreviewFile, setSocialPreviewFile] = useState<File | null>(null);
-  const [mediaStatus, setMediaStatus] = useState<{ hasFavicon: boolean; hasSocial: boolean }>({
-    hasFavicon: false,
-    hasSocial: false
-  });
 
   useEffect(() => {
-    // Validate existing edit session on load.
-    fetch("/api/edit/me", { credentials: "include" })
-      .then((res) => {
-        if (res.ok) {
-          setAuth(true);
-          void loadData();
-          return;
-        }
-        setAuth(false);
-      })
-      .catch(() => setAuth(false));
+    const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    const isReload = nav?.type === "reload";
+
+    async function bootstrapAuth() {
+      if (isReload) {
+        await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(() => {});
+      }
+
+      const res = await fetch("/api/edit/me", { credentials: "include" }).catch(() => null);
+      if (res?.ok) {
+        setAuth(true);
+        await loadData();
+        return;
+      }
+      setAuth(false);
+    }
+
+    void bootstrapAuth();
   }, []);
 
   async function loadData() {
@@ -209,14 +222,12 @@ export default function EditPage() {
         apiJson<Achievement[]>("/api/edit/achievements"),
         apiJson<Tagline[]>("/api/edit/taglines")
       ]);
-      const media = await apiJson<{ hasFavicon: boolean; hasSocial: boolean }>("/api/edit/site-media");
       setProfile(p);
       setProjects(proj || []);
       setExperience(exp || []);
       setLeadership(lead || []);
       setAchievements(ach || []);
       setTaglines(tgs || []);
-      setMediaStatus({ hasFavicon: !!media?.hasFavicon, hasSocial: !!media?.hasSocial });
       if (p) {
         setProfileForm({
           fullName: p.fullName || "",
@@ -227,15 +238,20 @@ export default function EditPage() {
           github: p.github || "",
           linkedinUrl: p.linkedinUrl || "",
           facebookUrl: p.facebookUrl || "",
+          discordUrl: p.discordUrl || "",
+          instagramUrl: p.instagramUrl || "",
+          spotifyUrl: p.spotifyUrl || "",
+          musicUrl: p.musicUrl || "",
+          cloudinaryCloudName: p.cloudinaryCloudName || "",
+          cloudinaryUploadPreset: p.cloudinaryUploadPreset || "",
           objective: p.objective || "",
           about: p.about || "",
           skills: p.skills || "",
+          viewCount: String(p.viewCount ?? 0),
           availability: p.availability || "",
           brandName: p.brandName || "",
           heroTagline: p.heroTagline || "",
           tabTitle: p.tabTitle || "",
-          faviconUrl: p.faviconUrl || "",
-          socialImageUrl: p.socialImageUrl || "",
           featuredLabel: p.featuredLabel || "",
           experienceTitle: p.experienceTitle || "",
           leadershipTitle: p.leadershipTitle || "",
@@ -466,6 +482,15 @@ export default function EditPage() {
     }
   }
 
+  async function handleLogout() {
+    await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(() => {});
+    setAuth(false);
+    setUsername("");
+    setPassword("");
+    setShowPassword(false);
+    setLoginError("");
+  }
+
   if (auth === null) {
     return (
       <main className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -558,7 +583,7 @@ export default function EditPage() {
           <div className="edit-orb one" />
           <div className="edit-orb two" />
           <div className="relative z-10 flex w-full items-center justify-between gap-3">
-            <a href="/" className="flex items-center gap-2.5 text-white">
+            <a href="/home" className="flex items-center gap-2.5 text-white">
               <span className="rounded-lg border border-white/20 bg-black/35 p-1.5">
                 <Cloud className="h-5 w-5 text-awsOrange" />
               </span>
@@ -568,11 +593,18 @@ export default function EditPage() {
               </span>
             </a>
             <a
-              href="/"
+              href="/home"
               className="rounded-lg border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-medium text-neutral-200 transition hover:border-awsOrange/60 hover:text-awsOrange"
             >
               View site
             </a>
+            <button
+              type="button"
+              onClick={() => void handleLogout()}
+              className="rounded-lg border border-red-400/35 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-200 transition hover:border-red-300/70 hover:text-red-100"
+            >
+              Logout
+            </button>
           </div>
         </header>
 
@@ -674,12 +706,19 @@ export default function EditPage() {
                     ...profileForm,
                     linkedinUrl: profileForm.linkedinUrl || null,
                     facebookUrl: profileForm.facebookUrl || null,
+                    discordUrl: profileForm.discordUrl || null,
+                    instagramUrl: profileForm.instagramUrl || null,
+                    spotifyUrl: profileForm.spotifyUrl || null,
+                    musicUrl: profileForm.musicUrl || null,
+                    cloudinaryCloudName: profileForm.cloudinaryCloudName || null,
+                    cloudinaryUploadPreset: profileForm.cloudinaryUploadPreset || null,
                     availability: profileForm.availability || null,
+                    viewCount: Number.isFinite(Number(profileForm.viewCount))
+                      ? Math.max(0, Math.trunc(Number(profileForm.viewCount)))
+                      : 0,
                     brandName: profileForm.brandName || null,
                     heroTagline: profileForm.heroTagline || null,
                     tabTitle: profileForm.tabTitle || null,
-                    faviconUrl: profileForm.faviconUrl || null,
-                    socialImageUrl: profileForm.socialImageUrl || null,
                     featuredLabel: profileForm.featuredLabel || null,
                     experienceTitle: profileForm.experienceTitle || null,
                     leadershipTitle: profileForm.leadershipTitle || null,
@@ -768,6 +807,46 @@ export default function EditPage() {
                         className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                       />
                     </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Discord Username</span>
+                      <input
+                        type="text"
+                        value={profileForm.discordUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, discordUrl: e.target.value }))}
+                        placeholder="@username"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Instagram URL</span>
+                      <input
+                        type="url"
+                        value={profileForm.instagramUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, instagramUrl: e.target.value }))}
+                        placeholder="https://instagram.com/..."
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Spotify Profile/Playlist URL</span>
+                      <input
+                        type="url"
+                        value={profileForm.spotifyUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, spotifyUrl: e.target.value }))}
+                        placeholder="https://open.spotify.com/..."
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
+                    <label className="space-y-1">
+                      <span className="text-xs text-neutral-400">Music Link (YouTube/Spotify or direct audio URL)</span>
+                      <input
+                        type="url"
+                        value={profileForm.musicUrl}
+                        onChange={(e) => setProfileForm((p) => ({ ...p, musicUrl: e.target.value }))}
+                        placeholder="https://youtube.com/watch?v=... or spotify link"
+                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
+                      />
+                    </label>
                   </div>
                 </div>
 
@@ -794,107 +873,6 @@ export default function EditPage() {
                         className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                       />
                     </label>
-                    <label className="space-y-1 md:col-span-2">
-                      <span className="text-xs text-neutral-400">Favicon URL (PNG/SVG)</span>
-                      <input
-                        type="url"
-                        value={profileForm.faviconUrl}
-                        onChange={(e) => setProfileForm((p) => ({ ...p, faviconUrl: e.target.value }))}
-                        placeholder="https://.../logo.png"
-                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                      />
-                    </label>
-                    <label className="space-y-1 md:col-span-2">
-                      <span className="text-xs text-neutral-400">Linked Preview Image URL (OpenGraph/Twitter)</span>
-                      <input
-                        type="url"
-                        value={profileForm.socialImageUrl}
-                        onChange={(e) => setProfileForm((p) => ({ ...p, socialImageUrl: e.target.value }))}
-                        placeholder="https://.../preview.jpg"
-                        className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
-                      />
-                    </label>
-                    <div className="rounded-lg border border-white/10 bg-black/35 p-3 md:col-span-2">
-                      <p className="mb-2 text-xs text-neutral-300">Upload images (saved in database)</p>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <form
-                          className="space-y-2"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            if (!faviconFile) return;
-                            void withSave(async () => {
-                              const formData = new FormData();
-                              formData.append("key", "favicon");
-                              formData.append("file", faviconFile);
-                              const res = await fetch("/api/edit/site-media", {
-                                method: "POST",
-                                body: formData,
-                                credentials: "include"
-                              });
-                              if (!res.ok) {
-                                const data = (await res.json().catch(() => ({}))) as ApiError;
-                                throw new Error(data.error || "Failed to upload favicon");
-                              }
-                              setFaviconFile(null);
-                            }, "Favicon uploaded.");
-                          }}
-                        >
-                          <label className="block space-y-1">
-                            <span className="text-xs text-neutral-400">Icon Upload (PNG recommended)</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
-                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
-                            />
-                          </label>
-                          <p className="text-[11px] text-neutral-500">
-                            Current: {mediaStatus.hasFavicon ? "DB image set" : "not set"}
-                          </p>
-                          <button type="submit" disabled={saving || !faviconFile} className="rounded-lg bg-awsOrange px-3 py-2 text-xs font-medium text-black disabled:opacity-60">
-                            Upload icon
-                          </button>
-                        </form>
-                        <form
-                          className="space-y-2"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            if (!socialPreviewFile) return;
-                            void withSave(async () => {
-                              const formData = new FormData();
-                              formData.append("key", "social");
-                              formData.append("file", socialPreviewFile);
-                              const res = await fetch("/api/edit/site-media", {
-                                method: "POST",
-                                body: formData,
-                                credentials: "include"
-                              });
-                              if (!res.ok) {
-                                const data = (await res.json().catch(() => ({}))) as ApiError;
-                                throw new Error(data.error || "Failed to upload social preview");
-                              }
-                              setSocialPreviewFile(null);
-                            }, "Linked preview image uploaded.");
-                          }}
-                        >
-                          <label className="block space-y-1">
-                            <span className="text-xs text-neutral-400">Linked Preview Upload</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => setSocialPreviewFile(e.target.files?.[0] ?? null)}
-                              className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
-                            />
-                          </label>
-                          <p className="text-[11px] text-neutral-500">
-                            Current: {mediaStatus.hasSocial ? "DB image set" : "not set"}
-                          </p>
-                          <button type="submit" disabled={saving || !socialPreviewFile} className="rounded-lg bg-awsOrange px-3 py-2 text-xs font-medium text-black disabled:opacity-60">
-                            Upload preview
-                          </button>
-                        </form>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -1500,7 +1478,7 @@ export default function EditPage() {
         </section>
 
         <p className="pt-3 text-xs text-neutral-600">
-          <a href="/" className="hover:text-awsOrange">
+          <a href="/home" className="hover:text-awsOrange">
             Back to site
           </a>
         </p>

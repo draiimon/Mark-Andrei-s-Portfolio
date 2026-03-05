@@ -1,19 +1,10 @@
 import "@/app/globals.css";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import { Manrope, Sora } from "next/font/google";
 import ClientTabMeta from "@/components/ClientTabMeta";
+import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
 import { prisma } from "@/lib/prisma";
-
-const bodyFont = Manrope({
-  subsets: ["latin"],
-  variable: "--font-body"
-});
-
-const displayFont = Sora({
-  subsets: ["latin"],
-  variable: "--font-display"
-});
+import { resolveMusicEmbed } from "@/lib/music";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mark-andrei-portfolio.onrender.com";
 
@@ -87,11 +78,20 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  let music = null;
+  try {
+    const profile = await prisma.profile.findFirst({ select: { musicUrl: true } });
+    music = resolveMusicEmbed(profile?.musicUrl);
+  } catch {
+    music = null;
+  }
+
   return (
     <html lang="en">
-      <body className={`${bodyFont.variable} ${displayFont.variable} font-body antialiased`}>
+      <body className="font-body antialiased">
         <ClientTabMeta />
+        <GlobalBackgroundMusic music={music} />
         {children}
       </body>
     </html>

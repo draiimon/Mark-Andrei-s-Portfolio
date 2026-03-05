@@ -6,9 +6,10 @@ type ScrollRevealProps = {
   children: ReactNode;
   className?: string;
   delayMs?: number;
+  repeat?: boolean;
 };
 
-export default function ScrollReveal({ children, className = "", delayMs = 0 }: ScrollRevealProps) {
+export default function ScrollReveal({ children, className = "", delayMs = 0, repeat = true }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -20,15 +21,23 @@ export default function ScrollReveal({ children, className = "", delayMs = 0 }: 
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.unobserve(entry.target);
+          if (!repeat) {
+            observer.unobserve(entry.target);
+          }
+          return;
+        }
+        if (repeat) {
+          setVisible(false);
         }
       },
       { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      observer.disconnect();
+    };
+  }, [repeat]);
 
   return (
     <div
