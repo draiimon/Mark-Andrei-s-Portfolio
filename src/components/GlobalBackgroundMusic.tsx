@@ -28,7 +28,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const lowPowerRef = useRef(false);
   const sampleTickRef = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(0.25);
 
   const setVibe = (value: number) => {
     const clamped = Math.max(0, Math.min(1, value));
@@ -80,6 +80,22 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       analyserRef.current = null;
       freqDataRef.current = null;
       analyserEnabledRef.current = false;
+    }
+  };
+
+  const ensureAudioContext = async () => {
+    if (!userGestureRef.current) return;
+
+    const AudioCtx =
+      window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new AudioCtx();
+    }
+
+    if (audioCtxRef.current.state === "suspended") {
+      await audioCtxRef.current.resume();
     }
   };
 
@@ -207,13 +223,11 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       audio.load();
     }
 
-    let retries = 0;
-    let timer: number | null = null;
-
     const tryPlay = async (fromGesture = false) => {
       try {
         if (fromGesture) {
           userGestureRef.current = true;
+          await ensureAudioContext();
         }
         await audio.play();
         setIsPlaying(true);
@@ -222,37 +236,15 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         }
         initAudioAnalysis();
         startVibeLoop();
-        if (timer) {
-          window.clearInterval(timer);
-          timer = null;
-        }
       } catch {
         setIsPlaying(false);
         stopVibeLoop();
         setVibe(0);
         setBeat(0);
-        retries += 1;
-        if (retries > 45 && timer) {
-          window.clearInterval(timer);
-          timer = null;
-        }
       }
     };
 
     void tryPlay();
-    timer = window.setInterval(() => {
-      void tryPlay();
-    }, 900);
-
-    const resume = () => {
-      userGestureRef.current = true;
-      if (audioCtxRef.current?.state === "suspended") {
-        void audioCtxRef.current.resume().then(() => {
-          initAudioAnalysis();
-        });
-      }
-      void tryPlay(true);
-    };
     const onPlay = () => {
       setIsPlaying(true);
       if (userGestureRef.current) {
@@ -271,21 +263,10 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setBeat(0);
     };
 
-    window.addEventListener("pointerdown", resume, { passive: true, capture: true });
-    window.addEventListener("touchstart", resume, { passive: true, capture: true });
-    window.addEventListener("click", resume, { passive: true, capture: true });
-    window.addEventListener("keydown", resume);
-    window.addEventListener("focus", resume);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
 
     return () => {
-      if (timer) window.clearInterval(timer);
-      window.removeEventListener("pointerdown", resume, true);
-      window.removeEventListener("touchstart", resume, true);
-      window.removeEventListener("click", resume, true);
-      window.removeEventListener("keydown", resume);
-      window.removeEventListener("focus", resume);
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       stopVibeLoop();
@@ -341,6 +322,8 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     if (!audio) return;
     try {
       if (audio.paused) {
+        userGestureRef.current = true;
+        await ensureAudioContext();
         await audio.play();
       } else {
         audio.pause();
