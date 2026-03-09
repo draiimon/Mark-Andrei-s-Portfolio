@@ -1,6 +1,6 @@
 import "@/app/globals.css";
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ClientTabMeta from "@/components/ClientTabMeta";
 import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +9,12 @@ import { resolveMusicEmbed } from "@/lib/music";
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mark-andrei-portfolio.onrender.com";
 
 export const dynamic = "force-dynamic";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   let profile: {

@@ -55,9 +55,9 @@ export default function TopBar({ brand, linkedinUrl, githubUrl, discordUrl, inst
   ];
 
   return (
-    <header className="topbar mb-4 flex items-start justify-between gap-2 sm:mb-5 sm:gap-3">
+    <header className="topbar mb-4 flex flex-col gap-3 sm:mb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
       <div className="min-w-0">
-        <span className="inline-flex min-w-0 items-center gap-1 text-[15px] font-extrabold sm:gap-2 sm:text-xl md:text-2xl">
+        <span className="inline-flex min-w-0 items-center gap-1 text-base font-extrabold sm:gap-2 sm:text-xl md:text-2xl">
           <Cloud className="h-5 w-5 text-awsOrange" />
           <span className="brand-wave music-reactive-brand whitespace-nowrap">
             {brand.split("").map((ch, idx) => (
@@ -71,7 +71,7 @@ export default function TopBar({ brand, linkedinUrl, githubUrl, discordUrl, inst
             ))}
           </span>
         </span>
-        <div className="mt-1.5 flex items-center gap-1.5">
+        <div className="mt-1.5 flex flex-wrap items-center gap-2">
           {socialLinks.map((item) => {
             const iconMarkup = (
               <svg viewBox="0 0 24 24" className="h-[1.35rem] w-[1.35rem] fill-current" aria-hidden="true">
@@ -133,7 +133,7 @@ export default function TopBar({ brand, linkedinUrl, githubUrl, discordUrl, inst
               </a>
             );
           })}
-          <p className="group relative inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+          <p className="group relative inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">
             <span className="inline-flex">
               <Eye className="h-[1.125rem] w-[1.125rem] text-awsOrange" />
             </span>
@@ -144,7 +144,7 @@ export default function TopBar({ brand, linkedinUrl, githubUrl, discordUrl, inst
           </p>
         </div>
       </div>
-      <nav className="flex min-w-0 items-center gap-1.5 whitespace-nowrap text-[10px] font-bold text-white sm:gap-3 sm:text-sm md:gap-4 md:text-base">
+      <nav className="flex min-w-0 flex-wrap items-center gap-3 text-xs font-bold text-white sm:gap-3 sm:text-sm md:gap-4 md:text-base">
         <a href="/api/resume" target="_blank" rel="noreferrer" className="nav-link">Resume</a>
         <a href={linkedinHref} target="_blank" rel="noreferrer" className={`nav-link ${!hasLinkedIn ? "pointer-events-none opacity-40" : ""}`}>LinkedIn</a>
         <a href={githubHref} target="_blank" rel="noreferrer" className={`nav-link ${!hasGitHub ? "pointer-events-none opacity-40" : ""}`}>GitHub</a>
