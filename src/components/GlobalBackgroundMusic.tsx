@@ -244,6 +244,10 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       }
     };
 
+    const handleEnterProfile = () => {
+      void tryPlay(true);
+    };
+
     void tryPlay();
     const onPlay = () => {
       setIsPlaying(true);
@@ -263,10 +267,12 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setBeat(0);
     };
 
+    window.addEventListener("portfolio:enter-profile", handleEnterProfile);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
 
     return () => {
+      window.removeEventListener("portfolio:enter-profile", handleEnterProfile);
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       stopVibeLoop();

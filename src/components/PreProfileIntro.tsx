@@ -1,7 +1,7 @@
 "use client";
 
 import { Cloud } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type PreProfileIntroProps = {
   brand: string;
@@ -10,8 +10,13 @@ type PreProfileIntroProps = {
 
 export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps) {
   const [phase, setPhase] = useState<"idle" | "loading" | "fade" | "hidden">("idle");
+  const hasEnteredRef = useRef(false);
+
   const begin = () => {
-    setPhase((p) => (p === "idle" ? "loading" : p));
+    if (hasEnteredRef.current) return;
+    hasEnteredRef.current = true;
+    window.dispatchEvent(new Event("portfolio:enter-profile"));
+    setPhase("loading");
   };
 
   useEffect(() => {
