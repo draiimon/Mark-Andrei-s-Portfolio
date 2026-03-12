@@ -23,13 +23,13 @@ export function resolveMusicEmbed(url: string | null | undefined): ResolvedMusic
     if (parsed.hostname.includes("youtube.com")) {
       const id = parsed.searchParams.get("v");
       if (!id) return null;
-      return { src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&playsinline=1&rel=0`, kind: "embed" };
+      return { src: `/api/stream?url=https://www.youtube.com/watch?v=${id}`, kind: "audio" };
     }
 
     if (parsed.hostname.includes("youtu.be")) {
       const id = parsed.pathname.replace("/", "").trim();
       if (!id) return null;
-      return { src: `https://www.youtube.com/embed/${id}?autoplay=1&mute=0&playsinline=1&rel=0`, kind: "embed" };
+      return { src: `/api/stream?url=https://www.youtube.com/watch?v=${id}`, kind: "audio" };
     }
 
     if (parsed.hostname.includes("spotify.com")) {
@@ -39,9 +39,11 @@ export function resolveMusicEmbed(url: string | null | undefined): ResolvedMusic
       if (!embedType || !embedId) return null;
       return { src: `https://open.spotify.com/embed/${embedType}/${embedId}?autoplay=1`, kind: "embed" };
     }
-  } catch {
-    return null;
-  }
 
-  return null;
+    // Fallback for any other valid URL, assume it's a direct audio stream
+    return { src: parsed.toString(), kind: "audio" };
+  } catch {
+    // If it's an invalid URL but might be a valid relative path without extension
+    return { src: raw, kind: "audio" };
+  }
 }
