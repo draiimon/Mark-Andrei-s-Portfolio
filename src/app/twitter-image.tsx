@@ -29,7 +29,7 @@ export default function TwitterImage() {
           <div style={{ fontSize: 66, fontWeight: 900, lineHeight: 1.06 }}>
             Mark Andrei,
             <div style={{ fontSize: 38, fontWeight: 700, color: "#ff9900", marginTop: 12 }}>
-              To the clouds.
+              Portfolio
             </div>
           </div>
           <div

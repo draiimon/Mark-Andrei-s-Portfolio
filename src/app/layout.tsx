@@ -41,9 +41,9 @@ export async function generateMetadata(): Promise<Metadata> {
     profile = null;
   }
 
-  const title = profile?.tabTitle || "To the clouds. - Mark Andrei Castillo";
+  const title = profile?.tabTitle || "Portfolio - Mark Andrei Castillo";
   const profileName = profile?.fullName || "Mark Andrei";
-  const ogTitle = profile?.brandName ? `${profileName}, ${profile.brandName}` : "Mark Andrei, To the clouds.";
+  const ogTitle = profile?.brandName ? `${profileName}, ${profile.brandName}` : `${profileName}, Portfolio`;
   const description =
     profile?.about ||
     "Entry-level DevOps and Software Developer portfolio of Mark Andrei Castillo focused on practical applications and reliable systems.";

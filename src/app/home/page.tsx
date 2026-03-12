@@ -34,7 +34,7 @@ export default async function Home() {
     "Entry-level DevOps and Software Developer focused on building practical applications and reliable systems.";
   const availability = profile?.availability || "Available for work";
   const email = profile?.email || "andreicastillofficial@gmail.com";
-  const brandName = profile?.brandName || "To the clouds.";
+  const brandName = profile?.brandName || "Portfolio";
   const featuredLabel = profile?.featuredLabel || "Featured Work";
   const experienceTitle = profile?.experienceTitle || "Experience Snapshot";
   const leadershipTitle = profile?.leadershipTitle || "Leadership and Community Activities";

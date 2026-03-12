@@ -74,7 +74,7 @@ export default function OpenGraphImage() {
           }}
         >
           <div style={{ fontSize: 21, color: "#ffcc84", fontWeight: 600 }}>
-            To the clouds. - Portfolio
+            Portfolio
           </div>
           <div style={{ fontSize: 20, color: "#c9ced6" }}>mark-andrei-portfolio.onrender.com</div>
         </div>

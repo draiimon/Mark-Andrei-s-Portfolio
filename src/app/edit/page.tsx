@@ -955,7 +955,7 @@ export default function EditPage() {
                         type="text"
                         value={profileForm.tabTitle}
                         onChange={(e) => setProfileForm((p) => ({ ...p, tabTitle: e.target.value }))}
-                        placeholder="To the clouds. - Mark Andrei"
+                        placeholder="Portfolio - Mark Andrei"
                         className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white"
                       />
                     </label>

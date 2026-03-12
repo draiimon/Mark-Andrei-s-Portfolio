@@ -71,7 +71,7 @@ export default function ClientTabMeta() {
         if (cancelled) return;
 
         clearTick();
-        runTypingLoop(data.tabTitle?.trim() || document.title || "To the clouds.");
+        runTypingLoop(data.tabTitle?.trim() || document.title || "Portfolio");
 
         const href = data.faviconUrl?.trim() || "/icon";
         upsertIcon("icon", href);
@@ -79,7 +79,7 @@ export default function ClientTabMeta() {
         upsertIcon("apple-touch-icon", href);
       } catch {
         clearTick();
-        runTypingLoop(document.title || "To the clouds.");
+        runTypingLoop(document.title || "Portfolio");
       }
     }
 

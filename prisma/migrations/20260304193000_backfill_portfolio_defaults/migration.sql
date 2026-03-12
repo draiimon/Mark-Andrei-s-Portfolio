@@ -2,7 +2,7 @@
 UPDATE "Profile"
 SET
   "availability" = CASE WHEN "availability" IS NULL OR trim("availability") = '' THEN 'Available for work' ELSE "availability" END,
-  "brandName" = CASE WHEN "brandName" IS NULL OR trim("brandName") = '' THEN 'To the clouds.' ELSE "brandName" END,
+  "brandName" = CASE WHEN "brandName" IS NULL OR trim("brandName") = '' THEN 'Portfolio' ELSE "brandName" END,
   "heroTagline" = CASE WHEN "heroTagline" IS NULL OR trim("heroTagline") = '' THEN 'builds in the cloud.' ELSE "heroTagline" END,
   "linkedinUrl" = CASE WHEN "linkedinUrl" IS NULL OR trim("linkedinUrl") = '' THEN 'https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/' ELSE "linkedinUrl" END,
   "github" = CASE WHEN "github" IS NULL OR trim("github") = '' THEN 'https://github.com/draiimon' ELSE "github" END,
