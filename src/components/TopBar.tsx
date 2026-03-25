@@ -59,7 +59,7 @@ export default function TopBar({ brand, linkedinUrl, githubUrl, discordUrl, inst
       <div className="min-w-0">
         <span className="inline-flex min-w-0 items-center gap-1 text-base font-extrabold sm:gap-2 sm:text-xl md:text-2xl">
           <Cloud className="h-5 w-5 text-awsOrange" />
-          <span className="brand-wave music-reactive-brand whitespace-nowrap">
+          <span className="brand-wave music-reactive-brand whitespace-normal">
             {brand.split("").map((ch, idx) => (
               <span
                 key={`${ch}-${idx}`}

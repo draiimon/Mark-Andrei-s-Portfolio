@@ -10,20 +10,43 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function Home() {
-  const [profileRaw, projects, experience, leadership, achievements, taglines] = await Promise.all([
-    prisma.profile.findFirst(),
-    prisma.project.findMany({ orderBy: [{ highlight: "desc" }, { createdAt: "desc" }] }),
-    prisma.experience.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
-    prisma.leadership.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
-    prisma.achievement.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
-    prisma.tagline.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] })
-  ]);
-  const profile = profileRaw
-    ? await prisma.profile.update({
-        where: { id: profileRaw.id },
-        data: { viewCount: { increment: 1 } }
-      })
-    : null;
+  let profile: Awaited<ReturnType<typeof prisma.profile.findFirst>> = null;
+  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
+  let experience: Awaited<ReturnType<typeof prisma.experience.findMany>> = [];
+  let leadership: Awaited<ReturnType<typeof prisma.leadership.findMany>> = [];
+  let achievements: Awaited<ReturnType<typeof prisma.achievement.findMany>> = [];
+  let taglines: Awaited<ReturnType<typeof prisma.tagline.findMany>> = [];
+
+  try {
+    const [profileRaw, projectsRaw, experienceRaw, leadershipRaw, achievementsRaw, taglinesRaw] = await Promise.all([
+      prisma.profile.findFirst(),
+      prisma.project.findMany({ orderBy: [{ highlight: "desc" }, { createdAt: "desc" }] }),
+      prisma.experience.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+      prisma.leadership.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+      prisma.achievement.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
+      prisma.tagline.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] })
+    ]);
+
+    projects = projectsRaw;
+    experience = experienceRaw;
+    leadership = leadershipRaw;
+    achievements = achievementsRaw;
+    taglines = taglinesRaw;
+
+    if (profileRaw) {
+      try {
+        profile = await prisma.profile.update({
+          where: { id: profileRaw.id },
+          data: { viewCount: { increment: 1 } }
+        });
+      } catch {
+        // Read success should still render if view increment fails.
+        profile = profileRaw;
+      }
+    }
+  } catch (error) {
+    console.error("Portfolio data load failed; rendering fallback content.", error);
+  }
 
   const featured = projects.find((p) => p.highlight) ?? projects[0] ?? null;
 
@@ -61,7 +84,7 @@ export default async function Home() {
 
         <ScrollReveal className="mb-14" delayMs={20} repeat={false}>
           <section>
-            <h1 className="music-reactive-hero font-display text-4xl font-black leading-[1.05] sm:text-5xl md:text-7xl">
+            <h1 className="music-reactive-hero font-display text-3xl font-black leading-[1.05] sm:text-5xl md:text-7xl">
               <strong className="hero-cloud-wave">
                 {[...`${heroName},`].map((ch, idx) => (
                   <span
@@ -189,10 +212,10 @@ export default async function Home() {
         </p>
 
         <footer className="mt-3 border-t border-white/10 pt-6 text-xs text-slate-300 sm:text-sm md:text-base">
-          <div className="mt-2 grid grid-cols-3 items-center gap-2">
-            <span className="text-left">{brandName}</span>
-            <span className="text-center">{footerCenterText}</span>
-            <span className="text-right">{footerRightText}</span>
+          <div className="mt-2 grid grid-cols-1 gap-1 text-center sm:grid-cols-3 sm:items-center sm:gap-2">
+            <span className="sm:text-left">{brandName}</span>
+            <span className="sm:text-center">{footerCenterText}</span>
+            <span className="sm:text-right">{footerRightText}</span>
           </div>
         </footer>
       </div>

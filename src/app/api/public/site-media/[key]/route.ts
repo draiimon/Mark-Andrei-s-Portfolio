@@ -13,19 +13,24 @@ export async function GET(_req: NextRequest, { params }: Params) {
     return new NextResponse("Not found", { status: 404 });
   }
 
-  const media = await prisma.siteMedia.findUnique({
-    where: { key },
-    select: { content: true, contentType: true, updatedAt: true }
-  });
+  try {
+    const media = await prisma.siteMedia.findUnique({
+      where: { key },
+      select: { content: true, contentType: true, updatedAt: true }
+    });
 
-  if (!media) return new NextResponse("Not found", { status: 404 });
+    if (!media) return new NextResponse("Not found", { status: 404 });
 
-  return new NextResponse(Buffer.from(media.content), {
-    status: 200,
-    headers: {
-      "Content-Type": media.contentType || "image/png",
-      "Cache-Control": "public, max-age=3600",
-      ETag: `W/"${media.updatedAt.getTime()}"`
-    }
-  });
+    return new NextResponse(Buffer.from(media.content), {
+      status: 200,
+      headers: {
+        "Content-Type": media.contentType || "image/png",
+        "Cache-Control": "public, max-age=3600",
+        ETag: `W/"${media.updatedAt.getTime()}"`
+      }
+    });
+  } catch (error) {
+    console.error(`Failed to fetch site media for key=${key}`, error);
+    return new NextResponse("Temporarily unavailable", { status: 503 });
+  }
 }

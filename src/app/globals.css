@@ -900,6 +900,8 @@ body {
 
 .brand-wave {
   display: inline-flex;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 
 .brand-letter {
@@ -1456,29 +1458,6 @@ body {
     filter: none;
   }
 
-  .music-reactive-hero,
-  .music-reactive-hero strong,
-  .hero-cloud-wave .hero-letter,
-  .music-reactive-brand,
-  .music-reactive-brand .brand-letter,
-  .brand-letter {
-    transform: none !important;
-    filter: none !important;
-    text-shadow: none !important;
-  }
-
-  .hero-cloud-wave .hero-letter,
-  .music-reactive-brand .brand-letter,
-  .brand-letter {
-    animation: none;
-  }
-
-  .glow-icon-link,
-  .glow-icon-link svg {
-    filter: none;
-    transform: none;
-  }
-
   :root[data-mobile-lite="true"] {
     --music-vibe: calc(var(--music-vibe) * 0.9);
     --music-beat: calc(var(--music-beat) * 0.72);
@@ -1550,6 +1529,10 @@ body {
   :root[data-mobile-lite="true"] .ask-ai-wrap {
     right: 0.62rem;
     bottom: calc(0.62rem + env(safe-area-inset-bottom));
+  }
+
+  .typewriter-wrap {
+    max-width: calc(100vw - 2.4rem);
   }
 
   :root[data-mobile-lite="true"] .ask-ai-fab {

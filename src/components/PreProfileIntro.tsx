@@ -93,7 +93,7 @@ export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps)
         <p className="pre-intro-kicker">{phase === "loading" || phase === "fade" ? "Loading profile" : "Enter profile"}</p>
         <p className={`pre-intro-brand ${phase === "idle" ? "pre-intro-brand-pulse" : ""}`}>
           <Cloud className="h-5 w-5 text-amber-500" />
-          <span className="pre-intro-brand-wave whitespace-nowrap">
+          <span className="pre-intro-brand-wave whitespace-normal">
             {brand.split("").map((ch, idx) => (
               <span
                 key={`${ch}-${idx}`}

@@ -26,6 +26,12 @@ ADMIN_EMAIL="<admin login email>"
 ADMIN_PASSWORD="<admin login password>"
 ```
 
+For Neon + Prisma, use a pooled connection string with SSL:
+
+```bash
+DATABASE_URL="postgresql://<user>:<password>@<project>-pooler.<region>.aws.neon.tech/<db>?sslmode=require&pgbouncer=true&connect_timeout=15"
+```
+
 3. Apply Prisma migrations:
 
 ```bash
@@ -40,9 +46,14 @@ npm run dev
 
 The app will be available at `http://localhost:3000`.
 
+### Production deployment notes
+
+- Run `npm run db:deploy` during deploy before `next start`.
+- Confirm `DATABASE_URL` is set in the hosting platform environment (not only local `.env`).
+- If the database is temporarily unreachable, the homepage now falls back safely instead of crashing.
+
 ### Admin panel
 
 - Public visitors land on `/` (the portfolio).
 - Admin login is at `/admin/login` (email + password from `.env`).
 - After login, `/admin/dashboard` shows a snapshot of profile, projects, and gallery.
-
