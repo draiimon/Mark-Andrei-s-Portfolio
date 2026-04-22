@@ -3,19 +3,85 @@ import PreProfileIntro from "@/components/PreProfileIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
+import portfolioSnapshot from "@/data/portfolio-snapshot.json";
 import { prisma } from "@/lib/prisma";
 import { ExternalLink, Github } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+type ProfileView = {
+  fullName: string;
+  headline?: string | null;
+  email: string;
+  github?: string | null;
+  linkedinUrl?: string | null;
+  discordUrl?: string | null;
+  instagramUrl?: string | null;
+  spotifyUrl?: string | null;
+  viewCount?: number | null;
+  about?: string | null;
+  availability?: string | null;
+  brandName?: string | null;
+  heroTagline?: string | null;
+  featuredLabel?: string | null;
+  experienceTitle?: string | null;
+  leadershipTitle?: string | null;
+  achievementsTitle?: string | null;
+  contactLabel?: string | null;
+  footerCenterText?: string | null;
+  footerRightText?: string | null;
+};
+
+type ProjectView = {
+  id: number;
+  name: string;
+  description: string;
+  techStack: string;
+  link: string | null;
+  githubUrl: string | null;
+  highlight: boolean;
+};
+
+type ExperienceView = {
+  id: number;
+  role: string;
+  company: string;
+  period: string;
+  summary: string;
+};
+
+type LeadershipView = {
+  id: number;
+  org: string;
+  role: string;
+  period: string;
+};
+
+type AchievementView = {
+  id: number;
+  text: string;
+};
+
 export default async function Home() {
-  let profile: Awaited<ReturnType<typeof prisma.profile.findFirst>> = null;
-  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
-  let experience: Awaited<ReturnType<typeof prisma.experience.findMany>> = [];
-  let leadership: Awaited<ReturnType<typeof prisma.leadership.findMany>> = [];
-  let achievements: Awaited<ReturnType<typeof prisma.achievement.findMany>> = [];
-  let taglines: Awaited<ReturnType<typeof prisma.tagline.findMany>> = [];
+  let profile: ProfileView = portfolioSnapshot.profile;
+  let projects: ProjectView[] = portfolioSnapshot.projects.map((project, idx) => ({
+    id: idx + 1,
+    ...project
+  }));
+  let experience: ExperienceView[] = portfolioSnapshot.experience.map((item, idx) => ({
+    id: idx + 1,
+    ...item
+  }));
+  let leadership: LeadershipView[] = portfolioSnapshot.leadership.map((item, idx) => ({
+    id: idx + 1,
+    ...item
+  }));
+  let achievements: AchievementView[] = portfolioSnapshot.achievements.map((item, idx) => ({
+    id: idx + 1,
+    ...item
+  }));
+  let taglines = portfolioSnapshot.taglines;
 
   try {
     const [profileRaw, projectsRaw, experienceRaw, leadershipRaw, achievementsRaw, taglinesRaw] = await Promise.all([
@@ -27,25 +93,25 @@ export default async function Home() {
       prisma.tagline.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] })
     ]);
 
-    projects = projectsRaw;
-    experience = experienceRaw;
-    leadership = leadershipRaw;
-    achievements = achievementsRaw;
-    taglines = taglinesRaw;
+    if (projectsRaw.length > 0) projects = projectsRaw;
+    if (experienceRaw.length > 0) experience = experienceRaw;
+    if (leadershipRaw.length > 0) leadership = leadershipRaw;
+    if (achievementsRaw.length > 0) achievements = achievementsRaw;
+    if (taglinesRaw.length > 0) taglines = taglinesRaw;
 
     if (profileRaw) {
       try {
         profile = await prisma.profile.update({
           where: { id: profileRaw.id },
           data: { viewCount: { increment: 1 } }
-        });
+        }) as unknown as ProfileView;
       } catch {
         // Read success should still render if view increment fails.
-        profile = profileRaw;
+        profile = profileRaw as unknown as ProfileView;
       }
     }
   } catch (error) {
-    console.error("Portfolio data load failed; rendering fallback content.", error);
+    console.error("Portfolio data load failed; rendering snapshot fallback.", error);
   }
 
   const featured = projects.find((p) => p.highlight) ?? projects[0] ?? null;
@@ -79,7 +145,7 @@ export default async function Home() {
           discordUrl={profile?.discordUrl}
           instagramUrl={profile?.instagramUrl}
           spotifyUrl={profile?.spotifyUrl}
-          viewCount={profile?.viewCount}
+          viewCount={profile?.viewCount ?? undefined}
         />
 
         <ScrollReveal className="mb-14" delayMs={20} repeat={false}>

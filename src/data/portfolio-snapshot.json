@@ -1,0 +1,206 @@
+{
+  "profile": {
+    "fullName": "Mark Andrei R. Castillo",
+    "headline": "With Honor Distinction",
+    "location": "#30 Coconut Street, Wood Estate Village 2, Molino 3, Bacoor City, Cavite",
+    "email": "andreicastillofficial@gmail.com",
+    "phone": "+639538521829",
+    "github": "https://github.com/draiimon",
+    "linkedinUrl": "https://www.linkedin.com/in/mark-andrei-castillo-1741302a0/",
+    "facebookUrl": "https://www.facebook.com/masoncalix",
+    "discordUrl": "masoncalix",
+    "instagramUrl": "https://www.instagram.com/masoncalix/",
+    "spotifyUrl": "https://open.spotify.com/user/31wibqoqmd73own5j774iqmvyayi",
+    "objective": "Self-driven Computer Science graduate with strong leadership experience and hands-on expertise in DevOps, full-stack development, and AI/ML.",
+    "about": "Entry-level DevOps and Software Developer focused on building practical applications and reliable systems, with leadership experience from student organizations and a passion for learning new technologies.",
+    "skills": "Python, Java, C/C++, PHP, SQL, Django, Laravel, React (Next.js), Node.js, AWS, Docker, Terraform, PostgreSQL, MongoDB, Firebase, Selenium, Playwright, YOLOv8, NLTK, spaCy",
+    "viewCount": 6222,
+    "availability": "Available for work",
+    "brandName": "To the clouds.",
+    "heroTagline": "builds in the cloud.",
+    "tabTitle": "Mark Andrei - To the clouds.....",
+    "faviconUrl": "/api/public/site-media/favicon?v=1772708449594",
+    "socialImageUrl": "/api/public/site-media/social?v=1772708460816",
+    "featuredLabel": "Featured Work",
+    "experienceTitle": "Experience Snapshot",
+    "leadershipTitle": "Leadership and Community Activities",
+    "achievementsTitle": "Achievements",
+    "contactLabel": "Say hi -",
+    "footerCenterText": "@2026 draiimon",
+    "footerRightText": "Thank you!",
+    "aiBehaviorPrompt": "Mark Andrei Hobbies are to play Valorant go to gym and doing night bars",
+    "accentRed": 255,
+    "accentGreen": 153,
+    "accentBlue": 0
+  },
+  "projects": [
+    {
+      "name": "PanicSense PH",
+      "tagline": "Real-time disaster signal monitoring",
+      "description": "Real-time disaster signal monitoring with multilingual sentiment analysis to surface urgent areas faster.",
+      "techStack": "Python / NLP / mBERT / Bi-GRU / LSTM",
+      "link": "https://panicsenseph.ct.ws/",
+      "githubUrl": "https://github.com/draiimon/Thesis-PanicSense/tree/main",
+      "highlight": true
+    },
+    {
+      "name": "Oaktree Platform",
+      "tagline": "Cloud-ready DevOps",
+      "description": "Cloud-ready DevOps platform focused on deploying and operationalizing a full-stack application using Docker, AWS ECS, and Infrastructure as Code with Terraform.",
+      "techStack": "Docker · Terraform · AWS ECS · GitHub Actions",
+      "link": null,
+      "githubUrl": "https://github.com/draiimon",
+      "highlight": false
+    },
+    {
+      "name": "Cloud Capture",
+      "tagline": "Serverless photo workflow",
+      "description": "Leveraged AWS services (S3, DynamoDB, Lambda) to automate photo editing and simplify photo-sharing for photobooth workflows.",
+      "techStack": "AWS S3 · DynamoDB · Lambda · Automation",
+      "link": null,
+      "githubUrl": "https://github.com/draiimon",
+      "highlight": false
+    },
+    {
+      "name": "SmartSort",
+      "tagline": "AI waste segregation",
+      "description": "AI-driven waste segregation system utilizing YOLOv8 to classify waste into biodegradable and non-biodegradable for improved waste management.",
+      "techStack": "Python · YOLOv8 · OpenCV · Computer Vision",
+      "link": null,
+      "githubUrl": "https://github.com/draiimon/Waste-Detection-Non-Bio-and-Bio-Project-Using-Yolov8",
+      "highlight": false
+    },
+    {
+      "name": "SignABC",
+      "tagline": "Sign-to-speech interpreter",
+      "description": "Sign-to-speech interpreter using MediaPipe and Python to support alphabetical sign language users and promote inclusive digital interfaces.",
+      "techStack": "Python · MediaPipe · Accessibility",
+      "link": null,
+      "githubUrl": "https://github.com/draiimon",
+      "highlight": false
+    },
+    {
+      "name": "MoodSync",
+      "tagline": "Mental health support chatbot",
+      "description": "Mental health support chatbot using NLP to analyze emotional tone and provide empathetic responses.",
+      "techStack": "NLP · Python · Chatbot",
+      "link": null,
+      "githubUrl": "https://github.com/draiimon",
+      "highlight": false
+    },
+    {
+      "name": "SpeakSmart",
+      "tagline": "Speech-to-text insights platform",
+      "description": "Speech-to-text platform using Azure Cognitive Services, NLTK, spaCy, and Hugging Face Transformers for sentiment and language insights.",
+      "techStack": "Azure Cognitive Services · NLTK · spaCy · Transformers",
+      "link": null,
+      "githubUrl": "https://github.com/draiimon",
+      "highlight": false
+    }
+  ],
+  "experience": [
+    {
+      "role": "BS Computer Science",
+      "company": "Technological Institute of the Philippines - Manila",
+      "period": "2021 - 2025",
+      "summary": "Recent graduate with hands-on project experience in cloud, AI, and full-stack development.",
+      "sortOrder": 1
+    },
+    {
+      "role": "Cloud DevOps Intern",
+      "company": "Oaktree Innovations",
+      "period": "Mar 2025 - May 2025",
+      "summary": "Assisted with AWS infrastructure tasks, improved CI/CD workflows, and supported deployment automation.",
+      "sortOrder": 2
+    }
+  ],
+  "leadership": [
+    {
+      "org": "Microsoft Student Community - TIP Manila",
+      "role": "TSMP & Communication Committee, LORSO Rep",
+      "period": "2021 - 2025",
+      "sortOrder": 1
+    },
+    {
+      "org": "League of Recognized Student Organizations - TIP Manila",
+      "role": "Assistant Secretary, Project Manager (Operations)",
+      "period": "2023 - 2025",
+      "sortOrder": 2
+    },
+    {
+      "org": "AWS Cloud Club - TIP Manila",
+      "role": "Vice-Chief Relations Officer",
+      "period": "2024",
+      "sortOrder": 3
+    },
+    {
+      "org": "ICONS (Information & Computing Organization of Networked Students)",
+      "role": "Treasurer, Public Relations Officer, Communications Head",
+      "period": "2021 - 2024",
+      "sortOrder": 4
+    },
+    {
+      "org": "UPHSD SHS Alumni Association",
+      "role": "Public Information Officer",
+      "period": "2024 - 2027",
+      "sortOrder": 5
+    },
+    {
+      "org": "College of Computer Studies - TIP Manila",
+      "role": "Public Relations Officer",
+      "period": "Jan 2023 - May 2024",
+      "sortOrder": 6
+    },
+    {
+      "org": "CITE Department Student Council - TIP Manila",
+      "role": "Mentee - Sponsorship & Marketing Head",
+      "period": "Aug 2021 - Jul 2022",
+      "sortOrder": 7
+    }
+  ],
+  "achievements": [
+    {
+      "text": "With Honor Distinction (BS Computer Science)",
+      "sortOrder": 1
+    },
+    {
+      "text": "Service Excellence Award",
+      "sortOrder": 2
+    },
+    {
+      "text": "Service Stewardship Award",
+      "sortOrder": 3
+    },
+    {
+      "text": "Built and deployed practical cloud/AI projects including PanicSense PH thesis",
+      "sortOrder": 4
+    },
+    {
+      "text": "Hands-on Cloud DevOps internship experience at Oaktree Innovations",
+      "sortOrder": 5
+    }
+  ],
+  "taglines": [
+    {
+      "text": "builds practical DevOps workflows.",
+      "sortOrder": 1
+    },
+    {
+      "text": "ships clean full-stack applications.",
+      "sortOrder": 2
+    },
+    {
+      "text": "creates reliable software systems.",
+      "sortOrder": 3
+    },
+    {
+      "text": "leads teams with service and focus.",
+      "sortOrder": 4
+    },
+    {
+      "text": "improves delivery through automation.",
+      "sortOrder": 5
+    }
+  ],
+  "galleryImage": []
+}

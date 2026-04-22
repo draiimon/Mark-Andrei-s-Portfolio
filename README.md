@@ -52,6 +52,22 @@ The app will be available at `http://localhost:3000`.
 - Confirm `DATABASE_URL` is set in the hosting platform environment (not only local `.env`).
 - If the database is temporarily unreachable, the homepage now falls back safely instead of crashing.
 
+### Snapshot backup (git-safe fallback)
+
+- Current portfolio state is committed at `src/data/portfolio-snapshot.json`.
+- Homepage auto-falls back to this snapshot if DB content is missing/unavailable.
+- Export latest DB state into snapshot:
+
+```bash
+npm run db:snapshot:export
+```
+
+- Restore snapshot into current DB:
+
+```bash
+npm run db:snapshot:restore
+```
+
 ### Admin panel
 
 - Public visitors land on `/` (the portfolio).
