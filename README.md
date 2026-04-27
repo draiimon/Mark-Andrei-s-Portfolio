@@ -15,15 +15,16 @@ Minimalist cloud-devops themed portfolio for **Mark Andrei R. Castillo**, built 
 npm install
 ```
 
-2. Set up environment variables in a `.env` file:
+2. Set up environment variables in a `.env` file (copy from `.env.example`):
 
 ```bash
 DATABASE_URL="<your Neon Postgres connection string>"
 GROQ_API_KEY="<your Groq API key>"
+ADMIN_USERNAME="<admin login username>"
+ADMIN_PASSWORD="<admin login password>"
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 NEXTAUTH_SECRET="<random-long-secret>"
 NEXTAUTH_URL="http://localhost:3000"
-ADMIN_EMAIL="<admin login email>"
-ADMIN_PASSWORD="<admin login password>"
 ```
 
 For Neon + Prisma, use a pooled connection string with SSL:
@@ -45,6 +46,12 @@ npm run dev
 ```
 
 The app will be available at `http://localhost:3000`.
+
+5. Verify environment + DB connectivity:
+
+```bash
+npm run env:check
+```
 
 ### Production deployment notes
 
@@ -71,5 +78,5 @@ npm run db:snapshot:restore
 ### Admin panel
 
 - Public visitors land on `/` (the portfolio).
-- Admin login is at `/admin/login` (email + password from `.env`).
+- Admin login is at `/edit` (`ADMIN_USERNAME` + `ADMIN_PASSWORD` from `.env`).
 - After login, `/admin/dashboard` shows a snapshot of profile, projects, and gallery.

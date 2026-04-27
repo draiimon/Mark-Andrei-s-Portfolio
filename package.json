@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "db:deploy": "prisma migrate deploy",
+    "env:check": "node scripts/env-check.cjs",
     "db:snapshot:export": "node scripts/db-export-snapshot.cjs",
     "db:snapshot:restore": "node scripts/db-restore-snapshot.cjs",
     "start": "next start",
