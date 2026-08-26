@@ -1180,8 +1180,8 @@ export default function EditPage() {
             <input type="text" placeholder="Tagline" value={newProject.tagline} onChange={(e) => setNewProject((p) => ({ ...p, tagline: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <textarea placeholder="Description" value={newProject.description} onChange={(e) => setNewProject((p) => ({ ...p, description: e.target.value }))} rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <input type="text" placeholder="Tech stack" value={newProject.techStack} onChange={(e) => setNewProject((p) => ({ ...p, techStack: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="url" placeholder="Live demo URL" value={newProject.link} onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="url" placeholder="GitHub URL" value={newProject.githubUrl} onChange={(e) => setNewProject((p) => ({ ...p, githubUrl: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <input type="text" placeholder="Live demo URL" value={newProject.link} onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <input type="text" placeholder="GitHub URL" value={newProject.githubUrl} onChange={(e) => setNewProject((p) => ({ ...p, githubUrl: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <label className="flex items-center gap-2 text-neutral-300">
               <input type="checkbox" checked={newProject.highlight} onChange={(e) => setNewProject((p) => ({ ...p, highlight: e.target.checked }))} />
               Featured project

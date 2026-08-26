@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { buildProjectWriteData } from "@/lib/project-data";
 import { prisma } from "@/lib/prisma";
 
 async function isEditAuth() {
@@ -12,16 +13,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const id = Number((await params).id);
   if (Number.isNaN(id)) return NextResponse.json({ error: "Bad request" }, { status: 400 });
   const body = await req.json();
+  const data = buildProjectWriteData(body);
+
+  if (data.highlight) {
+    await prisma.project.updateMany({
+      where: { id: { not: id }, highlight: true },
+      data: { highlight: false }
+    });
+  }
+
   const project = await prisma.project.update({
     where: { id },
-    data: {
-      ...(body.name != null && { name: String(body.name) }),
-      ...(body.tagline != null && { tagline: String(body.tagline) }),
-      ...(body.description != null && { description: String(body.description) }),
-      ...(body.techStack != null && { techStack: String(body.techStack) }),
-      ...(body.link != null && { link: body.link ? String(body.link) : null }),
-      ...(body.githubUrl != null && { githubUrl: body.githubUrl ? String(body.githubUrl) : null })
-    }
+    data
   });
   return NextResponse.json(project);
 }
