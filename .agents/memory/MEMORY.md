@@ -2,3 +2,4 @@
 - [Root Docker setup](root-docker-setup.md) — preserve the main project's root Docker files during cleanup; archival copies are not a substitute.
 - [Portfolio interaction layer](portfolio-interaction-layer.md) — keep scroll reveal, music reactivity, aura glow, and chat motion expressive; do not flatten them in surface passes.
 - [Editor music autoplay](editor-music-autoplay.md) — autoplay can start media before Web Audio analysis unlocks, so preserve a visible Edit beat path until interaction unlocks analysis.
+- [Portfolio performance tiers](portfolio-performance-tiers.md) — share low-end scheduling across phones, but keep visual-lite surface rules scoped to their existing device class.

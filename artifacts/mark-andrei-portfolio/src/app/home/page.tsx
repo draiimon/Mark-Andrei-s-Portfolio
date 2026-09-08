@@ -1,10 +1,10 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import PreProfileIntro from "@/components/PreProfileIntro";
+import { lazy, startTransition, Suspense, useEffect, useState } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
 import portfolioSnapshot from "@/data/portfolio-snapshot.json";
 import { ExternalLink, Github } from "lucide-react";
+import { runWhenIdle } from "@/lib/performance";
 
 const LazyChatbot = lazy(() => import("@/components/Chatbot"));
 
@@ -13,9 +13,7 @@ function DeferredChatbot({ interactionPreview }: { interactionPreview: boolean }
 
   useEffect(() => {
     if (ready) return;
-    const onEnterProfile = () => setReady(true);
-    window.addEventListener("portfolio:enter-profile", onEnterProfile, { once: true });
-    return () => window.removeEventListener("portfolio:enter-profile", onEnterProfile);
+    return runWhenIdle(() => setReady(true), 1600);
   }, [ready]);
 
   if (!ready) return null;
@@ -112,7 +110,9 @@ export default function Home() {
         });
         const data = (await response.json().catch(() => null)) as { viewCount?: unknown } | null;
         if (!cancelled && typeof data?.viewCount === "number") {
-          setProfile((current) => ({ ...current, viewCount: data.viewCount as number }));
+          startTransition(() => {
+            setProfile((current) => ({ ...current, viewCount: data.viewCount as number }));
+          });
         }
       } catch {
         // A view counter failure must not block the portfolio from rendering.
@@ -123,18 +123,21 @@ export default function Home() {
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (cancelled || !data) return;
-        setProfile({ ...portfolioSnapshot.profile, ...data.profile });
-        if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
-        if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
-        if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
-        if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
-        if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
+         startTransition(() => {
+           setProfile({ ...portfolioSnapshot.profile, ...data.profile });
+           if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
+           if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
+           if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
+           if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
+           if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
+         });
       })
       .catch(() => undefined);
-    void recordView();
+     const cancelIdleView = runWhenIdle(() => void recordView(), 2500);
 
     return () => {
       cancelled = true;
+       cancelIdleView();
     };
   }, []);
 
@@ -160,11 +163,12 @@ export default function Home() {
       <video
         className="site-video-background"
         src="/assets/solar-eclipse-background-pingpong.mp4"
+         poster="/assets/solar-eclipse-background-poster.jpg"
         autoPlay
         loop
         muted
         playsInline
-        preload="auto"
+         preload="metadata"
         tabIndex={-1}
         aria-hidden="true"
       />
@@ -320,7 +324,6 @@ export default function Home() {
         </div>
 
         <DeferredChatbot interactionPreview={interactionPreview} />
-        {!interactionPreview && <PreProfileIntro brand={brandName} />}
       </div>
     </main>
   );

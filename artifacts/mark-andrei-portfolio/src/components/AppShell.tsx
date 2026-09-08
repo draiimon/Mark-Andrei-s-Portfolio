@@ -4,6 +4,7 @@ import ClientTabMeta from "@/components/ClientTabMeta";
 import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
 import MoonCursor from "@/components/MoonCursor";
 import { resolveMusicEmbed } from "@/lib/music";
+import { runWhenIdle } from "@/lib/performance";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const music = resolveMusicEmbed("/uploads/music/1772698457967-vuu52gsd.mp3");
@@ -12,6 +13,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     let idleTimer: number | null = null;
     let scrollTimer: number | null = null;
+    let lastPointerActivity = 0;
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
 
     const clearTimer = (timer: number | null) => {
       if (timer !== null) window.clearTimeout(timer);
@@ -41,7 +44,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
     const handlePointerMove = (event: PointerEvent) => {
       // A touch drag is page scrolling, not pointer activity. Let touchmove
       // keep the floating music control hidden instead of revealing it again.
-      if (event.pointerType === "touch" || window.matchMedia("(pointer: coarse)").matches) return;
+      if (event.pointerType === "touch" || coarsePointer.matches) return;
+      const now = performance.now();
+      if (now - lastPointerActivity < 120) return;
+      lastPointerActivity = now;
       showControls();
     };
 
@@ -68,6 +74,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
       window.removeEventListener("keydown", showControls);
       window.removeEventListener("focusin", showControls);
     };
+  }, []);
+
+  useEffect(() => {
+    if (!import.meta.env.PROD || !("serviceWorker" in navigator)) return;
+    const cancel = runWhenIdle(() => {
+      void navigator.serviceWorker.register("/sw.js", { scope: "/" });
+    }, 3500);
+    return cancel;
   }, []);
 
   useEffect(() => {

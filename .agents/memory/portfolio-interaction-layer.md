@@ -9,9 +9,9 @@ The portfolio’s scroll reveal, music controller, music-reactive hero, and chat
 
 **How to apply:** Keep the dark, grid-free surface and transparent header, but treat the interaction layer as expressive UI: restore original animation and depth styles when adding broader surface overrides.
 
-On mobile, preserve the original interaction geometry: the music control docks as a compact rounded button at bottom-left, the assistant stays at bottom-right, and the intro hides both until entry; desktop keeps the vertical music rail with speaker, play/pause, and volume.
+On mobile, preserve the interaction geometry: the music control docks as a compact rounded button at bottom-left, the assistant stays at bottom-right, and desktop keeps the vertical music rail with speaker, play/pause, and volume. The homepage now renders directly without an entry/loading gate.
 
-**Why:** The original mobile experience depends on these fixed touch targets and responsive state changes, not just their visual styling.
+**Why:** The mobile experience depends on these fixed touch targets and responsive state changes, not just their visual styling; the redundant profile-entry/loading overlay was removed to improve first use.
 
 **How to apply:** Any future mobile CSS pass must keep the bottom docking, hidden mobile speaker/volume controls, and intro visibility state in sync with the original.
 

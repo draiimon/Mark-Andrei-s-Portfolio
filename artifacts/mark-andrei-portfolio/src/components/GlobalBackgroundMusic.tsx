@@ -1,6 +1,7 @@
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ResolvedMusic } from "@/lib/music";
+import { isLowPowerDevice, shouldUseMobileLiteStyles } from "@/lib/performance";
 
 type GlobalBackgroundMusicProps = {
   music: ResolvedMusic | null;
@@ -206,12 +207,8 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   useEffect(() => {
     const updateMobileFlag = () => {
       isMobileRef.current = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
-      const mem = typeof navigator !== "undefined" && "deviceMemory" in navigator ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8 : 8;
-      const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency || 8 : 8;
-      const ua = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
-      const isAndroid = ua.includes("android");
-      lowPowerRef.current = isAndroid && (mem <= 6 || cores <= 6);
-      if (lowPowerRef.current) {
+       lowPowerRef.current = isLowPowerDevice();
+       if (shouldUseMobileLiteStyles()) {
         document.documentElement.setAttribute("data-mobile-lite", "true");
       } else {
         document.documentElement.removeAttribute("data-mobile-lite");
@@ -276,10 +273,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       }
     };
 
-    const handleEnterProfile = () => {
-      void tryPlay(true);
-    };
-
     const onPlay = () => {
       setIsPlaying(true);
       if (userGestureRef.current) {
@@ -305,7 +298,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       if (!document.hidden && !audio.paused) startVibeLoop();
     };
 
-    window.addEventListener("portfolio:enter-profile", handleEnterProfile);
     if (isEditorRoute) {
       // Attempt autoplay for the editor. Browsers that block unprompted audio
       // will resume it on the first real interaction and unlock analysis.
@@ -318,7 +310,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
-      window.removeEventListener("portfolio:enter-profile", handleEnterProfile);
       if (isEditorRoute) {
         window.removeEventListener("pointerdown", handleEditorInteraction);
         window.removeEventListener("keydown", handleEditorInteraction);

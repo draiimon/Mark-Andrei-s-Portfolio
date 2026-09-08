@@ -7209,3 +7209,22 @@ html:has(.pre-intro) .ask-ai-wrap {
     transform: none !important;
   }
 }
+
+/* Keep below-the-fold layout out of the first composite while preserving the
+   same painted result once a section enters the viewport. */
+.portfolio-page-content > section[id] {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
+.site-video-background,
+.site-video-shade {
+  contain: paint;
+  backface-visibility: hidden;
+}
+
+html[data-mobile-lite] .site-shell::before,
+html[data-mobile-lite] .site-shell::after,
+html[data-mobile-lite] .cloud-light {
+  will-change: auto;
+}

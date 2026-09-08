@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Mail, RotateCcw, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import SolarAura from "@/components/SolarAura";
+import { isLowPowerDevice } from "@/lib/performance";
 
 type Message = { role: "user" | "assistant"; content: string };
 type TypingReply = { index: number; fullText: string; visibleText: string };
@@ -14,6 +15,27 @@ const questions = [
   { label: "Get in touch", text: "How can I contact Andrei about a job opportunity?", icon: Mail },
 ];
 const thinkingSteps = ["Reading the portfolio", "Connecting the details", "Thinking it through", "Crafting a reply"];
+
+const markdownComponents = {
+  a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    const isExternalLink = typeof href === "string" && /^https?:\/\//i.test(href);
+    return (
+      <a
+        {...props}
+        href={href}
+        target={isExternalLink ? "_blank" : undefined}
+        rel={isExternalLink ? "noopener noreferrer" : undefined}
+      >
+        {children}
+      </a>
+    );
+  },
+};
+
+const typingMarkdownComponents = {
+  ...markdownComponents,
+  p: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+};
 
 function normalizeAssistantReply(value: string) {
   return value
@@ -38,28 +60,10 @@ function removeUnclosedEmphasis(value: string) {
 
 function AssistantReply({ content, typing = false }: { content: string; typing?: boolean }) {
   const markdown = typing ? removeUnclosedEmphasis(content) : content;
-  const markdownComponents = {
-    a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-      const isExternalLink = typeof href === "string" && /^https?:\/\//i.test(href);
-      return (
-        <a
-          {...props}
-          href={href}
-          target={isExternalLink ? "_blank" : undefined}
-          rel={isExternalLink ? "noopener noreferrer" : undefined}
-        >
-          {children}
-        </a>
-      );
-    },
-  };
   return (
     <div className={`chat-rich-copy ${typing ? "chat-rich-copy-typing" : ""}`}>
       <ReactMarkdown
-        components={{
-          ...markdownComponents,
-          ...(typing ? { p: ({ children }) => <span>{children}</span> } : {}),
-        }}
+        components={typing ? typingMarkdownComponents : markdownComponents}
       >
         {markdown}
       </ReactMarkdown>
@@ -125,7 +129,10 @@ export default function Chatbot() {
 
     typingActiveRef.current = true;
     const { index, fullText } = typingReply;
-    const step = fullText.length > 700 ? 3 : fullText.length > 320 ? 2 : 1;
+    const baseStep = fullText.length > 700 ? 3 : fullText.length > 320 ? 2 : 1;
+    const lowPower = isLowPowerDevice();
+    const interval = lowPower ? 32 : 16;
+    const step = lowPower ? baseStep * 2 : baseStep;
     let cursor = 0;
     const timer = window.setInterval(() => {
       cursor = Math.min(fullText.length, cursor + step);
@@ -139,7 +146,7 @@ export default function Chatbot() {
         return;
       }
       setTypingReply((current) => current ? { ...current, visibleText: fullText.slice(0, cursor) } : null);
-    }, 16);
+    }, interval);
     return () => window.clearInterval(timer);
   }, [typingReply?.index, typingReply?.fullText]);
 
