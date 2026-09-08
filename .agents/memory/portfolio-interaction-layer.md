@@ -14,3 +14,9 @@ On mobile, preserve the original interaction geometry: the music control docks a
 **Why:** The original mobile experience depends on these fixed touch targets and responsive state changes, not just their visual styling.
 
 **How to apply:** Any future mobile CSS pass must keep the bottom docking, hidden mobile speaker/volume controls, and intro visibility state in sync with the original.
+
+The homepage should use the original `site-shell` styling path without the newer `portfolio-refinement` class; that extra layer changes responsive heading sizing and can push the trailing comma onto a new mobile line.
+
+**Why:** The original responsive utility classes already produce the correct mobile title, card, and interaction geometry.
+
+**How to apply:** Do not re-add broad refinement classes to the homepage unless every mobile override is checked against the original source at the same viewport.

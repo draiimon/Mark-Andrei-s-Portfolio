@@ -164,7 +164,7 @@ const taglines: Tagline[] = [
   { id: 5, text: "improves delivery through automation.", sortOrder: 5 },
 ];
 
-const dbReady = (async () => {
+const dbReady = pool ? (async () => {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS portfolio_state (
       id INTEGER PRIMARY KEY,
@@ -195,9 +195,10 @@ const dbReady = (async () => {
   } else {
     await persistState();
   }
-})();
+})() : Promise.resolve();
 
 async function persistState() {
+  if (!pool) return;
   await pool.query(
     `INSERT INTO portfolio_state (id, state, updated_at)
      VALUES (1, $1::jsonb, NOW())

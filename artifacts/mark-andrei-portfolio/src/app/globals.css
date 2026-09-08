@@ -2603,6 +2603,15 @@ body {
   transform: translateY(8px);
 }
 
+/* Use the rendered intro node as an immediate first-paint guard too. The
+   document attribute is still used for the transition state, but :has()
+   prevents the controls from flashing before that effect runs. */
+html:has(.pre-intro) .music-edge-controller,
+html:has(.pre-intro) .ask-ai-wrap {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .ask-ai-fab {
   position: relative;
   isolation: isolate;
@@ -3117,6 +3126,95 @@ body {
 
   :root[data-pre-intro="active"] .portfolio-refinement .music-edge-controller {
     transform: translateY(8px);
+  }
+}
+
+/* Active homepage parity: preserve the current dark surface and containers while
+   keeping the original opening depth and music interaction layer visible. */
+.pre-intro {
+  background: rgba(8, 10, 14, 0.12);
+  backdrop-filter: blur(12px) saturate(112%);
+  -webkit-backdrop-filter: blur(12px) saturate(112%);
+}
+
+.pre-intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 12% 28%, rgba(255, 153, 0, 0.24), transparent 38%),
+    radial-gradient(ellipse at 86% 24%, rgba(86, 125, 174, 0.22), transparent 42%),
+    radial-gradient(ellipse at 52% 92%, rgba(255, 153, 0, 0.12), transparent 42%);
+  opacity: 0.92;
+  mix-blend-mode: screen;
+}
+
+.pre-intro-core {
+  animation: preIntroCoreFloat 4.8s ease-in-out infinite;
+}
+
+.music-edge-controller {
+  animation: musicControllerFloat 4.8s ease-in-out infinite;
+}
+
+.music-speaker-pill {
+  animation:
+    musicHaloDrift 2.4s ease-in-out infinite,
+    musicPillBreathe 1.8s ease-in-out infinite;
+}
+
+.music-edge-controller.is-playing {
+  animation:
+    musicControllerFloat 4.8s ease-in-out infinite,
+    musicFrameShimmer 1.5s ease-in-out infinite;
+}
+
+.music-edge-button.is-playing {
+  animation: musicButtonBeat 0.9s ease-in-out infinite;
+}
+
+@keyframes preIntroCoreFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes musicButtonBeat {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(255, 153, 0, 0.32));
+  }
+  50% {
+    filter: drop-shadow(0 0 11px rgba(255, 153, 0, 0.78));
+  }
+}
+
+@media (max-width: 768px) {
+  .pre-intro {
+    background: rgba(8, 10, 14, 0.1);
+    backdrop-filter: blur(8px) saturate(112%);
+    -webkit-backdrop-filter: blur(8px) saturate(112%);
+  }
+}
+
+@media (max-width: 640px) {
+  .music-edge-controller {
+    border-radius: 999px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pre-intro-core,
+  .music-edge-controller,
+  .music-speaker-pill,
+  .music-edge-controller.is-playing,
+  .music-edge-button.is-playing {
+    animation: none !important;
   }
 }
 

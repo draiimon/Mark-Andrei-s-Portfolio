@@ -4,13 +4,12 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
+const databaseUrl = process.env.DATABASE_URL;
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+// The portfolio has a local snapshot fallback, so the API can still serve
+// public content when a database has not been provisioned for this environment.
+// Callers that require persistence must check for a null pool before querying.
+export const pool = databaseUrl ? new Pool({ connectionString: databaseUrl }) : null;
+export const db = pool ? drizzle(pool, { schema }) : null;
 
 export * from "./schema";
