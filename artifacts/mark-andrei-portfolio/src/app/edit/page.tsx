@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
+import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
 type Profile = {
@@ -597,7 +597,7 @@ export default function EditPage() {
           >
             <div className="edit-login-copy">
               <a href="/" className="edit-login-back">
-                <span aria-hidden="true">←</span>
+                <span className="edit-login-back-icon" aria-hidden="true">←</span>
                 Return to public profile
               </a>
               <p className="edit-login-identity">Mark Andrei / Portfolio</p>
@@ -608,54 +608,49 @@ export default function EditPage() {
             </div>
 
             <div className="edit-login-panel">
-              <div className="login-shell edit-login-shell w-full p-7 md:p-8 fade-rise">
+              <div className="login-shell edit-login-shell w-full fade-rise">
                 <div className="edit-orb one" />
                 <div className="edit-orb two" />
                 <div className="relative z-10">
                   <div className="edit-login-heading">
                     <div className="edit-login-mark">
-                        <img
-                          src="/solar-eclipse-logo.svg"
-                          alt=""
-                          className="edit-login-main-icon"
-                          aria-hidden="true"
-                        />
+                      <SolarAura small state="idle" className="edit-login-aura" />
                     </div>
-                    <div>
+                    <div className="edit-login-heading-copy">
                       <p className="edit-login-title">Sign in to edit portfolio</p>
                     </div>
                   </div>
 
-                  <form onSubmit={handleLogin} className="edit-login-form space-y-3.5">
-                    <label className="block space-y-1">
-                      <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Username</span>
-                      <div className="field-shell edit-login-field rounded-xl px-3 py-2.5">
+                  <form onSubmit={handleLogin} className="edit-login-form">
+                    <label className="edit-login-label">
+                      <span>Username</span>
+                      <div className="field-shell edit-login-field">
                         <input
                           type="text"
                           placeholder="draiimon"
                           autoComplete="username"
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
-                          className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                          className="edit-login-input"
                         />
                       </div>
                     </label>
 
-                    <label className="block space-y-1">
-                      <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Password</span>
-                      <div className="field-shell edit-login-field flex items-center rounded-xl px-3 py-2.5">
+                    <label className="edit-login-label">
+                      <span>Password</span>
+                      <div className="field-shell edit-login-field edit-login-password-field">
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter password"
                           autoComplete="current-password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                          className="edit-login-input"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword((v) => !v)}
-                          className="ml-2 rounded p-1 text-neutral-400 hover:text-awsOrange"
+                          className="edit-login-password-toggle"
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -663,9 +658,10 @@ export default function EditPage() {
                       </div>
                     </label>
 
-                    {loginError && <p className="text-xs text-red-400">{loginError}</p>}
-                    <button type="submit" className="edit-login-submit w-full rounded-xl px-4 py-2.5 font-semibold transition">
-                      Enter Edit Mode
+                    {loginError && <p className="edit-login-error" role="alert">{loginError}</p>}
+                    <button type="submit" className="edit-login-submit">
+                      <span>Enter Edit Mode</span>
+                      <ArrowUpRight className="edit-login-submit-icon" aria-hidden="true" />
                     </button>
                   </form>
                 </div>
