@@ -79,6 +79,9 @@ export default function Home() {
     ...item
   })));
   const [taglines, setTaglines] = useState(portfolioSnapshot.taglines);
+  const interactionPreview =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("preview") === "interactions";
 
   useEffect(() => {
     let cancelled = false;
@@ -271,7 +274,7 @@ export default function Home() {
       </div>
 
       <Chatbot />
-      <PreProfileIntro brand={brandName} />
+      {!interactionPreview && <PreProfileIntro brand={brandName} />}
     </main>
   );
 }
