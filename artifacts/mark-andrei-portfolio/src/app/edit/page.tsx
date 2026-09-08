@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
+import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
 type Profile = {
@@ -593,15 +593,16 @@ export default function EditPage() {
             className={`edit-login-stage mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6 lg:px-8 ${solarIntroActive ? "edit-login-stage-muted" : ""}`}
             aria-hidden={solarIntroActive}
           >
-            <div className="edit-login-utility">
-              <div className="edit-login-mark">
-                <SolarAura small state="idle" className="edit-login-aura" showOrbits={false} />
-              </div>
-              <p className="edit-login-identity">Mark Andrei / Portfolio</p>
+            <div className="edit-login-copy">
               <a href="/" className="edit-login-back">
                 <span className="edit-login-back-icon" aria-hidden="true">←</span>
                 Return to public profile
               </a>
+              <p className="edit-login-identity">Mark Andrei / Portfolio</p>
+              <h1 className="edit-login-display">
+                Shape the story
+                <span>behind the work.</span>
+              </h1>
             </div>
 
             <div className="edit-login-panel">
@@ -610,6 +611,9 @@ export default function EditPage() {
                 <div className="edit-orb two" />
                 <div className="relative z-10">
                   <div className="edit-login-heading">
+                    <div className="edit-login-mark">
+                      <SolarAura small state="idle" className="edit-login-aura" showOrbits={false} />
+                    </div>
                     <div className="edit-login-heading-copy">
                       <p className="edit-login-title">Sign in to edit portfolio</p>
                     </div>
@@ -654,7 +658,8 @@ export default function EditPage() {
 
                     {loginError && <p className="edit-login-error" role="alert">{loginError}</p>}
                     <button type="submit" className="edit-login-submit">
-                      Enter Edit Mode
+                      <span>Enter Edit Mode</span>
+                      <ArrowUpRight className="edit-login-submit-icon" aria-hidden="true" />
                     </button>
                   </form>
                 </div>
