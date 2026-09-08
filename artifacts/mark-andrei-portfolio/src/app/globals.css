@@ -694,6 +694,166 @@ body {
   }
 }
 
+/* Restore the expressive interaction layer: the portfolio should feel alive,
+   even while the page surface stays dark, clean, and grid-free. */
+.portfolio-refinement .reveal {
+  opacity: 0;
+  transform: translateY(24px) scale(0.99);
+  filter: blur(4px);
+  transition:
+    opacity 560ms ease,
+    transform 620ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 560ms ease;
+}
+
+.portfolio-refinement .reveal.reveal-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.portfolio-chat .chat-launcher {
+  min-height: 50px;
+  padding: 0.5rem 1rem 0.5rem 0.55rem;
+  border: 1px solid #edaa4a85;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #39220fec, #191b22f5);
+  color: #fff1d9;
+  box-shadow: 0 0 24px #ff990026, inset 0 1px 0 #ffd49c20;
+  backdrop-filter: blur(15px);
+}
+
+.portfolio-chat .chat-launcher:hover {
+  border-color: #ffd197;
+  box-shadow: 0 0 32px #ff990050, inset 0 1px 0 #ffd49c35;
+}
+
+.portfolio-chat .chat-window {
+  border: 1px solid #db9d535e;
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(ellipse at 90% 0%, #b2661726, transparent 47%),
+    linear-gradient(150deg, #151923f5, #10141cf7);
+  box-shadow:
+    0 25px 80px #0009,
+    0 0 42px #ff990012,
+    inset 0 1px 0 #ffe1b52b;
+  backdrop-filter: blur(24px);
+  animation: chat-reveal 220ms ease-out both;
+}
+
+.portfolio-chat .chat-top {
+  background: transparent;
+}
+
+.portfolio-chat .chat-bottom {
+  background: #0d111ac9;
+}
+
+.portfolio-chat .chat-icon-button {
+  border-radius: 0.45rem;
+}
+
+.portfolio-chat .chat-launcher .chat-aura {
+  display: inline-block;
+}
+
+.portfolio-chat .chat-heading h2 > span {
+  border-radius: 0.25rem;
+  border: 1px solid #ffcb7f24;
+  background: #ffb84e0c;
+}
+
+.portfolio-chat .chat-suggestions button {
+  border-radius: 0.6rem;
+  background: linear-gradient(100deg, #ffbf7008, #ffffff02);
+}
+
+.portfolio-chat .chat-suggestions button:hover {
+  background: #ffad5510;
+}
+
+.portfolio-chat .chat-message-user .chat-message-content {
+  border-radius: 0.8rem 0.8rem 0.2rem 0.8rem;
+}
+
+.portfolio-chat .chat-composer {
+  border-radius: 0.8rem;
+}
+
+.portfolio-chat .chat-composer button {
+  border-radius: 0.6rem;
+  background: linear-gradient(140deg, #ffd293, #ffa331);
+  box-shadow: 0 0 12px #ffad3e1c;
+}
+
+.portfolio-chat .chat-error {
+  border-radius: 0.6rem;
+}
+
+.music-edge-controller {
+  border: 1px solid rgba(255, 153, 0, 0.5);
+  border-radius: 999px;
+  background:
+    linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
+    rgba(10, 10, 14, 0.78);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow:
+    0 0 22px rgba(255, 153, 0, 0.24),
+    0 0 34px rgba(255, 153, 0, 0.1),
+    inset 0 0 18px rgba(255, 153, 0, 0.16);
+}
+
+.music-edge-controller::before {
+  opacity: 1;
+  filter: blur(8px);
+}
+
+.music-speaker-pill,
+.music-edge-button {
+  border-radius: 999px;
+}
+
+.music-speaker-pill {
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
+    inset 0 0 10px rgba(255, 153, 0, 0.12);
+}
+
+.music-edge-button {
+  box-shadow: none;
+}
+
+.music-edge-button.is-playing {
+  box-shadow:
+    0 0 calc(8px + (var(--music-vibe) * 8px)) rgba(255, 153, 0, calc(0.28 + (var(--music-vibe) * 0.32))),
+    inset 0 0 8px rgba(255, 153, 0, 0.2);
+}
+
+.music-edge-controller.is-playing {
+  box-shadow:
+    0 0 calc(20px + (var(--music-vibe) * 20px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.35))),
+    0 0 calc(36px + (var(--music-vibe) * 24px)) rgba(255, 153, 0, calc(0.11 + (var(--music-vibe) * 0.22))),
+    inset 0 0 calc(16px + (var(--music-vibe) * 10px)) rgba(255, 153, 0, calc(0.17 + (var(--music-vibe) * 0.2)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-refinement .reveal,
+  .portfolio-refinement .reveal.reveal-in,
+  .portfolio-chat *,
+  .portfolio-chat *::before,
+  .portfolio-chat *::after,
+  .music-edge-controller *,
+  .music-edge-controller::before,
+  .music-edge-controller::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
 /* Amber glass assistant: its own styles leave the homepage geometry intact. */
 .portfolio-chat { position: fixed; right: 1.25rem; bottom: calc(1.25rem + env(safe-area-inset-bottom)); z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: .8rem; }
 .chat-launcher { display: inline-flex; align-items: center; gap: .75rem; min-height: 50px; padding: .5rem 1rem .5rem .55rem; border: 1px solid #edaa4a85; border-radius: 999px; background: linear-gradient(120deg, #39220fec, #191b22f5); color: #fff1d9; box-shadow: 0 0 24px #ff990026, inset 0 1px 0 #ffd49c20; backdrop-filter: blur(15px); font-size: .82rem; font-weight: 600; transition: border-color 180ms, box-shadow 180ms; }
