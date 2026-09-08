@@ -213,7 +213,7 @@ body {
   object-fit: cover;
   object-position: center center;
   opacity: 0.78;
-  transform: scale(calc(1.04 + (var(--music-vibe) * 0.06) + (var(--music-beat) * 0.1)));
+  transform: scale(calc(1.04 + (var(--music-vibe) * 0.045) + (var(--music-beat) * 0.075)));
   filter:
     blur(calc(10px - (var(--music-vibe) * 2px) - (var(--music-beat) * 3px)))
     saturate(calc(0.92 + (var(--music-vibe) * 0.16) + (var(--music-beat) * 0.22)))
@@ -252,11 +252,11 @@ body {
     radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.14), transparent 40%),
     radial-gradient(circle at 48% 92%, rgba(255, 153, 0, 0.14), transparent 46%);
   transform: translate3d(
-      calc((var(--music-vibe) * 22px) + (var(--music-beat) * 12px)),
-      calc((var(--music-vibe) * -18px) + (var(--music-beat) * -14px)),
+      calc((var(--music-vibe) * 22px) + (var(--music-beat) * 9px)),
+      calc((var(--music-vibe) * -18px) + (var(--music-beat) * -10.5px)),
       0
     )
-    scale(calc(1 + (var(--music-vibe) * 0.04) + (var(--music-beat) * 0.05)));
+    scale(calc(1 + (var(--music-vibe) * 0.04) + (var(--music-beat) * 0.0375)));
   opacity: calc(0.48 + (var(--music-vibe) * 0.2) + (var(--music-beat) * 0.16));
   filter: blur(calc(34px - (var(--music-vibe) * 8px)));
   transition: transform 220ms ease-out, opacity 220ms ease-out, filter 220ms ease-out;
@@ -297,11 +297,11 @@ body {
   opacity: 0.58;
   pointer-events: none;
   transform: translate3d(
-      calc((var(--music-vibe) * var(--cloud-shift-x)) + (var(--music-beat) * 6px)),
-      calc((var(--music-vibe) * var(--cloud-shift-y)) + (var(--music-beat) * -7px)),
+      calc((var(--music-vibe) * var(--cloud-shift-x)) + (var(--music-beat) * 4.5px)),
+      calc((var(--music-vibe) * var(--cloud-shift-y)) + (var(--music-beat) * -5.25px)),
       0
     )
-    scale(calc(1 + (var(--music-vibe) * 0.045) + (var(--music-beat) * var(--cloud-beat))));
+    scale(calc(1 + (var(--music-vibe) * 0.045) + (var(--music-beat) * var(--cloud-beat) * 0.75)));
   transition: transform 220ms ease-out, filter 220ms ease-out;
   animation: cloudFloat 10.5s ease-in-out infinite;
   will-change: transform, filter;
