@@ -112,7 +112,7 @@ function PortfolioSurface({
   backgroundSparkIntensity = 0,
   backgroundBurstOrigin = null,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   backgroundBurstCycle?: number;
   backgroundSparkIntensity?: number;
   backgroundBurstOrigin?: { x: number; y: number } | null;
@@ -400,7 +400,6 @@ export default function EditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [solarIntroActive, setSolarIntroActive] = useState(true);
   const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
   const [isTouchViewport, setIsTouchViewport] = useState(false);
@@ -503,18 +502,6 @@ export default function EditPage() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const [socialFile, setSocialFile] = useState<File | null>(null);
-
-  useEffect(() => {
-    if (auth !== false) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setSolarIntroActive(false);
-      return;
-    }
-
-    const timer = window.setTimeout(() => setSolarIntroActive(false), 1850);
-    return () => window.clearTimeout(timer);
-  }, [auth]);
 
   async function loadData(): Promise<{ ok: boolean; message?: string }> {
     try {
@@ -880,17 +867,8 @@ export default function EditPage() {
 
   if (auth === null) {
     return (
-      <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
+      <main className="edit-page site-shell min-h-screen text-white">
         <PortfolioSurface>
-          {solarIntroActive && (
-            <div className="edit-solar-reveal" role="status" aria-live="polite">
-              <div className="edit-solar-reveal-visual" aria-hidden="true">
-                <span className="edit-solar-halo edit-solar-halo-one" />
-                <span className="edit-solar-halo edit-solar-halo-two" />
-                <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
-              </div>
-            </div>
-          )}
         </PortfolioSurface>
       </main>
     );
@@ -906,30 +884,14 @@ export default function EditPage() {
     const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
 
     return (
-      <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
+      <main className="edit-page site-shell min-h-screen text-white">
         <PortfolioSurface
           backgroundBurstCycle={backgroundBurstCycle}
           backgroundSparkIntensity={starIntensity}
           backgroundBurstOrigin={backgroundBurstOrigin}
         >
-          {solarIntroActive && (
-            <div className="edit-solar-reveal" role="status" aria-live="polite">
-              <div className="edit-solar-reveal-visual" aria-hidden="true">
-                <span className="edit-solar-halo edit-solar-halo-one" />
-                <span className="edit-solar-halo edit-solar-halo-two" />
-                <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
-              </div>
-              <p className="edit-solar-reveal-label">MARK ANDREI / EDIT</p>
-              <p className="edit-solar-reveal-status">Entering control center</p>
-              <button type="button" className="edit-solar-skip" onClick={() => setSolarIntroActive(false)}>
-                Skip intro
-              </button>
-            </div>
-          )}
-
           <div
-            className={`edit-login-stage mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6 lg:px-8 ${solarIntroActive ? "edit-login-stage-muted" : ""}`}
-            aria-hidden={solarIntroActive}
+            className="edit-login-stage mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6 lg:px-8"
           >
             <div className="edit-login-copy">
               <a href="/" className="edit-login-back">

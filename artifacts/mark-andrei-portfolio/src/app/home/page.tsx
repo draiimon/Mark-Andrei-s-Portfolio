@@ -156,19 +156,17 @@ export default function Home() {
       undefined,
     );
 
-    Promise.all([portfolioData, fontsReady, firstPaint]).then(([data]) => {
-      if (cancelled) return;
-      if (data) {
-        setProfile({ ...portfolioSnapshot.profile, ...data.profile });
-        if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
-        if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
-        if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
-        if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
-        if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
-      }
-      // A bundled snapshot is the deliberate offline/error fallback, so a
-      // failed live request does not trap the public page behind a loader.
-      markPageReady(currentRoute);
+    Promise.all([fontsReady, firstPaint]).then(() => {
+      if (!cancelled) markPageReady(currentRoute);
+    });
+    portfolioData.then((data) => {
+      if (cancelled || !data) return;
+      setProfile({ ...portfolioSnapshot.profile, ...data.profile });
+      if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
+      if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
+      if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
+      if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
+      if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
     });
     void recordView();
 

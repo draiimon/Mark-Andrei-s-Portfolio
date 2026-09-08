@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -13,6 +14,7 @@ type PageLoadingStatus = "loading" | "ready" | "error";
 type PageLoadingState = {
   route: string;
   status: PageLoadingStatus;
+  routeReady: boolean;
   message: string;
   error: string;
   retry: (() => void) | null;
@@ -30,55 +32,81 @@ const PageLoadingContext = createContext<PageLoadingContextValue | null>(null);
 function GlobalPageLoader({
   state,
   onRetry,
+  onSkip,
 }: {
   state: PageLoadingState;
   onRetry: () => void;
+  onSkip: () => void;
 }) {
   const active = state.status !== "ready";
   const isError = state.status === "error";
+  const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(state.route);
+  const contextLabel = isEditorRoute ? "MARK ANDREI / EDIT" : "MARK ANDREI / PORTFOLIO";
+  const contextStatus = isEditorRoute ? "Entering control center" : "Preparing portfolio";
 
   return (
     <div
-      className="global-page-loader"
+      className="global-page-loader edit-solar-reveal"
       data-active={active ? "true" : "false"}
       data-status={state.status}
       aria-hidden={!active}
     >
-      <div className="global-page-loader-panel" role={active ? "status" : undefined} aria-live="polite">
-        <div className="global-page-loader-mark" aria-hidden="true">
-          <span className="global-page-loader-progress-ring" />
-          <span className="edit-login-mark global-page-loader-eclipse-shell">
-            <span className="edit-login-aura-bounce">
-              <SolarAura small className="edit-login-aura" state={isError ? "thinking" : "idle"} showOrbits={false} />
-            </span>
-          </span>
-        </div>
-        {isError && (
-          <div className="global-page-loader-error" role="alert">
-            <p>{state.error}</p>
-            <button
-              type="button"
-              className="global-page-loader-retry"
-              onClick={onRetry}
-              tabIndex={active ? 0 : -1}
-            >
-              Try again
-            </button>
-          </div>
-        )}
+      <div className="edit-solar-reveal-visual" aria-hidden="true">
+        <span className="edit-solar-halo edit-solar-halo-one" />
+        <span className="edit-solar-halo edit-solar-halo-two" />
+        <SolarAura className="edit-solar-aura" state={isError ? "thinking" : "idle"} showOrbits={false} />
       </div>
+      <p className="edit-solar-reveal-label">{isError ? "Unable to enter / edit" : contextLabel}</p>
+      <p className="edit-solar-reveal-status" role={isError ? "alert" : undefined}>
+        {isError ? state.error : contextStatus}
+      </p>
+      <button
+        type="button"
+        className="edit-solar-skip"
+        onClick={isError ? onRetry : onSkip}
+        tabIndex={active ? 0 : -1}
+      >
+        {isError ? "Try again" : "Skip intro"}
+      </button>
     </div>
   );
 }
 
 export function PageLoadingProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PageLoadingState>({
-    route: "",
+    route: typeof window !== "undefined" ? window.location.pathname : "",
     status: "loading",
+    routeReady: false,
     message: "Loading the essential experience…",
     error: "",
     retry: null,
   });
+  const [minimumLoaderReady, setMinimumLoaderReady] = useState(false);
+  const [loaderSkipped, setLoaderSkipped] = useState(false);
+
+  useEffect(() => {
+    setMinimumLoaderReady(false);
+    setLoaderSkipped(false);
+    const timer = window.setTimeout(() => setMinimumLoaderReady(true), 5000);
+    return () => window.clearTimeout(timer);
+  }, [state.route]);
+
+  useEffect(() => {
+    const releaseIntro = () => {
+      setLoaderSkipped(true);
+      setMinimumLoaderReady(true);
+    };
+    window.addEventListener("portfolio:enter-profile", releaseIntro);
+    return () => window.removeEventListener("portfolio:enter-profile", releaseIntro);
+  }, []);
+
+  useEffect(() => {
+    if (!minimumLoaderReady && !loaderSkipped) return;
+    setState((current) => {
+      if (!current.routeReady || current.status === "ready") return current;
+      return { ...current, status: "ready", message: "", error: "", retry: null };
+    });
+  }, [loaderSkipped, minimumLoaderReady]);
 
   const beginRoute = useCallback((route: string) => {
     setState((current) => {
@@ -86,6 +114,7 @@ export function PageLoadingProvider({ children }: { children: ReactNode }) {
       return {
         route,
         status: "loading",
+        routeReady: false,
         message: "Loading the essential experience…",
         error: "",
         retry: null,
@@ -96,9 +125,14 @@ export function PageLoadingProvider({ children }: { children: ReactNode }) {
   const markPageReady = useCallback((route: string) => {
     setState((current) => {
       if (current.route !== route) return current;
-      return { ...current, status: "ready", message: "", error: "", retry: null };
+      if (
+        !minimumLoaderReady && !loaderSkipped
+      ) {
+        return { ...current, routeReady: true, status: "loading" };
+      }
+      return { ...current, routeReady: true, status: "ready", message: "", error: "", retry: null };
     });
-  }, []);
+  }, [loaderSkipped, minimumLoaderReady]);
 
   const markPageError = useCallback((route: string, message: string, retry: () => void) => {
     setState((current) => {
@@ -128,6 +162,7 @@ export function PageLoadingProvider({ children }: { children: ReactNode }) {
     setState((current) => ({
       ...current,
       status: "loading",
+      routeReady: false,
       message: "Retrying the page…",
       error: "",
       retry: null,
@@ -135,19 +170,21 @@ export function PageLoadingProvider({ children }: { children: ReactNode }) {
     retry();
   };
 
-  const browserPath = typeof window !== "undefined" ? window.location.pathname : "";
-  const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(state.route || browserPath);
-  const showGlobalLoader = !isEditorRoute;
+  const skipIntro = () => {
+    window.dispatchEvent(new Event("portfolio:enter-profile"));
+  };
+
+  const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(state.route);
 
   return (
     <PageLoadingContext.Provider value={contextValue}>
       <div
         className="app-route-content"
-        data-route-loading={showGlobalLoader && state.status !== "ready" ? "true" : "false"}
+        data-route-loading={state.status !== "ready" ? "true" : "false"}
       >
         {children}
       </div>
-      {showGlobalLoader && <GlobalPageLoader state={state} onRetry={retryCurrentPage} />}
+      {isEditorRoute && <GlobalPageLoader state={state} onRetry={retryCurrentPage} onSkip={skipIntro} />}
     </PageLoadingContext.Provider>
   );
 }

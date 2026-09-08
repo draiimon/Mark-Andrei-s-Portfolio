@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { shouldUseMobilePreloadGate } from "@/lib/performance-profile";
 
 export default function AmbientBackgroundVideo() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -39,7 +40,7 @@ export default function AmbientBackgroundVideo() {
       loop
       muted
       playsInline
-      preload="metadata"
+      preload={shouldUseMobilePreloadGate() ? "auto" : "metadata"}
       tabIndex={-1}
       aria-hidden="true"
     />

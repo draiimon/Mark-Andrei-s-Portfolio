@@ -5,6 +5,7 @@ import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
 import MoonCursor from "@/components/MoonCursor";
 import { PageLoadingProvider } from "@/components/PageLoading";
 import { resolveMusicEmbed } from "@/lib/music";
+import { getPerformanceProfile } from "@/lib/performance-profile";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const music = resolveMusicEmbed("/uploads/music/1772698457967-vuu52gsd.mp3");
@@ -14,20 +15,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     let idleTimer: number | null = null;
     let scrollTimer: number | null = null;
-    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    const { coarsePointer, constrainedNetwork, lowPower } = getPerformanceProfile();
     let lastPointerMove = 0;
-    const connection = (navigator as Navigator & {
-      connection?: { effectiveType?: string; saveData?: boolean };
-    }).connection;
-    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-    const cores = navigator.hardwareConcurrency || 8;
-    const constrainedNetwork =
-      Boolean(connection?.saveData) ||
-      connection?.effectiveType === "slow-2g" ||
-      connection?.effectiveType === "2g";
-    const lowPower =
-      constrainedNetwork ||
-      (coarsePointer.matches && ((memory ?? 8) <= 4 || cores <= 4));
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (lowPower) root.dataset.mobileLite = "true";

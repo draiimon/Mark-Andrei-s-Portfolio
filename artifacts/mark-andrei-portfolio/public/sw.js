@@ -1,4 +1,4 @@
-const CACHE_VERSION = "portfolio-cache-v1";
+const CACHE_VERSION = "portfolio-cache-v2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 const SHELL = [
@@ -6,8 +6,10 @@ const SHELL = [
   "/site.webmanifest",
   "/favicon.svg",
   "/solar-eclipse-logo.svg",
+  "/apple-touch-icon.png",
   "/icon-192.png",
   "/icon-512.png",
+  "/assets/solar-eclipse-background-pingpong.mp4",
 ];
 
 self.addEventListener("install", (event) => {
@@ -65,7 +67,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (["script", "style", "font", "image", "manifest"].includes(request.destination)) {
+  if (["script", "style", "font", "image", "video", "manifest"].includes(request.destination)) {
     event.respondWith(
       caches.match(request).then((cached) => {
         const update = fetch(request).then(async (response) => {
