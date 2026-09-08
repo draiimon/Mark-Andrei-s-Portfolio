@@ -37,7 +37,7 @@ const profile: Profile = {
   objective: "Self-driven Computer Science graduate with strong leadership experience and hands-on expertise in DevOps, full-stack development, and AI/ML.",
   about: "Computer Science graduate pursuing opportunities in software development and Cloud DevOps. Hands-on experience includes web application development, AWS infrastructure, CI/CD workflows, and AI integration. Seeking an entry-level role that applies this technical foundation to application delivery and automation while developing further industry experience.",
   skills: "Python, Java, C/C++, PHP, SQL, Django, Laravel, React (Next.js), Node.js, AWS, Docker, Terraform, PostgreSQL, MongoDB, Firebase, Selenium, Playwright, YOLOv8, NLTK, spaCy",
-  viewCount: 6743,
+  viewCount: 6342,
   availability: "Available for work",
   brandName: "To the clouds.",
   heroTagline: "builds in the cloud.",
@@ -235,10 +235,14 @@ async function syncCollection(
   const ids = rows.map((row) => Number(row.id));
 
   for (const row of rows) {
-    const insertColumns = ["id", ...columns];
+    const now = new Date();
+    const insertColumns = ["id", ...columns, "createdAt", "updatedAt"];
     const placeholders = insertColumns.map((_, index) => `$${index + 1}`).join(", ");
-    const values = insertColumns.map((column) => row[column]);
-    const updates = columns.map((column) => `"${column}" = EXCLUDED."${column}"`).join(", ");
+    const values = [...insertColumns.slice(0, -2).map((column) => row[column]), now, now];
+    const updates = [
+      ...columns.map((column) => `"${column}" = EXCLUDED."${column}"`),
+      `"updatedAt" = NOW()`,
+    ].join(", ");
     await client.query(
       `INSERT INTO "${table}" (${insertColumns.map((column) => `"${column}"`).join(", ")})
        VALUES (${placeholders})
@@ -279,11 +283,12 @@ async function persistState() {
       [...profileValues, profile.id],
     );
     if (profileResult.rowCount === 0) {
-      const insertColumns = ["id", ...profileColumns];
+      const now = new Date();
+      const insertColumns = ["id", ...profileColumns, "createdAt", "updatedAt"];
       await client.query(
         `INSERT INTO "Profile" (${insertColumns.map((column) => `"${column}"`).join(", ")})
          VALUES (${insertColumns.map((_, index) => `$${index + 1}`).join(", ")})`,
-        [profile.id, ...profileValues],
+        [profile.id, ...profileValues, now, now],
       );
     }
 
@@ -300,6 +305,14 @@ async function persistState() {
   } finally {
     client.release();
   }
+}
+
+async function persistViewCount() {
+  if (!pool) return;
+  await pool.query(
+    `UPDATE "Profile" SET "viewCount" = $1, "updatedAt" = NOW() WHERE "id" = $2`,
+    [profile.viewCount, profile.id],
+  );
 }
 
 const dbReady = pool ? hydrateFromDatabase() : Promise.resolve();
@@ -470,7 +483,7 @@ router.post("/public/views", async (req, res) => {
     return res.json({ viewCount: profile.viewCount, counted: false });
   }
   profile.viewCount += 1;
-  await persistState();
+  await persistViewCount();
   return res.json({ viewCount: profile.viewCount, counted: true });
 });
 
@@ -635,8 +648,14 @@ router.post("/chat", async (req, res) => {
     leadership,
     achievements,
     taglines,
+    portfolioSite: {
+      name: "Mark Andrei Portfolio",
+      type: "Personal portfolio website",
+      builtBy: "Mark Andrei Castillo",
+      ownership: "This is one of Andrei's own projects. He built and maintains the portfolio site, its API, admin editor, AI assistant, music interaction, and database-backed content.",
+    },
   };
-  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 short sentences. Use plain text only: never use Markdown, bold, headings, bullets, or numbered lists. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
+  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 short sentences. Use plain text only: never use Markdown, bold, headings, bullets, or numbered lists. The portfolio website itself is one of Andrei's projects: he built and maintains this site and its portfolio systems. If someone asks whether Andrei made or built this portfolio/site, answer yes and briefly explain that it is his own project. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
 
 Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
   try {
