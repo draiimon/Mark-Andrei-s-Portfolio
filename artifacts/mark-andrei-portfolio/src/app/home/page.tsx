@@ -85,6 +85,21 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
+    const recordView = async () => {
+      try {
+        const response = await fetch("/api/public/views", {
+          method: "POST",
+          credentials: "same-origin",
+        });
+        const data = (await response.json().catch(() => null)) as { viewCount?: unknown } | null;
+        if (!cancelled && typeof data?.viewCount === "number") {
+          setProfile((current) => ({ ...current, viewCount: data.viewCount as number }));
+        }
+      } catch {
+        // A view counter failure must not block the portfolio from rendering.
+      }
+    };
+
     fetch("/api/public/portfolio", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
@@ -97,6 +112,8 @@ export default function Home() {
         if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
       })
       .catch(() => undefined);
+    void recordView();
+
     return () => {
       cancelled = true;
     };

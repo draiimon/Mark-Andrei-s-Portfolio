@@ -4408,3 +4408,107 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* Conversation bubbles: give the assistant a real surface instead of leaving
+   its reply as loose text, while keeping the visitor message lighter and
+   visually subordinate. */
+.portfolio-chat .chat-messages {
+  gap: 1rem;
+}
+
+.portfolio-chat .chat-message {
+  max-width: 92%;
+}
+
+.portfolio-chat .chat-message-assistant {
+  margin-right: 1.1rem;
+}
+
+.portfolio-chat .chat-message-assistant .chat-speaker,
+.portfolio-chat .chat-message-user .chat-speaker {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.5rem;
+  font-weight: 700;
+}
+
+.portfolio-chat .chat-message-assistant .chat-speaker::before {
+  content: "";
+  width: 0.35rem;
+  height: 0.35rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #ffc477;
+  box-shadow: 0 0 8px rgba(255, 177, 75, 0.8);
+}
+
+.portfolio-chat .chat-message-assistant .chat-message-content {
+  position: relative;
+  padding: 0.78rem 0.9rem;
+  border: 1px solid rgba(255, 205, 135, 0.16);
+  border-left: 2px solid rgba(238, 170, 74, 0.72);
+  border-radius: 0.28rem 1rem 1rem 1rem;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 186, 92, 0.1), transparent 46%),
+    linear-gradient(145deg, rgba(40, 34, 31, 0.86), rgba(14, 18, 27, 0.82));
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 235, 203, 0.08);
+}
+
+.portfolio-chat .chat-message-assistant .chat-message-content::before {
+  content: "";
+  position: absolute;
+  left: -0.36rem;
+  top: 0.82rem;
+  width: 0.62rem;
+  height: 0.62rem;
+  border-left: 1px solid rgba(238, 170, 74, 0.62);
+  border-bottom: 1px solid rgba(238, 170, 74, 0.62);
+  background: #292421;
+  transform: rotate(45deg);
+}
+
+.portfolio-chat .chat-message-assistant .chat-message-content p,
+.portfolio-chat .chat-message-assistant .chat-message-content ul,
+.portfolio-chat .chat-message-assistant .chat-message-content ol {
+  position: relative;
+}
+
+.portfolio-chat .chat-message-user {
+  max-width: 84%;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.portfolio-chat .chat-message-user .chat-message-content {
+  border-color: rgba(255, 188, 102, 0.28);
+  border-radius: 1rem 0.28rem 1rem 1rem;
+  background: linear-gradient(145deg, rgba(116, 70, 29, 0.38), rgba(69, 45, 36, 0.32));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 226, 179, 0.08);
+}
+
+.portfolio-chat .chat-message-user .chat-speaker {
+  justify-content: flex-end;
+  color: #b6a89a;
+}
+
+.portfolio-chat .chat-message-content > :first-child {
+  margin-top: 0;
+}
+
+.portfolio-chat .chat-message-content > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .portfolio-chat .chat-message {
+    max-width: 94%;
+  }
+
+  .portfolio-chat .chat-message-user {
+    max-width: 88%;
+  }
+}
+

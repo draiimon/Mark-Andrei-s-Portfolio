@@ -697,9 +697,13 @@ export default function EditPage() {
               e.preventDefault();
               if (!resumeFile) return;
               void withSave(async () => {
-                const formData = new FormData();
-                formData.append("file", resumeFile);
-                const res = await fetch("/api/edit/resume", { method: "POST", body: formData, credentials: "include" });
+                if (resumeFile.type !== "application/pdf") throw new Error("Please choose a PDF resume.");
+                const res = await fetch("/api/edit/resume", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/pdf" },
+                  body: resumeFile,
+                  credentials: "include",
+                });
                 if (!res.ok) {
                   const data = (await res.json().catch(() => ({}))) as ApiError;
                   throw new Error(data.error || `Upload failed (${res.status})`);

@@ -1,4 +1,5 @@
-import { Router, type Request, type Response } from "express";
+import { randomUUID } from "node:crypto";
+import express, { Router, type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
 import { pool } from "@workspace/db";
 
@@ -24,7 +25,7 @@ type PortfolioState = {
   leadership: Leadership[];
   achievements: Achievement[];
   taglines: Tagline[];
-  _meta?: { viewCountResetTo6743?: boolean };
+  _meta?: { viewCountResetTo6743?: boolean; viewCountBaselineRestored?: boolean };
 };
 
 const profile: Profile = {
@@ -184,14 +185,14 @@ const dbReady = pool ? (async () => {
   const result = await pool.query<{ state: PortfolioState }>("SELECT state FROM portfolio_state WHERE id = 1");
   const saved = result.rows[0]?.state;
   if (saved) {
-    const needsViewCountReset = saved._meta?.viewCountResetTo6743 !== true;
+    const needsViewCountBaselineRestore = saved._meta?.viewCountBaselineRestored !== true;
     Object.assign(profile, saved.profile);
     projects.splice(0, projects.length, ...saved.projects);
     experience.splice(0, experience.length, ...saved.experience);
     leadership.splice(0, leadership.length, ...saved.leadership);
     achievements.splice(0, achievements.length, ...saved.achievements);
     taglines.splice(0, taglines.length, ...saved.taglines);
-    if (needsViewCountReset) {
+    if (needsViewCountBaselineRestore) {
       profile.viewCount = 6743;
       await persistState();
     }
@@ -210,7 +211,7 @@ async function persistState() {
     `INSERT INTO portfolio_state (id, state, updated_at)
      VALUES (1, $1::jsonb, NOW())
      ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
-    [JSON.stringify({ profile, projects, experience, leadership, achievements, taglines, _meta: { viewCountResetTo6743: true } })],
+    [JSON.stringify({ profile, projects, experience, leadership, achievements, taglines, _meta: { viewCountResetTo6743: true, viewCountBaselineRestored: true } })],
   );
 }
 
@@ -231,6 +232,117 @@ function cleanUrl(value: unknown) {
   if (value == null || String(value).trim() === "") return null;
   const valueString = String(value).trim();
   return /^https?:\/\//i.test(valueString) ? valueString : `https://${valueString}`;
+}
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function generatedResumeHtml() {
+  const experienceMarkup = experience
+    .map(
+      (item) => `
+        <article>
+          <h2>${escapeHtml(item.role)} · ${escapeHtml(item.company)}</h2>
+          <p class="muted">${escapeHtml(item.period)}</p>
+          <p>${escapeHtml(item.summary)}</p>
+        </article>`,
+    )
+    .join("");
+  const leadershipMarkup = leadership
+    .map((item) => `<li><strong>${escapeHtml(item.role)}</strong> · ${escapeHtml(item.org)} <span>${escapeHtml(item.period)}</span></li>`)
+    .join("");
+  const achievementsMarkup = achievements.map((item) => `<li>${escapeHtml(item.text)}</li>`).join("");
+
+  return `<!doctype html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>${escapeHtml(profile.fullName)} — Resume</title>
+      <style>
+        :root { color-scheme: light; font-family: Arial, sans-serif; }
+        body { max-width: 820px; margin: 0 auto; padding: 48px 28px; color: #17202a; line-height: 1.55; }
+        h1 { margin: 0; font-size: 2.2rem; letter-spacing: -.03em; }
+        h2 { margin: 1.3rem 0 .15rem; font-size: 1rem; }
+        h3 { margin: 2rem 0 .5rem; padding-bottom: .35rem; border-bottom: 2px solid #f59e0b; text-transform: uppercase; letter-spacing: .12em; font-size: .78rem; }
+        p { margin: .35rem 0; }
+        .headline { color: #a16207; font-weight: 700; }
+        .muted, li span { color: #64748b; font-size: .9rem; }
+        ul { padding-left: 1.2rem; }
+        li { margin: .4rem 0; }
+        .contact { margin-top: .4rem; color: #475569; font-size: .9rem; }
+        @media print { body { padding: 0; } }
+      </style>
+    </head>
+    <body>
+      <header>
+        <h1>${escapeHtml(profile.fullName)}</h1>
+        <p class="headline">${escapeHtml(profile.headline)}</p>
+        <p class="contact">${escapeHtml(profile.email)} · ${escapeHtml(profile.phone)} · ${escapeHtml(profile.location)}</p>
+      </header>
+      <h3>Objective</h3>
+      <p>${escapeHtml(profile.objective)}</p>
+      <h3>About</h3>
+      <p>${escapeHtml(profile.about)}</p>
+      <h3>Skills</h3>
+      <p>${escapeHtml(profile.skills)}</p>
+      <h3>Experience</h3>
+      ${experienceMarkup}
+      <h3>Leadership</h3>
+      <ul>${leadershipMarkup}</ul>
+      <h3>Achievements</h3>
+      <ul>${achievementsMarkup}</ul>
+    </body>
+  </html>`;
+}
+
+function parseStoragePath(path: string) {
+  const parts = path.replace(/^\/+/, "").split("/");
+  const bucketName = parts.shift();
+  if (!bucketName || parts.length === 0) throw new Error("Invalid object storage path");
+  return { bucketName, objectName: parts.join("/") };
+}
+
+async function signStorageUrl({
+  bucketName,
+  objectName,
+  method,
+  ttlSec,
+}: {
+  bucketName: string;
+  objectName: string;
+  method: "GET" | "PUT";
+  ttlSec: number;
+}) {
+  const response = await fetch("http://127.0.0.1:1106/object-storage/signed-object-url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      bucket_name: bucketName,
+      object_name: objectName,
+      method,
+      expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
+    }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) throw new Error(`Object storage signer returned HTTP ${response.status}`);
+  const data = (await response.json()) as { signed_url?: unknown };
+  if (typeof data.signed_url !== "string" || !data.signed_url) throw new Error("Object storage signer returned no URL");
+  return data.signed_url;
+}
+
+function getPrivateResumeTarget() {
+  const privateDir = process.env.PRIVATE_OBJECT_DIR;
+  if (!privateDir) throw new Error("PRIVATE_OBJECT_DIR is not configured");
+  const objectName = `uploads/resume-${randomUUID()}.pdf`;
+  const { bucketName } = parseStoragePath(`${privateDir}/${objectName}`);
+  return { bucketName, objectName, objectPath: `/objects/${objectName}` };
 }
 
 function normalizedIp(value: string) {
@@ -378,9 +490,67 @@ router.post("/edit/site-media", async (req, res) => {
   await persistState();
   return res.json({ ok: true, url });
 });
-router.post("/edit/resume", (req, res) => (isAdmin(req) ? res.json({ ok: true }) : unauthorized(res)));
+router.post(
+  "/edit/resume",
+  express.raw({ type: ["application/pdf", "application/octet-stream"], limit: "10mb" }),
+  async (req, res) => {
+    if (!isAdmin(req)) return unauthorized(res);
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+      return res.status(400).json({ error: "Upload a non-empty PDF file" });
+    }
+
+    try {
+      const target = getPrivateResumeTarget();
+      const uploadUrl = await signStorageUrl({
+        bucketName: target.bucketName,
+        objectName: target.objectName,
+        method: "PUT",
+        ttlSec: 900,
+      });
+      const uploadResponse = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": "application/pdf" },
+        body: new Uint8Array(req.body),
+      });
+      if (!uploadResponse.ok) {
+        req.log.error({ status: uploadResponse.status }, "Resume upload failed");
+        return res.status(502).json({ error: "Resume storage upload failed" });
+      }
+
+      profile.resumeObjectPath = target.objectPath;
+      await persistState();
+      return res.json({ ok: true, url: "/api/resume" });
+    } catch (error) {
+      req.log.error({ err: error }, "Resume upload failed");
+      return res.status(500).json({ error: "Resume upload failed" });
+    }
+  },
+);
 router.post("/edit/music", (req, res) => (isAdmin(req) ? res.json({ ok: true, url: profile.musicUrl }) : unauthorized(res)));
-router.get("/resume", (_req, res) => res.status(404).send("Resume not uploaded yet. Add one at /edit."));
+router.get("/resume", async (req, res) => {
+  const objectPath = typeof profile.resumeObjectPath === "string" ? profile.resumeObjectPath : "";
+  if (!objectPath.startsWith("/objects/")) {
+    res.type("html").send(generatedResumeHtml());
+    return;
+  }
+
+  try {
+    const privateDir = process.env.PRIVATE_OBJECT_DIR;
+    if (!privateDir) throw new Error("PRIVATE_OBJECT_DIR is not configured");
+    const objectName = objectPath.slice("/objects/".length);
+    const { bucketName } = parseStoragePath(`${privateDir}/${objectName}`);
+    const downloadUrl = await signStorageUrl({
+      bucketName,
+      objectName,
+      method: "GET",
+      ttlSec: 300,
+    });
+    return res.redirect(downloadUrl);
+  } catch (error) {
+    req.log.error({ err: error }, "Failed to create resume download URL");
+    return res.status(404).send("Resume is temporarily unavailable.");
+  }
+});
 
 router.post("/chat", async (req, res) => {
   const last = Array.isArray(req.body?.messages) ? req.body.messages.at(-1)?.content : "";
