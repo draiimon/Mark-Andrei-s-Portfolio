@@ -26,3 +26,9 @@ The editor background sparkle field should read as persistent air-dragged dust: 
 **Why:** The intended effect needs a deliberate buildup before the star spread, followed by an always-present star-dust atmosphere that gradually gains density; page load and early clicks should remain clean without unbounded particle growth.
 
 **How to apply:** Keep the initial field empty, trigger the first and later batches at ten-click intervals, launch each batch from the eclipse toward random full-viewport settle points, keep particles alive after settling, move them only with small local wind drift, cap the pool by removing only the oldest particles, and clamp edges instead of wrapping.
+
+The authenticated editor should use a quieter companion surface: restrained charcoal glass, warm hairline borders, compact low-emphasis controls, and readable spacing. Keep this treatment scoped to the Control Center so login and homepage atmosphere remain unchanged.
+
+**Why:** The editor needs to feel like the same portfolio without competing with the cinematic public/login presentation.
+
+**How to apply:** Scope editor-only visual overrides to the authenticated shell class; preserve existing form, CRUD, upload, drag-and-drop, and navigation behavior while styling surfaces and controls.

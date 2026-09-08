@@ -959,7 +959,7 @@ export default function EditPage() {
     projects.length + experience.length + leadership.length + achievements.length + taglines.length;
 
   return (
-    <main className={`edit-page site-shell min-h-screen text-white ${deckScrolling ? "deck-scrolling" : ""}`}>
+    <main className={`edit-page edit-control-center site-shell min-h-screen text-white ${deckScrolling ? "deck-scrolling" : ""}`}>
       <PortfolioSurface>
         <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6 md:space-y-10 md:py-14">
           <header className="topbar edit-topbar rounded-2xl px-4 py-3 md:px-5">
@@ -997,6 +997,39 @@ export default function EditPage() {
             {success && <p className="rounded border border-green-500/40 bg-green-500/10 px-3 py-2 text-sm text-green-300">{success}</p>}
           </div>
         )}
+
+        <section className="edit-dashboard-hero" aria-labelledby="edit-dashboard-title">
+          <div className="edit-dashboard-hero-copy">
+            <p className="edit-dashboard-eyebrow">Mark Andrei / Portfolio</p>
+            <h1 id="edit-dashboard-title">
+              Shape the story
+              <span>behind the work.</span>
+            </h1>
+            <p className="edit-dashboard-description">
+              A quiet control room for the ideas, projects, and proof behind the public profile.
+            </p>
+            <div className="edit-dashboard-stats" aria-label="Portfolio status">
+              <div>
+                <strong>{totalContentItems}</strong>
+                <span>content records</span>
+              </div>
+              <div>
+                <strong>{projects.length}</strong>
+                <span>projects live</span>
+              </div>
+              <div>
+                <strong>{profile?.updatedAt ? new Date(profile.updatedAt).toLocaleDateString() : "Ready"}</strong>
+                <span>last update</span>
+              </div>
+            </div>
+          </div>
+          <div className="edit-dashboard-hero-orbit" aria-hidden="true">
+            <span className="edit-dashboard-orbit-glow edit-dashboard-orbit-glow-one" />
+            <span className="edit-dashboard-orbit-glow edit-dashboard-orbit-glow-two" />
+            <SolarAura small state="idle" showOrbits={false} className="edit-dashboard-aura" />
+            <span className="edit-dashboard-orbit-label">Control / Ready</span>
+          </div>
+        </section>
 
         <section className="control-deck rounded-2xl p-5">
           <div className="deck-glow one" />
