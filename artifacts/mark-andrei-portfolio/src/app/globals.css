@@ -3800,3 +3800,199 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* Dynamic solar moon for the AI assistant. The dark center stays legible
+   while its corona and orbital rings communicate the assistant's state. */
+.portfolio-chat .chat-aura {
+  --chat-aura-speed: 5s;
+  --chat-aura-glow: 0.28;
+  isolation: isolate;
+  overflow: visible;
+  background:
+    radial-gradient(circle at 50% 50%, #05070b 0 40%, #17110d 48%, #ffca78 57%, #a75a17 68%, rgba(56, 37, 38, 0) 78%);
+  box-shadow:
+    0 0 22px rgba(255, 182, 77, var(--chat-aura-glow)),
+    inset 0 0 12px rgba(255, 225, 171, 0.12);
+  animation: chat-aura-breathe var(--chat-aura-speed) ease-in-out infinite;
+}
+
+.portfolio-chat .chat-aura::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -15%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 18%,
+    rgba(255, 231, 186, 0.7) 26%,
+    rgba(255, 167, 61, 0.32) 38%,
+    transparent 50% 72%,
+    rgba(255, 207, 126, 0.45) 84%,
+    transparent 92%
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 58%, #000 64% 72%, transparent 80%);
+  mask: radial-gradient(circle, transparent 0 58%, #000 64% 72%, transparent 80%);
+  filter: blur(1px);
+  opacity: 0.72;
+  animation: chat-aura-corona 8s linear infinite;
+  pointer-events: none;
+}
+
+.portfolio-chat .chat-aura::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 25%, rgba(255, 247, 222, 0.2), transparent 18% 52%, rgba(0, 0, 0, 0.32) 78%);
+  mix-blend-mode: screen;
+  opacity: 0.72;
+  animation: chat-aura-core 4.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.portfolio-chat .chat-aura > span {
+  z-index: 1;
+  transform-origin: center;
+  animation: chat-aura-orbit 7s linear infinite;
+}
+
+.portfolio-chat .chat-aura > span:nth-child(2) {
+  animation-duration: 10s;
+  animation-direction: reverse;
+}
+
+.portfolio-chat .chat-aura > span:nth-child(3) {
+  animation-duration: 13s;
+  animation-direction: reverse;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"] {
+  --chat-aura-speed: 2.2s;
+  --chat-aura-glow: 0.5;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"]::before {
+  opacity: 1;
+  filter: blur(0.5px);
+  animation-duration: 2.1s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"]::after {
+  opacity: 0.96;
+  animation-duration: 1.8s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"] > span {
+  animation-duration: 2.4s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="typing"] {
+  --chat-aura-speed: 3.2s;
+  --chat-aura-glow: 0.38;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="typing"]::before {
+  opacity: 0.88;
+  animation-duration: 4s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="typing"]::after {
+  opacity: 0.85;
+  animation-duration: 2.8s;
+}
+
+.portfolio-chat .chat-aura-small::before {
+  inset: -18%;
+}
+
+@keyframes chat-aura-corona {
+  from { transform: rotate(0deg) scale(0.96); }
+  50% { transform: rotate(180deg) scale(1.04); }
+  to { transform: rotate(360deg) scale(0.96); }
+}
+
+@keyframes chat-aura-core {
+  0%, 100% { transform: scale(0.94); opacity: 0.56; }
+  50% { transform: scale(1.08); opacity: 0.92; }
+}
+
+@keyframes chat-aura-orbit {
+  from { transform: rotate(-32deg) scaleX(0.5); }
+  to { transform: rotate(328deg) scaleX(0.5); }
+}
+
+/* Make the solar motion visibly readable at launcher size as well as in the
+   larger chat header moon. */
+.portfolio-chat .chat-aura {
+  animation: chat-aura-solar-breathe var(--chat-aura-speed) ease-in-out infinite;
+  will-change: transform, filter, box-shadow;
+}
+
+.portfolio-chat .chat-aura::before {
+  z-index: 0;
+  opacity: 0.95;
+  animation: chat-aura-corona 4.6s linear infinite;
+  will-change: transform, opacity;
+}
+
+.portfolio-chat .chat-aura::after {
+  z-index: 2;
+  animation: chat-aura-core 2.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.portfolio-chat .chat-aura > span {
+  border-color: rgba(255, 243, 213, 0.78);
+  z-index: 3;
+  animation-duration: 4.2s;
+  will-change: transform, opacity;
+}
+
+.portfolio-chat .chat-aura > span:nth-child(2) {
+  animation-duration: 5.8s;
+}
+
+.portfolio-chat .chat-aura > span:nth-child(3) {
+  animation-duration: 7.2s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"] {
+  animation-duration: 1.25s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"]::before {
+  animation-duration: 1.6s;
+  opacity: 1;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"]::after {
+  animation-duration: 1.15s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="thinking"] > span {
+  animation-duration: 1.8s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="typing"] {
+  animation-duration: 1.9s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="typing"]::before {
+  animation-duration: 2.8s;
+}
+
+.portfolio-chat .chat-aura[data-aura-state="typing"]::after {
+  animation-duration: 1.9s;
+}
+
+@keyframes chat-aura-solar-breathe {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(0.96);
+    filter: brightness(0.94) saturate(0.96);
+  }
+  50% {
+    transform: translate3d(0, -2px, 0) scale(1.06);
+    filter: brightness(1.2) saturate(1.12);
+  }
+}
+

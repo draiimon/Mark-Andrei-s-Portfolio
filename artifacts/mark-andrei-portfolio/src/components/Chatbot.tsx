@@ -6,6 +6,7 @@ import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Mail, RotateCcw, X } f
 
 type Message = { role: "user" | "assistant"; content: string };
 type TypingReply = { index: number; fullText: string; visibleText: string };
+type AuraState = "idle" | "thinking" | "typing";
 const questions = [
   { label: "Explore my projects", text: "Tell me about Andrei's projects, starting with PanicSense PH.", icon: Code2 },
   { label: "Experience & skills", text: "What work experience and technical skills does Andrei have?", icon: BriefcaseBusiness },
@@ -13,8 +14,8 @@ const questions = [
 ];
 const thinkingSteps = ["Reading the portfolio", "Connecting the details", "Thinking it through", "Crafting a reply"];
 
-function Aura({ small = false }: { small?: boolean }) {
-  return <span className={`chat-aura ${small ? "chat-aura-small" : ""}`} aria-hidden="true"><span /><span /><span /></span>;
+function Aura({ small = false, state = "idle" }: { small?: boolean; state?: AuraState }) {
+  return <span className={`chat-aura ${small ? "chat-aura-small" : ""}`} data-aura-state={state} aria-hidden="true"><span /><span /><span /></span>;
 }
 
 export default function Chatbot() {
@@ -109,13 +110,14 @@ export default function Chatbot() {
   }
   function submit(event: FormEvent) { event.preventDefault(); void send(input); }
   function close() { setOpen(false); triggerRef.current?.focus(); }
+  const auraState: AuraState = loading ? "thinking" : typingReply ? "typing" : "idle";
 
   return (
     <div className="ask-ai-wrap portfolio-chat">
       {open && (
         <section className="chat-window" role="dialog" aria-labelledby="chat-title" id="portfolio-chat-window">
           <header className="chat-top">
-            <Aura small />
+            <Aura small state={auraState} />
             <div className="chat-heading"><h2 id="chat-title">Ask my AI</h2><p>A little more about Andrei.</p></div>
             {messages.length > 0 && <button className="chat-icon-button" aria-label="New conversation" disabled={loading || Boolean(typingReply)} onClick={() => { setMessages([]); setError(false); setTypingReply(null); typingActiveRef.current = false; inputRef.current?.focus(); }}><RotateCcw size={15} /></button>}
             <button className="chat-icon-button" aria-label="Close chat" onClick={close}><X size={19} /></button>
@@ -124,7 +126,7 @@ export default function Chatbot() {
           <div className="chat-scroll" ref={scrollRef}>
             {messages.length === 0 ? (
               <div className="chat-welcome">
-                <div className="chat-welcome-aura"><Aura /><span className="chat-orbit" /></div>
+                <div className="chat-welcome-aura"><Aura state="idle" /><span className="chat-orbit" /></div>
                 <p className="chat-kicker">Beyond the overview</p>
                 <h3>Let’s talk<br /><span>about the work.</span></h3>
                 <p className="chat-welcome-copy">Projects, experience, or the next opportunity.<br />What would you like to know?</p>
@@ -159,7 +161,7 @@ export default function Chatbot() {
         </section>
       )}
       <button className={`chat-launcher ${open ? "chat-launcher-open" : ""}`} ref={triggerRef} onClick={() => setOpen(value => !value)} aria-expanded={open} aria-controls="portfolio-chat-window" aria-label={open ? "Close portfolio assistant" : "Open portfolio assistant"}>
-        {open ? <X size={20} /> : <Aura small />}
+         {open ? <X size={20} /> : <Aura small state={auraState} />}
         <span>{open ? "Close chat" : "Ask my AI"}</span>
         {!open && <ArrowUpRight size={15} className="chat-launcher-arrow" />}
       </button>
