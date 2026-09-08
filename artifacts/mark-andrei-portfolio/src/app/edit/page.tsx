@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
@@ -139,9 +139,21 @@ export default function EditPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [solarIntroActive, setSolarIntroActive] = useState(true);
+  const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
+  const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [deckScrolling, setDeckScrolling] = useState(false);
+
+  useEffect(() => {
+    if (loginAuraMomentum <= 0) return;
+
+    const timer = window.setTimeout(() => {
+      setLoginAuraMomentum((momentum) => Math.max(0, momentum - 1));
+    }, 160);
+
+    return () => window.clearTimeout(timer);
+  }, [loginAuraMomentum, loginAuraClickTick]);
 
   const [profile, setProfile] = useState<Profile>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -595,7 +607,6 @@ export default function EditPage() {
           >
             <div className="edit-login-copy">
               <a href="/" className="edit-login-back">
-                <span className="edit-login-back-icon" aria-hidden="true">←</span>
                 Return to public profile
               </a>
               <p className="edit-login-identity">Mark Andrei / Portfolio</p>
@@ -611,9 +622,31 @@ export default function EditPage() {
                 <div className="edit-orb two" />
                 <div className="relative z-10">
                   <div className="edit-login-heading">
-                    <div className="edit-login-mark">
-                      <SolarAura small state="idle" className="edit-login-aura" showOrbits={false} />
-                    </div>
+                    <button
+                      type="button"
+                      className={`edit-login-mark ${loginAuraMomentum > 0 ? "has-momentum" : ""}`}
+                      onClick={() => {
+                        setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
+                        setLoginAuraClickTick((tick) => tick + 1);
+                      }}
+                       aria-label="Speed up eclipse"
+                       title="Click repeatedly to build momentum; it slows down when you stop"
+                    >
+                      <SolarAura
+                        small
+                        state="idle"
+                        className="edit-login-aura"
+                        showOrbits={false}
+                         momentum={loginAuraMomentum}
+                        style={
+                          {
+                            "--login-aura-speed": `${Math.max(0.7, 5 - loginAuraMomentum * 0.32)}s`,
+                            "--login-aura-corona-speed": `${Math.max(0.42, 4.6 - loginAuraMomentum * 0.3)}s`,
+                            "--login-aura-core-speed": `${Math.max(0.38, 2.8 - loginAuraMomentum * 0.2)}s`,
+                          } as CSSProperties
+                        }
+                      />
+                    </button>
                     <div className="edit-login-heading-copy">
                       <p className="edit-login-title">Sign in to edit portfolio</p>
                     </div>
