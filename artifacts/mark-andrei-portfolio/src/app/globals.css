@@ -7224,10 +7224,10 @@ html:has(.pre-intro) .ask-ai-wrap {
   place-items: center;
   padding: 1.5rem;
   background:
-    radial-gradient(circle at 50% 42%, rgba(255, 153, 0, 0.1), transparent 28rem),
-    rgba(5, 8, 13, 0.84);
-  backdrop-filter: blur(18px) saturate(118%);
-  -webkit-backdrop-filter: blur(18px) saturate(118%);
+    radial-gradient(circle at 50% 42%, rgba(255, 153, 0, 0.14), transparent 23rem),
+    linear-gradient(180deg, rgba(5, 8, 13, 0.78), rgba(5, 8, 13, 0.9));
+  backdrop-filter: blur(10px) saturate(112%);
+  -webkit-backdrop-filter: blur(10px) saturate(112%);
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -7242,37 +7242,27 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .global-page-loader-panel {
   display: flex;
-  width: min(100%, 23rem);
+  width: min(100%, 27rem);
   flex-direction: column;
   align-items: center;
-  border: 1px solid rgba(255, 209, 145, 0.2);
-  border-radius: 1.5rem;
-  padding: clamp(2.2rem, 8vw, 3.5rem) clamp(1.4rem, 6vw, 2.8rem);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.025)),
-    rgba(21, 25, 32, 0.42);
-  box-shadow:
-    0 1.5rem 4rem rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(255, 166, 58, 0.08);
-  backdrop-filter: blur(24px) saturate(130%);
-  -webkit-backdrop-filter: blur(24px) saturate(130%);
+  padding: 0;
   text-align: center;
 }
 
 .global-page-loader-mark {
   position: relative;
-  width: 3.8rem;
-  height: 3.8rem;
-  margin-bottom: 1.8rem;
+  width: 5.4rem;
+  height: 5.4rem;
+  margin-bottom: 1.7rem;
   display: grid;
   place-items: center;
+  filter: drop-shadow(0 0 1.8rem rgba(255, 153, 0, 0.28));
 }
 
 .global-page-loader-eclipse-shell {
   display: grid;
-  width: 3.8rem;
-  height: 3.8rem;
+  width: 5.4rem;
+  height: 5.4rem;
   cursor: default;
   place-items: center;
   pointer-events: none;
@@ -7283,30 +7273,35 @@ html:has(.pre-intro) .ask-ai-wrap {
   height: 100%;
 }
 
+.global-page-loader-eclipse-shell .edit-login-aura {
+  width: 5.4rem;
+  height: 5.4rem;
+}
+
 .global-page-loader-kicker {
   margin: 0;
-  color: #ffb866;
-  font-size: 0.62rem;
+  color: rgba(255, 184, 102, 0.86);
+  font-size: 0.57rem;
   font-weight: 750;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .global-page-loader-title {
-  margin: 0.7rem 0 1.2rem;
+  margin: 0.7rem 0 1.3rem;
   color: #f5f0e8;
-  font-size: clamp(2rem, 8vw, 3.3rem);
+  font-size: clamp(2.3rem, 10vw, 4rem);
   font-weight: 650;
   letter-spacing: -0.07em;
   line-height: 0.95;
 }
 
 .global-page-loader-track {
-  width: min(100%, 15rem);
+  width: min(100%, 11rem);
   height: 1px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .global-page-loader-track span {
@@ -7318,10 +7313,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 .global-page-loader-message {
-  max-width: 20rem;
-  margin: 1rem 0 0;
-  color: rgba(226, 232, 240, 0.64);
-  font-size: 0.72rem;
+  max-width: 21rem;
+  margin: 0.9rem 0 0;
+  color: rgba(226, 232, 240, 0.58);
+  font-size: 0.66rem;
   line-height: 1.6;
 }
 

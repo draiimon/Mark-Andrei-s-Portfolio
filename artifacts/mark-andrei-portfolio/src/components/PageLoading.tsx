@@ -55,12 +55,11 @@ function GlobalPageLoader({
         <p className="global-page-loader-kicker">
           {isError ? "Unable to prepare page" : "Preparing profile"}
         </p>
-        <h1 className="global-page-loader-title">Mark Andrei</h1>
         <div className="global-page-loader-track" aria-hidden="true">
           <span />
         </div>
         <p className="global-page-loader-message">
-          {isError ? state.error : state.message}
+          {isError ? state.error : "Loading the essentials…"}
         </p>
         {isError && (
           <button
