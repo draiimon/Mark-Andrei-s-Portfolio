@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
-const EDIT_SOLAR_INTRO_DURATION_MS = 3000;
+const EDIT_SOLAR_INTRO_MOBILE_DURATION_MS = 3000;
+const EDIT_SOLAR_INTRO_DESKTOP_DURATION_MS = 3000;
 const EDIT_SOLAR_INTRO_MOBILE_FADE_MS = 1100;
 const EDIT_SOLAR_INTRO_DESKTOP_FADE_MS = 420;
 
@@ -495,13 +496,17 @@ export default function EditPage() {
       return;
     }
 
-    const fadeDuration = window.matchMedia("(max-width: 760px)").matches
+    const isMobileViewport = window.matchMedia("(max-width: 760px)").matches;
+    const holdDuration = isMobileViewport
+      ? EDIT_SOLAR_INTRO_MOBILE_DURATION_MS
+      : EDIT_SOLAR_INTRO_DESKTOP_DURATION_MS;
+    const fadeDuration = isMobileViewport
       ? EDIT_SOLAR_INTRO_MOBILE_FADE_MS
       : EDIT_SOLAR_INTRO_DESKTOP_FADE_MS;
-    const fadeTimer = window.setTimeout(() => setSolarIntroFading(true), EDIT_SOLAR_INTRO_DURATION_MS);
+    const fadeTimer = window.setTimeout(() => setSolarIntroFading(true), holdDuration);
     const hideTimer = window.setTimeout(
       () => setSolarIntroActive(false),
-      EDIT_SOLAR_INTRO_DURATION_MS + fadeDuration,
+      holdDuration + fadeDuration,
     );
     return () => {
       window.clearTimeout(fadeTimer);

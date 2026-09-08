@@ -1,5 +1,0 @@
-{
-  "name": "PanicSense PH",
-  "description": "An AI-powered disaster monitoring and sentiment analysis platform designed for the Philippines. It analyzes English, Tagalog, and Taglish content to classify disaster-related emotions such as panic, fear/anxiety, disbelief, resilience, and neutral, with real-time social media monitoring, news analysis, interactive maps, and sentiment dashboards.",
-  "techStack": "React / TypeScript / Node.js / Express / PostgreSQL / Python / Groq AI"
-}

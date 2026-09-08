@@ -1,40 +1,42 @@
-# Build stage: install deps and build Next
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
 
-COPY prisma ./prisma/
-RUN npx prisma generate
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY artifacts/api-server/package.json artifacts/api-server/package.json
+COPY artifacts/mark-andrei-portfolio/package.json artifacts/mark-andrei-portfolio/package.json
+COPY artifacts/mockup-sandbox/package.json artifacts/mockup-sandbox/package.json
+COPY lib/api-client-react/package.json lib/api-client-react/package.json
+COPY lib/api-spec/package.json lib/api-spec/package.json
+COPY lib/api-zod/package.json lib/api-zod/package.json
+COPY lib/db/package.json lib/db/package.json
+COPY scripts/package.json scripts/package.json
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN mkdir -p public
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
 
-# Run stage: serve with Node
-FROM node:20-alpine AS runner
+ENV NODE_ENV=production
+ENV PORT=5000
+ENV BASE_PATH=/
+
+RUN pnpm --filter @workspace/mark-andrei-portfolio run build
+RUN pnpm --filter @workspace/api-server run build
+
+FROM node:24-alpine AS runtime
 
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=5000
+ENV HOST=0.0.0.0
+ENV STATIC_ROOT=/app/artifacts/mark-andrei-portfolio/dist/public
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+COPY --from=build /app/artifacts/api-server/dist ./artifacts/api-server/dist
+COPY --from=build /app/artifacts/mark-andrei-portfolio/dist/public ./artifacts/mark-andrei-portfolio/dist/public
 
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/prisma ./prisma
+EXPOSE 5000
 
-USER nextjs
-EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
-CMD ["node", "server.js"]
+CMD ["node", "--enable-source-maps", "/app/artifacts/api-server/dist/index.mjs"]
