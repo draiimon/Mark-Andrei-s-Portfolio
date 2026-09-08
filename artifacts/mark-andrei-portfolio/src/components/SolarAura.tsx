@@ -4,12 +4,10 @@ export default function SolarAura({
   small = false,
   state = "idle",
   className = "",
-  showOrbits = true,
 }: {
   small?: boolean;
   state?: SolarAuraState;
   className?: string;
-  showOrbits?: boolean;
 }) {
   return (
     <span
@@ -17,13 +15,9 @@ export default function SolarAura({
       data-aura-state={state}
       aria-hidden="true"
     >
-      {showOrbits && (
-        <>
-          <span />
-          <span />
-          <span />
-        </>
-      )}
+      <span />
+      <span />
+      <span />
     </span>
   );
 }
