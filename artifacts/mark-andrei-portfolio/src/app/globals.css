@@ -2386,6 +2386,12 @@ body {
   animation: none;
 }
 
+.hero-copy-block .music-reactive-copy {
+  transform: translateY(calc((var(--music-vibe) * -0.8px) + (var(--music-beat) * -1.8px)));
+  filter: drop-shadow(0 0 calc(1px + (var(--music-vibe) * 3px) + (var(--music-beat) * 4px)) rgba(255, 153, 0, calc(0.06 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.16))));
+  transition: transform 180ms ease-out, filter 180ms ease-out;
+}
+
 .text-amber-300,
 .text-amber-400,
 .text-amber-500,
