@@ -1,4 +1,4 @@
-import { Pause, Play, Volume2 } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ResolvedMusic } from "@/lib/music";
 
@@ -15,6 +15,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const outputGainRef = useRef<GainNode | null>(null);
   const freqDataRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const analyserEnabledRef = useRef(false);
   const userGestureRef = useRef(false);
@@ -69,13 +70,20 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       }
 
       const analyser = ctx.createAnalyser();
+      const outputGain = ctx.createGain();
       analyser.fftSize = lowPowerRef.current ? 128 : 512;
       analyser.smoothingTimeConstant = lowPowerRef.current ? 0.9 : 0.82;
+      outputGain.gain.value = audio.volume;
       sourceNodeRef.current.connect(analyser);
-      analyser.connect(ctx.destination);
+      analyser.connect(outputGain);
+      outputGain.connect(ctx.destination);
       analyserRef.current = analyser;
+      outputGainRef.current = outputGain;
       freqDataRef.current = new Uint8Array(new ArrayBuffer(analyser.frequencyBinCount));
       analyserEnabledRef.current = true;
+      // Keep the analyzer fed with the full signal while outputGain controls
+      // the audible level independently.
+      audio.volume = 1;
     } catch {
       analyserRef.current = null;
       freqDataRef.current = null;
@@ -111,6 +119,12 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         analyserRef.current.disconnect();
       } catch {}
       analyserRef.current = null;
+    }
+    if (outputGainRef.current) {
+      try {
+        outputGainRef.current.disconnect();
+      } catch {}
+      outputGainRef.current = null;
     }
     analyserEnabledRef.current = false;
     freqDataRef.current = null;
@@ -286,7 +300,9 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   }, [music]);
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (outputGainRef.current) {
+      outputGainRef.current.gain.value = volume;
+    } else if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
@@ -339,13 +355,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     }
   };
 
-  const onVolumeChange = (value: number) => {
-    setVolume(value);
-    if (audioRef.current) {
-      audioRef.current.volume = value;
-    }
-  };
-
   if (!music) return null;
 
   if (music.kind === "embed") {
@@ -363,7 +372,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   }
 
   return (
-    <aside className={`music-edge-controller ${isPlaying ? "is-playing" : ""}`}>
+    <aside className={`music-edge-controller music-edge-controller-solar ${isPlaying ? "is-playing" : ""}`}>
       <button
         type="button"
         onClick={() => void togglePlay()}
@@ -372,19 +381,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       >
         {isPlaying ? <Pause className="music-edge-icon h-3.5 w-3.5" /> : <Play className="music-edge-icon h-3.5 w-3.5" />}
       </button>
-
-      <div className="music-edge-volume">
-        <Volume2 className={`music-volume-icon h-3.5 w-3.5 text-awsOrange ${isPlaying ? "is-playing" : ""}`} />
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={volume}
-          onChange={(e) => onVolumeChange(Number(e.target.value))}
-          aria-label="Music volume"
-        />
-      </div>
     </aside>
   );
 }

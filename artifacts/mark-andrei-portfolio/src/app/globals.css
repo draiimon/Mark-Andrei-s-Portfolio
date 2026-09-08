@@ -101,6 +101,47 @@
   }
 }
 
+/* The music rail is intentionally a single Solar Moon play/pause control. */
+.music-edge-controller-solar {
+  width: 3.2rem;
+  height: 3.2rem;
+  padding: 0.35rem;
+  display: grid;
+  place-items: center;
+  gap: 0;
+  border-radius: 50%;
+}
+
+.music-edge-controller-solar .music-edge-button {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-color: rgba(255, 206, 133, 0.36);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(1, 3, 7, 0.98) 0 48%, rgba(255, 153, 0, 0.13) 59%, rgba(255, 153, 0, 0) 78%),
+    rgba(4, 6, 10, 0.38);
+  color: #fff1d9;
+}
+
+.music-edge-controller-solar .music-edge-button.is-playing {
+  box-shadow:
+    0 0 calc(12px + (var(--music-vibe) * 18px)) rgba(255, 153, 0, calc(0.14 + (var(--music-vibe) * 0.24))),
+    inset 0 0 calc(9px + (var(--music-beat) * 8px)) rgba(255, 153, 0, calc(0.08 + (var(--music-beat) * 0.18)));
+}
+
+@media (max-width: 640px) {
+  .music-edge-controller-solar {
+    width: 2.85rem;
+    height: 2.85rem;
+    padding: 0.28rem;
+  }
+
+  .music-edge-controller-solar .music-edge-button {
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+}
+
 @media (pointer: coarse), (max-width: 768px) {
   .moon-cursor {
     display: none;
@@ -172,8 +213,13 @@ body {
   object-fit: cover;
   object-position: center center;
   opacity: 0.78;
-  transform: scale(1.04);
-  filter: blur(10px) saturate(0.92) brightness(0.6) contrast(0.94);
+  transform: scale(calc(1.04 + (var(--music-vibe) * 0.06) + (var(--music-beat) * 0.1)));
+  filter:
+    blur(calc(10px - (var(--music-vibe) * 2px) - (var(--music-beat) * 3px)))
+    saturate(calc(0.92 + (var(--music-vibe) * 0.16) + (var(--music-beat) * 0.22)))
+    brightness(calc(0.6 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.2)))
+    contrast(0.94);
+  transition: transform 150ms ease-out, filter 150ms ease-out;
   will-change: transform, filter;
 }
 
@@ -688,7 +734,7 @@ body {
 }
 
 .portfolio-refinement .hero-cloud-wave .hero-letter {
-  animation: heroCloudWave 1.9s ease-in-out infinite;
+  animation: none;
   filter: drop-shadow(0 0 8px rgba(255, 153, 0, 0.2));
 }
 
@@ -2304,10 +2350,10 @@ body {
 }
 
 .music-reactive-hero {
-  transform: translateY(calc((var(--music-vibe) * -2px) + (var(--music-beat) * -2.2px)))
-    scale(calc(1 + (var(--music-vibe) * 0.018) + (var(--music-beat) * 0.022)));
+  transform: translateY(calc((var(--music-vibe) * -4px) + (var(--music-beat) * -6px)))
+    scale(calc(1 + (var(--music-vibe) * 0.04) + (var(--music-beat) * 0.05)));
   transform-origin: left center;
-  filter: drop-shadow(0 0 calc(4px + (var(--music-vibe) * 8px) + (var(--music-beat) * 7px)) rgba(255, 153, 0, calc(0.16 + (var(--music-vibe) * 0.28) + (var(--music-beat) * 0.26))));
+  filter: drop-shadow(0 0 calc(4px + (var(--music-vibe) * 12px) + (var(--music-beat) * 14px)) rgba(255, 153, 0, calc(0.16 + (var(--music-vibe) * 0.34) + (var(--music-beat) * 0.36))));
   transition:
     transform 180ms ease-out,
     filter 180ms ease-out;
@@ -2315,12 +2361,12 @@ body {
 
 .music-reactive-hero strong {
   display: inline-block;
-  transform: translateY(calc((var(--music-vibe) * -1.5px) + (var(--music-beat) * -3px)))
-    rotate(calc(var(--music-beat) * -0.55deg));
-  letter-spacing: calc((var(--music-vibe) * 0.01em) + (var(--music-beat) * 0.008em));
+  transform: translateY(calc((var(--music-vibe) * -3px) + (var(--music-beat) * -5px)))
+    rotate(calc(var(--music-beat) * -1.2deg));
+  letter-spacing: calc((var(--music-vibe) * 0.02em) + (var(--music-beat) * 0.014em));
   text-shadow:
-    0 0 calc(3px + (var(--music-vibe) * 6px) + (var(--music-beat) * 6px)) rgba(255, 153, 0, calc(0.18 + (var(--music-vibe) * 0.22) + (var(--music-beat) * 0.24))),
-    0 0 calc(1px + (var(--music-vibe) * 2px) + (var(--music-beat) * 2px)) rgba(255, 240, 213, calc(0.14 + (var(--music-vibe) * 0.1) + (var(--music-beat) * 0.12)));
+    0 0 calc(3px + (var(--music-vibe) * 9px) + (var(--music-beat) * 10px)) rgba(255, 153, 0, calc(0.18 + (var(--music-vibe) * 0.3) + (var(--music-beat) * 0.34))),
+    0 0 calc(1px + (var(--music-vibe) * 3px) + (var(--music-beat) * 3px)) rgba(255, 240, 213, calc(0.14 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.16)));
   transition:
     transform 180ms ease-out,
     letter-spacing 180ms ease-out,
@@ -2333,11 +2379,32 @@ body {
 
 .hero-cloud-wave .hero-letter {
   display: inline-block;
-  transform: translateY(calc((var(--music-vibe) * -2.2px) + (var(--music-beat) * -5.2px)))
-    scale(calc(1 + (var(--music-vibe) * 0.02) + (var(--music-beat) * 0.032)));
-  filter: drop-shadow(0 0 calc(2px + (var(--music-vibe) * 8px) + (var(--music-beat) * 12px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.3) + (var(--music-beat) * 0.42))));
+  transform: translateY(calc((var(--music-vibe) * -5px) + (var(--music-beat) * -9px)))
+    scale(calc(1 + (var(--music-vibe) * 0.05) + (var(--music-beat) * 0.06)));
+  filter: drop-shadow(0 0 calc(2px + (var(--music-vibe) * 11px) + (var(--music-beat) * 16px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.38) + (var(--music-beat) * 0.5))));
   transition: transform 180ms ease-out, filter 180ms ease-out;
-  animation: heroCloudWave 1.5s ease-in-out infinite;
+  animation: none;
+}
+
+.portfolio-page-content h2,
+.portfolio-page-content h3 {
+  transform: translateY(calc((var(--music-vibe) * -1.5px) + (var(--music-beat) * -3px)))
+    scale(calc(1 + (var(--music-vibe) * 0.01) + (var(--music-beat) * 0.022)));
+  filter: drop-shadow(0 0 calc(2px + (var(--music-vibe) * 5px) + (var(--music-beat) * 7px)) rgba(255, 153, 0, calc(0.12 + (var(--music-vibe) * 0.2) + (var(--music-beat) * 0.28))));
+  transition: transform 180ms ease-out, filter 180ms ease-out;
+}
+
+.portfolio-page-content .music-reactive-copy,
+.portfolio-page-content .portfolio-copy {
+  transform: translateY(calc((var(--music-vibe) * -0.8px) + (var(--music-beat) * -1.8px)));
+  filter: drop-shadow(0 0 calc(1px + (var(--music-vibe) * 3px) + (var(--music-beat) * 4px)) rgba(255, 153, 0, calc(0.06 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.16))));
+  transition: transform 180ms ease-out, filter 180ms ease-out;
+}
+
+.portfolio-page-content .text-awsOrange {
+  transform: translateY(calc((var(--music-vibe) * -1px) + (var(--music-beat) * -2.5px)));
+  filter: drop-shadow(0 0 calc(2px + (var(--music-vibe) * 5px) + (var(--music-beat) * 7px)) rgba(255, 153, 0, calc(0.2 + (var(--music-vibe) * 0.24) + (var(--music-beat) * 0.34))));
+  transition: transform 180ms ease-out, filter 180ms ease-out;
 }
 
 .music-reactive-brand .brand-letter {
@@ -4213,5 +4280,22 @@ html:has(.pre-intro) .ask-ai-wrap {
 @keyframes chat-aura-light-breathe {
   0%, 100% { filter: brightness(0.96) saturate(0.98); }
   50% { filter: brightness(1.2) saturate(1.12); }
+}
+
+/* Keep the single Solar Moon control anchored to the lower-left corner. */
+.music-edge-controller-solar {
+  left: 0.9rem !important;
+  top: auto !important;
+  bottom: calc(0.9rem + env(safe-area-inset-bottom)) !important;
+  transform: none !important;
+}
+
+@media (max-width: 640px) {
+  .music-edge-controller-solar {
+    left: 0.75rem !important;
+    top: auto !important;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom)) !important;
+    transform: none !important;
+  }
 }
 

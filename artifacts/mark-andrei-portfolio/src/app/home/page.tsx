@@ -138,7 +138,7 @@ export default function Home() {
         <div className="cloud-light two" />
         <div className="cloud-light three" />
 
-        <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 md:py-16">
+        <div className="portfolio-page-content mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 md:py-16">
           <TopBar
             brand={brandName}
             linkedinUrl={profile?.linkedinUrl}
@@ -165,21 +165,21 @@ export default function Home() {
               </strong>
             </h1>
             <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
-              <p className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-awsOrange sm:gap-2 sm:text-sm sm:tracking-[0.18em]">
+              <p className="music-reactive-copy inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-awsOrange sm:gap-2 sm:text-sm sm:tracking-[0.18em]">
                 <span className="h-2 w-2 rounded-full bg-awsOrange" />
                 {availability}
               </p>
               {profile?.headline && (
-                <p className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-200 sm:gap-2 sm:text-sm sm:tracking-[0.12em]">
+                <p className="music-reactive-copy inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-200 sm:gap-2 sm:text-sm sm:tracking-[0.12em]">
                   <span className="h-2 w-2 rounded-full bg-slate-200" />
                   {profile.headline}
                 </p>
               )}
             </div>
-            <p className="mt-2 w-full overflow-hidden text-xl font-semibold text-white sm:text-2xl md:text-3xl">
+            <p className="music-reactive-copy mt-2 w-full overflow-hidden text-xl font-semibold text-white sm:text-2xl md:text-3xl">
               <TypewriterTagline lines={taglineLines} />
             </p>
-            <p className="portfolio-copy mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">{aboutText}</p>
+            <p className="portfolio-copy music-reactive-copy mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">{aboutText}</p>
           </section>
         </ScrollReveal>
 
