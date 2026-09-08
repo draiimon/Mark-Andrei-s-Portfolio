@@ -3218,3 +3218,47 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* Current portfolio surface: darker than the parity pass, with the current
+   justified copy and borderless cards that still respond on hover. */
+.site-shell {
+  background:
+    radial-gradient(ellipse at 10% 18%, rgba(92, 55, 13, 0.16), transparent 38%),
+    radial-gradient(ellipse at 88% 22%, rgba(36, 54, 78, 0.14), transparent 42%),
+    linear-gradient(165deg, #040609 0%, #070a0f 52%, #0a0d13 100%);
+}
+
+.site-shell .portfolio-copy {
+  text-align: justify;
+  text-justify: inter-word;
+  text-align-last: left;
+}
+
+.site-shell .feature-card,
+.site-shell .snap-card {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(135deg, rgba(255, 174, 72, 0.045), rgba(255, 255, 255, 0.012) 48%, rgba(75, 103, 140, 0.035)),
+    rgba(255, 255, 255, 0.012);
+  box-shadow:
+    0 16px 38px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  transition:
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.site-shell .feature-card:hover,
+.site-shell .snap-card:hover {
+  border-color: transparent;
+  background:
+    linear-gradient(135deg, rgba(255, 174, 72, 0.09), rgba(255, 255, 255, 0.025) 48%, rgba(75, 103, 140, 0.07)),
+    rgba(255, 255, 255, 0.02);
+  box-shadow:
+    0 20px 46px rgba(0, 0, 0, 0.28),
+    0 0 28px rgba(255, 153, 0, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  transform: translateY(-4px);
+}
+
