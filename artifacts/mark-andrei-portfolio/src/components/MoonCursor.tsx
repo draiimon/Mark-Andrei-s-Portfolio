@@ -24,6 +24,10 @@ export default function MoonCursor() {
     document.documentElement.classList.add("has-moon-cursor");
 
     const onMove = (event: PointerEvent) => {
+      if (!active) {
+        current.x = event.clientX;
+        current.y = event.clientY;
+      }
       target.x = event.clientX;
       target.y = event.clientY;
       active = true;
@@ -36,8 +40,10 @@ export default function MoonCursor() {
     const animate = () => {
       const deltaX = target.x - current.x;
       const deltaY = target.y - current.y;
-      current.x += deltaX * 0.2;
-      current.y += deltaY * 0.2;
+      current.x += deltaX * 0.58;
+      current.y += deltaY * 0.58;
+      if (Math.abs(deltaX) < 0.2) current.x = target.x;
+      if (Math.abs(deltaY) < 0.2) current.y = target.y;
 
       const speed = Math.min(1, Math.hypot(deltaX, deltaY) / 32);
       const tilt = clamp(deltaX * 0.38, -14, 14);
