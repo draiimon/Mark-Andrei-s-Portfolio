@@ -610,7 +610,7 @@ export default function EditPage() {
                 Return to public profile
               </a>
               <p className="edit-login-identity">Mark Andrei / Portfolio</p>
-              <h1 className="edit-login-display">
+              <h1 className="edit-login-display music-reactive-hero">
                 Shape the story
                 <span>behind the work.</span>
               </h1>
@@ -632,16 +632,49 @@ export default function EditPage() {
                       aria-label="Speed up eclipse"
                       title="Click repeatedly to speed up the eclipse; it gradually slows down"
                     >
-                      <SolarAura
+                      <span
+                        className={`edit-login-aura-bounce ${
+                          loginAuraClickTick > 0
+                            ? loginAuraClickTick % 2 === 0
+                              ? "edit-login-click-pulse-a"
+                              : "edit-login-click-pulse-b"
+                            : ""
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <SolarAura
                         small
                         state="idle"
                         className="edit-login-aura"
                         showOrbits={false}
                         momentum={loginAuraMomentum}
-                      />
+                        />
+                      </span>
+                      <span
+                        className={`edit-login-sparks ${
+                          loginAuraMomentum >= 10
+                            ? loginAuraClickTick % 2 === 0
+                              ? "edit-login-spark-burst-a"
+                              : "edit-login-spark-burst-b"
+                            : ""
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {Array.from({ length: 10 }, (_, index) => (
+                          <span
+                            key={`eclipse-spark-${index}`}
+                            style={
+                              {
+                                "--spark-angle": `${index * 36}deg`,
+                                "--spark-delay": `${index * 18}ms`,
+                              } as React.CSSProperties
+                            }
+                          />
+                        ))}
+                      </span>
                     </button>
-                    <div className="edit-login-heading-copy">
-                      <p className="edit-login-title">Sign in to edit portfolio</p>
+                    <div className="edit-login-heading-copy hero-copy-block">
+                      <p className="edit-login-title music-reactive-copy">Sign in to edit portfolio</p>
                     </div>
                   </div>
 

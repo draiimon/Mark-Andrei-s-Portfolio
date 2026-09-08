@@ -5506,8 +5506,9 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .edit-login-identity {
   margin-bottom: 1.35rem;
-  color: rgba(255, 183, 82, 0.82);
+  color: #ff9900;
   font-size: 0.64rem;
+  font-weight: 800;
   letter-spacing: 0.26em;
 }
 
@@ -6193,6 +6194,7 @@ html:has(.pre-intro) .ask-ai-wrap {
    the rotation momentum without resizing the control. */
 .edit-login-mark {
   display: grid;
+  position: relative;
   appearance: none;
   padding: 0;
   place-items: center;
@@ -6209,7 +6211,7 @@ html:has(.pre-intro) .ask-ai-wrap {
 .edit-login-mark:focus-visible {
   filter: brightness(1.1);
   outline: none;
-  transform: scale(1.14);
+  transform: none;
 }
 
 .edit-login-mark:focus-visible {
@@ -6236,6 +6238,61 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .edit-login-mark .edit-login-aura {
   animation-duration: var(--login-aura-speed, 5s);
+  transform: none !important;
+  filter:
+    brightness(calc(1 + (var(--music-vibe) * 0.18) + (var(--music-beat) * 0.24)))
+    drop-shadow(
+      0 0 calc(8px + (var(--music-vibe) * 8px) + (var(--music-beat) * 10px))
+      rgba(255, 153, 0, calc(0.18 + (var(--music-vibe) * 0.16) + (var(--music-beat) * 0.22)))
+    );
+  transition: filter 180ms ease-out;
+}
+
+.edit-login-aura-bounce {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+
+.edit-login-aura-bounce.edit-login-click-pulse-a {
+  animation: edit-login-click-pulse-a 540ms cubic-bezier(0.22, 0.8, 0.32, 1) both;
+}
+
+.edit-login-aura-bounce.edit-login-click-pulse-b {
+  animation: edit-login-click-pulse-b 540ms cubic-bezier(0.22, 0.8, 0.32, 1) both;
+}
+
+@keyframes edit-login-click-pulse-a {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.14);
+  }
+  42% {
+    transform: scale(0.985);
+  }
+  65% {
+    transform: scale(1.055);
+  }
+}
+
+@keyframes edit-login-click-pulse-b {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.14);
+  }
+  44% {
+    transform: scale(0.985);
+  }
+  68% {
+    transform: scale(1.055);
+  }
 }
 
 .edit-login-mark .edit-login-aura::before {
@@ -6345,6 +6402,62 @@ html:has(.pre-intro) .ask-ai-wrap {
   will-change: auto;
 }
 
+.edit-login-sparks {
+  position: absolute;
+  z-index: 4;
+  inset: -2.9rem;
+  pointer-events: none;
+}
+
+.edit-login-sparks > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.16rem;
+  height: 0.58rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff5d7, #ff9900);
+  box-shadow: 0 0 0.45rem rgba(255, 153, 0, 0.95);
+  opacity: 0;
+  transform-origin: center;
+}
+
+.edit-login-sparks.edit-login-spark-burst-a > span {
+  animation: edit-login-spark-burst-a 620ms cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
+}
+
+.edit-login-sparks.edit-login-spark-burst-b > span {
+  animation: edit-login-spark-burst-b 620ms cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
+}
+
+@keyframes edit-login-spark-burst-a {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(0) scale(0.35);
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(-2.7rem) scale(0.08);
+  }
+}
+
+@keyframes edit-login-spark-burst-b {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(0) scale(0.35);
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--spark-angle)) translateY(-2.95rem) scale(0.08);
+  }
+}
+
 @keyframes solar-core-pulse {
   0%, 100% { transform: scale(0.94); opacity: 0.56; }
   50% { transform: scale(1.08); opacity: 0.92; }
@@ -6352,33 +6465,32 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 /* Lift the editor intro copy slightly without shifting the login panel. */
 .edit-login-copy {
-  transform: translateY(-10px);
+  transform: translateY(-34px);
 }
 
-/* Match the Home header's music response on the editor login foreground,
-   while keeping the motion restrained enough that click momentum never
-   becomes a size jump. */
-.edit-login-display {
-  transform: translateY(calc((var(--music-vibe) * -1.2px) + (var(--music-beat) * -2px)))
-    scale(calc(1 + (var(--music-vibe) * 0.012) + (var(--music-beat) * 0.016)));
-  text-shadow:
-    0 0 calc(5px + (var(--music-vibe) * 8px) + (var(--music-beat) * 9px))
-    rgba(255, 153, 0, calc(0.08 + (var(--music-vibe) * 0.16) + (var(--music-beat) * 0.18)));
-  transition: transform 180ms ease-out, text-shadow 180ms ease-out;
+/* The editor login uses underline fields rather than focus cards. Keep the
+   browser and shared field-shell focus treatment from drawing a rectangle
+   around the text holders. */
+.edit-page .edit-login-field,
+.edit-page .edit-login-field:focus-within {
+  border: 0 !important;
+  border-bottom: 1px solid rgba(231, 238, 246, 0.17) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
-.edit-login-title {
-  display: inline-block;
-  transform: translateY(calc((var(--music-vibe) * -0.5px) + (var(--music-beat) * -1px)))
-    scale(calc(1 + (var(--music-vibe) * 0.008) + (var(--music-beat) * 0.01)));
-  text-shadow:
-    0 0 calc(3px + (var(--music-vibe) * 5px) + (var(--music-beat) * 6px))
-    rgba(255, 153, 0, calc(0.06 + (var(--music-vibe) * 0.1) + (var(--music-beat) * 0.12)));
-  transition: transform 180ms ease-out, text-shadow 180ms ease-out;
+.edit-page .edit-login-field:focus-within {
+  border-bottom-color: rgba(255, 188, 99, 0.72) !important;
+  box-shadow: 0 1px 0 rgba(255, 153, 0, 0.26) !important;
 }
 
-.edit-login-mark .edit-login-aura {
-  transform: translateY(calc((var(--music-vibe) * -0.8px) + (var(--music-beat) * -1.4px)))
-    scale(calc(1 + (var(--music-vibe) * 0.018) + (var(--music-beat) * 0.035)));
-  transition: transform 180ms ease-out, filter 180ms ease-out;
+.edit-page .edit-login-input,
+.edit-page .edit-login-input:focus {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  transform: none !important;
 }

@@ -7,6 +7,7 @@ type GlobalBackgroundMusicProps = {
 };
 
 const MUSIC_VISUAL_STRENGTH = 0.5;
+const EDITOR_ROUTE_RE = /^\/(?:edit|admin)(?:\/|$)/;
 
 export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -176,6 +177,14 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         const hasPeak = bass > threshold && rise > (lowPowerRef.current ? 0.026 : 0.016);
         beatRef.current = hasPeak ? 1 : beatRef.current * (lowPowerRef.current ? 0.95 : 0.92);
         prevBassRef.current = prevBassRef.current * 0.58 + bass * 0.42;
+      } else if (active && EDITOR_ROUTE_RE.test(window.location.pathname)) {
+        // Autoplay can start the audio element before the browser permits a
+        // Web Audio analyser. Keep the Edit ambience alive with a restrained
+        // musical fallback until the first interaction unlocks real analysis.
+        const phase = audio?.currentTime ?? ts / 1000;
+        const pulse = (Math.sin(phase * Math.PI * 3.2 - 0.8) + 1) / 2;
+        target = 0.06 + pulse * 0.28;
+        beatRef.current = pulse > 0.86 ? 0.72 : beatRef.current * 0.9;
       }
 
       const vibeSmooth = isMobileRef.current ? 0.9 : 0.82;
@@ -248,6 +257,12 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         ensureAudioSource();
         await audio.play();
         setIsPlaying(true);
+        if (isEditorRoute && !userGestureRef.current) {
+          // The media element is already audible; this lets the analyzer
+          // attempt to attach immediately while the fallback covers browsers
+          // that keep AudioContext suspended during autoplay.
+          userGestureRef.current = true;
+        }
         if (userGestureRef.current && audioCtxRef.current?.state === "suspended") {
           await audioCtxRef.current.resume();
         }
@@ -282,7 +297,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setVibe(0);
       setBeat(0);
     };
-    const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(window.location.pathname);
+    const isEditorRoute = EDITOR_ROUTE_RE.test(window.location.pathname);
     const handleEditorInteraction = () => {
       void tryPlay(true);
     };
