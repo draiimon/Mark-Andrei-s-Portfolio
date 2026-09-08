@@ -579,9 +579,7 @@ export default function EditPage() {
               <div className="edit-solar-reveal-visual" aria-hidden="true">
                 <span className="edit-solar-halo edit-solar-halo-one" />
                 <span className="edit-solar-halo edit-solar-halo-two" />
-                <span className="edit-solar-orbit edit-solar-orbit-one" />
-                <span className="edit-solar-orbit edit-solar-orbit-two" />
-                <SolarAura className="edit-solar-aura" state="idle" />
+                <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
               </div>
               <p className="edit-solar-reveal-label">SOLAR / EDIT</p>
               <p className="edit-solar-reveal-status">Entering control center</p>
@@ -614,7 +612,7 @@ export default function EditPage() {
                 <div className="relative z-10">
                   <div className="edit-login-heading">
                     <div className="edit-login-mark">
-                      <SolarAura small state="idle" className="edit-login-aura" />
+                      <SolarAura small state="idle" className="edit-login-aura" showOrbits={false} />
                     </div>
                     <div className="edit-login-heading-copy">
                       <p className="edit-login-title">Sign in to edit portfolio</p>
