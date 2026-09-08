@@ -2230,9 +2230,12 @@ body {
 .pre-intro {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  min-height: 100svh;
   z-index: 60;
   display: grid;
   place-items: center;
+  justify-items: center;
   background: rgba(8, 10, 14, 0.2);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -2250,7 +2253,9 @@ body {
 
 .pre-intro-core {
   position: relative;
-  min-width: 250px;
+  width: min(20rem, calc(100vw - 2rem));
+  min-width: 0;
+  margin-inline: auto;
   text-align: center;
   z-index: 2;
 }
@@ -3073,12 +3078,6 @@ html:has(.pre-intro) .ask-ai-wrap {
 :root[data-mobile-lite="true"] .site-shell #achievements {
   content-visibility: visible;
   contain-intrinsic-size: none;
-}
-
-@media (max-width: 768px) {
-  .site-shell .portfolio-page-content {
-    padding-bottom: max(5rem, calc(5rem + env(safe-area-inset-bottom)));
-  }
 }
 
 /* Final portfolio surface pass: intentionally flat, quiet, and high contrast. */
