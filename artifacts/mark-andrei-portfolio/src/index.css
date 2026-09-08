@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-awsOrange: #ff9900;
+  --color-awsBlack: #131a22;
+  --color-awsGray: #232f3e;
+  --shadow-glow: 0 0 45px rgba(255, 153, 0, 0.35);
+}

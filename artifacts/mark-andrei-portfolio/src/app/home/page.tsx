@@ -1,14 +1,11 @@
+import { useEffect, useState } from "react";
 import Chatbot from "@/components/Chatbot";
 import PreProfileIntro from "@/components/PreProfileIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
 import portfolioSnapshot from "@/data/portfolio-snapshot.json";
-import { prisma } from "@/lib/prisma";
 import { ExternalLink, Github } from "lucide-react";
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 type ProfileView = {
   fullName: string;
@@ -63,56 +60,44 @@ type AchievementView = {
   text: string;
 };
 
-export default async function Home() {
-  let profile: ProfileView = portfolioSnapshot.profile;
-  let projects: ProjectView[] = portfolioSnapshot.projects.map((project, idx) => ({
+export default function Home() {
+  const [profile, setProfile] = useState<ProfileView>(portfolioSnapshot.profile);
+  const [projects, setProjects] = useState<ProjectView[]>(portfolioSnapshot.projects.map((project, idx) => ({
     id: idx + 1,
     ...project
-  }));
-  let experience: ExperienceView[] = portfolioSnapshot.experience.map((item, idx) => ({
+  })));
+  const [experience, setExperience] = useState<ExperienceView[]>(portfolioSnapshot.experience.map((item, idx) => ({
     id: idx + 1,
     ...item
-  }));
-  let leadership: LeadershipView[] = portfolioSnapshot.leadership.map((item, idx) => ({
+  })));
+  const [leadership, setLeadership] = useState<LeadershipView[]>(portfolioSnapshot.leadership.map((item, idx) => ({
     id: idx + 1,
     ...item
-  }));
-  let achievements: AchievementView[] = portfolioSnapshot.achievements.map((item, idx) => ({
+  })));
+  const [achievements, setAchievements] = useState<AchievementView[]>(portfolioSnapshot.achievements.map((item, idx) => ({
     id: idx + 1,
     ...item
-  }));
-  let taglines = portfolioSnapshot.taglines;
+  })));
+  const [taglines, setTaglines] = useState(portfolioSnapshot.taglines);
 
-  try {
-    const [profileRaw, projectsRaw, experienceRaw, leadershipRaw, achievementsRaw, taglinesRaw] = await Promise.all([
-      prisma.profile.findFirst(),
-      prisma.project.findMany({ orderBy: [{ highlight: "desc" }, { createdAt: "desc" }] }),
-      prisma.experience.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
-      prisma.leadership.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
-      prisma.achievement.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] }),
-      prisma.tagline.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] })
-    ]);
-
-    if (projectsRaw.length > 0) projects = projectsRaw;
-    if (experienceRaw.length > 0) experience = experienceRaw;
-    if (leadershipRaw.length > 0) leadership = leadershipRaw;
-    if (achievementsRaw.length > 0) achievements = achievementsRaw;
-    if (taglinesRaw.length > 0) taglines = taglinesRaw;
-
-    if (profileRaw) {
-      try {
-        profile = await prisma.profile.update({
-          where: { id: profileRaw.id },
-          data: { viewCount: { increment: 1 } }
-        }) as unknown as ProfileView;
-      } catch {
-        // Read success should still render if view increment fails.
-        profile = profileRaw as unknown as ProfileView;
-      }
-    }
-  } catch (error) {
-    console.error("Portfolio data load failed; rendering snapshot fallback.", error);
-  }
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/portfolio", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setProfile({ ...portfolioSnapshot.profile, ...data.profile });
+        if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
+        if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
+        if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
+        if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
+        if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const featured = projects.find((p) => p.highlight) ?? projects[0] ?? null;
 

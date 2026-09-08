@@ -1,0 +1,1 @@
+- [Legacy Tailwind migration](legacy-tailwind-port.md) — v3 `@apply` styles need a v4 theme reference and custom utility declarations.

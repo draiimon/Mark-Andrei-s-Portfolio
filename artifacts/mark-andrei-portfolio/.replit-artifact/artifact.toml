@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Mark Andrei’s Portfolio"
+description = "A personal portfolio site showcasing Mark Andrei’s projects, experience, achievements, gallery, music, and editable profile content."
+version = "1.0.0"
+id = "artifacts/mark-andrei-portfolio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19383
+
+[services.development]
+run = "pnpm --filter @workspace/mark-andrei-portfolio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mark-andrei-portfolio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/mark-andrei-portfolio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19383"
+BASE_PATH = "/"

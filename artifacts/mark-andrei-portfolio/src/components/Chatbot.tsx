@@ -1,5 +1,3 @@
-"use client";
-
 import { FormEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Mail, RotateCcw, X } from "lucide-react";
