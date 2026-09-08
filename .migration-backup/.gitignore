@@ -1,0 +1,14 @@
+node_modules
+.next
+.turbo
+.env
+*.log
+dist
+out
+
+node_modules
+# Keep environment variables out of version control
+.env
+# Resume and other uploads live in DB; don't commit to GitHub
+public/resume.pdf
+public/*.pdf
