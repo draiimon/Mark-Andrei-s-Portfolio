@@ -863,7 +863,7 @@ export default function EditPage() {
                 <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
               </div>
               <button type="button" className="edit-solar-skip" onClick={() => setSolarIntroActive(false)}>
-                Skip intro
+                Portfolio/Edit
               </button>
             </div>
           )}
