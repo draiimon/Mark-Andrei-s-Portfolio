@@ -4271,3 +4271,140 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* Final Solar Moon treatment: a black eclipse core surrounded by a live
+   orange corona instead of a generic framed media button. */
+.music-edge-controller-solar {
+  width: 4.35rem !important;
+  height: 4.35rem !important;
+  padding: 0.55rem !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.music-edge-controller-solar::before {
+  content: "";
+  position: absolute;
+  inset: 0.02rem;
+  z-index: -2;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 215deg,
+      rgba(255, 153, 0, 0) 0deg,
+      rgba(255, 188, 94, 0.96) 34deg,
+      rgba(255, 126, 0, 0.3) 68deg,
+      rgba(255, 153, 0, 0) 104deg,
+      rgba(255, 153, 0, 0) 172deg,
+      rgba(255, 190, 104, 0.86) 220deg,
+      rgba(255, 112, 0, 0.22) 264deg,
+      rgba(255, 153, 0, 0) 315deg
+    );
+  -webkit-mask: radial-gradient(circle, transparent 52%, #000 57%, #000 67%, transparent 74%);
+  mask: radial-gradient(circle, transparent 52%, #000 57%, #000 67%, transparent 74%);
+  opacity: calc(0.68 + (var(--music-vibe) * 0.24) + (var(--music-beat) * 0.18));
+  filter:
+    blur(calc(0.2px - (var(--music-beat) * 0.08px)))
+    drop-shadow(0 0 calc(7px + (var(--music-vibe) * 14px) + (var(--music-beat) * 19px)) rgba(255, 132, 0, calc(0.34 + (var(--music-vibe) * 0.3) + (var(--music-beat) * 0.28))));
+  transform: rotate(calc(var(--music-beat) * 3deg)) scale(calc(1 + (var(--music-vibe) * 0.05) + (var(--music-beat) * 0.08)));
+  transition: opacity 180ms ease-out, filter 180ms ease-out, transform 180ms ease-out;
+}
+
+.music-edge-controller-solar::after {
+  content: "";
+  position: absolute;
+  inset: -0.18rem;
+  z-index: -1;
+  border: 1px solid rgba(255, 190, 104, 0.2);
+  border-left-color: rgba(255, 137, 0, 0.8);
+  border-right-color: rgba(255, 190, 104, 0.58);
+  border-radius: 50%;
+  opacity: calc(0.42 + (var(--music-vibe) * 0.22) + (var(--music-beat) * 0.2));
+  transform: rotate(calc(var(--music-beat) * -4deg)) scale(calc(1 + (var(--music-beat) * 0.07)));
+  box-shadow:
+    0 0 calc(4px + (var(--music-vibe) * 8px)) rgba(255, 153, 0, calc(0.16 + (var(--music-vibe) * 0.22))),
+    inset 0 0 calc(5px + (var(--music-beat) * 6px)) rgba(255, 153, 0, calc(0.08 + (var(--music-beat) * 0.18)));
+  transition: opacity 180ms ease-out, transform 180ms ease-out, box-shadow 180ms ease-out;
+}
+
+.music-edge-controller-solar .music-edge-button,
+.music-edge-controller-solar .music-edge-button.is-playing {
+  position: relative;
+  width: 3.25rem !important;
+  height: 3.25rem !important;
+  border: 1px solid rgba(255, 205, 135, 0.52) !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 36% 31%, rgba(255, 225, 175, 0.16) 0 4%, transparent 17%),
+    radial-gradient(circle at 50% 50%, #000 0 48%, #050608 58%, rgba(255, 125, 0, 0.62) 69%, #08090b 76%);
+  color: #fff0d5;
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 11px) + (var(--music-beat) * 16px)) rgba(255, 127, 0, calc(0.23 + (var(--music-vibe) * 0.24) + (var(--music-beat) * 0.28))),
+    inset 0 0 calc(10px + (var(--music-beat) * 8px)) rgba(255, 173, 65, calc(0.1 + (var(--music-beat) * 0.18)));
+  transform: scale(calc(1 + (var(--music-vibe) * 0.035) + (var(--music-beat) * 0.095)));
+  transition: transform 140ms ease-out, box-shadow 140ms ease-out, border-color 140ms ease-out;
+  animation: none !important;
+}
+
+.music-edge-controller-solar .music-edge-button::before {
+  content: "";
+  position: absolute;
+  inset: 0.38rem;
+  border: 1px solid rgba(255, 217, 157, 0.16);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 153, 0, calc(0.08 + (var(--music-vibe) * 0.16)));
+  pointer-events: none;
+}
+
+.music-edge-controller-solar .music-edge-button:hover:not(:disabled) {
+  border-color: rgba(255, 226, 179, 0.88) !important;
+  background:
+    radial-gradient(circle at 36% 31%, rgba(255, 225, 175, 0.2) 0 4%, transparent 17%),
+    radial-gradient(circle at 50% 50%, #000 0 46%, #050608 57%, rgba(255, 145, 0, 0.78) 69%, #08090b 76%);
+  filter: drop-shadow(0 0 12px rgba(255, 144, 0, 0.72));
+  transform: scale(1.08);
+}
+
+.music-edge-controller-solar .music-edge-icon {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  color: #fff3df !important;
+  filter: drop-shadow(0 0 5px rgba(255, 153, 0, 0.45));
+}
+
+.music-edge-controller-solar.is-playing::before {
+  animation: solarCoronaSpin 8s linear infinite;
+}
+
+.music-edge-controller-solar.is-playing::after {
+  animation: solarOrbitPulse 1.25s ease-in-out infinite;
+}
+
+@keyframes solarCoronaSpin {
+  to { transform: rotate(360deg) scale(calc(1 + (var(--music-vibe) * 0.05) + (var(--music-beat) * 0.08))); }
+}
+
+@keyframes solarOrbitPulse {
+  0%, 100% { filter: brightness(0.9); }
+  50% { filter: brightness(1.3); }
+}
+
+@media (max-width: 640px) {
+  .music-edge-controller-solar {
+    width: 3.8rem !important;
+    height: 3.8rem !important;
+    padding: 0.45rem !important;
+  }
+
+  .music-edge-controller-solar .music-edge-button,
+  .music-edge-controller-solar .music-edge-button.is-playing {
+    width: 2.8rem !important;
+    height: 2.8rem !important;
+  }
+}
+
