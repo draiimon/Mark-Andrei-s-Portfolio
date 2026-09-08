@@ -348,6 +348,118 @@ body {
   --cloud-beat: 0.026;
 }
 
+.edit-background-spark-field {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  isolation: isolate;
+}
+
+.edit-background-spark-field > span {
+  position: absolute;
+  top: calc(36% + var(--bg-origin-y, 0vh));
+  left: calc(60% + var(--bg-origin-x, 0vw));
+  width: var(--bg-spark-size, 0.12rem);
+  height: var(--bg-spark-trail, 0.8rem);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #fff8d7 16%, #ffd477 52%, #ff8a18 78%, transparent 100%);
+  box-shadow:
+    0 0 0.2rem rgba(255, 255, 240, 1),
+    0 0 0.65rem rgba(255, 220, 128, 0.98),
+    0 0 1.35rem rgba(255, 112, 0, 0.8);
+  filter: brightness(1.5) saturate(1.4);
+  opacity: 0;
+  transform: translate3d(0, 0, 0) rotate(var(--bg-spark-angle, 0deg)) scale(0.2);
+  transform-origin: center;
+  animation: edit-background-spark-flight
+    var(--bg-spark-duration, 3s)
+    linear
+    var(--bg-spark-delay, 0ms)
+    both;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes edit-background-spark-flight {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--bg-spark-angle, 0deg)) scale(0.2);
+    filter: brightness(2.4) saturate(1.8);
+  }
+  7% {
+    opacity: 1;
+    transform: translate3d(var(--bg-x-06, 0vw), var(--bg-y-06, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(1.1);
+    filter: brightness(2.9) saturate(2);
+  }
+  15% {
+    opacity: 0.3;
+    transform: translate3d(var(--bg-x-14, 0vw), var(--bg-y-14, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.72);
+  }
+  24% {
+    opacity: 0.95;
+    transform: translate3d(var(--bg-x-25, 0vw), var(--bg-y-25, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.92);
+  }
+  32% {
+    opacity: 0.2;
+    transform: translate3d(var(--bg-x-35, 0vw), var(--bg-y-35, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.62);
+  }
+  40% {
+    opacity: 0.88;
+    transform: translate3d(var(--bg-x-48, 0vw), var(--bg-y-48, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.86);
+  }
+  51% {
+    opacity: 0.12;
+    transform: translate3d(var(--bg-x-62, 0vw), var(--bg-y-62, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.54);
+  }
+  61% {
+    opacity: 0.72;
+    transform: translate3d(var(--bg-x-74, 0vw), var(--bg-y-74, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.74);
+  }
+  73% {
+    opacity: 0.08;
+    transform: translate3d(var(--bg-x-86, 0vw), var(--bg-y-86, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.42);
+  }
+  82% {
+    opacity: 0.34;
+    transform: translate3d(var(--bg-x-94, 0vw), var(--bg-y-94, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--bg-x-100, 0vw), var(--bg-y-100, 0vh), 0)
+      rotate(var(--bg-spark-angle, 0deg))
+      scale(0.04);
+    filter: brightness(0.72) saturate(0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edit-background-spark-field > span {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+
 .topbar {
   position: sticky;
   top: 0.75rem;
@@ -5478,12 +5590,25 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 .edit-login-back {
-  min-height: 2.5rem;
-  margin-bottom: clamp(2.8rem, 7vh, 4.6rem);
-  color: rgba(226, 232, 240, 0.68);
-  font-size: 0.68rem;
+  display: inline-flex;
+  min-height: 0;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: clamp(1.65rem, 4vh, 2.4rem);
+  color: rgba(226, 232, 240, 0.62);
+  font-size: 0.61rem;
   font-weight: 650;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.105em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.edit-login-back::before {
+  content: "←";
+  color: rgba(255, 153, 0, 0.84);
+  font-size: 0.78rem;
+  letter-spacing: 0;
+  transform: translateY(-0.02rem);
 }
 
 .edit-login-back-icon {
@@ -5505,11 +5630,13 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 .edit-login-identity {
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.15rem;
   color: #ff9900;
-  font-size: 0.64rem;
-  font-weight: 800;
-  letter-spacing: 0.26em;
+  font-size: 0.6rem;
+  font-weight: 750;
+  letter-spacing: 0.19em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .edit-login-display {
@@ -6405,7 +6532,7 @@ html:has(.pre-intro) .ask-ai-wrap {
 .edit-login-sparks {
   position: absolute;
   z-index: 4;
-  inset: -2.9rem;
+  inset: -4.35rem;
   pointer-events: none;
 }
 
@@ -6413,48 +6540,52 @@ html:has(.pre-intro) .ask-ai-wrap {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 0.16rem;
-  height: 0.58rem;
+  width: 0.14rem;
+  height: var(--spark-length, 0.72rem);
   border-radius: 999px;
   background: linear-gradient(180deg, #fff5d7, #ff9900);
-  box-shadow: 0 0 0.45rem rgba(255, 153, 0, 0.95);
+  box-shadow:
+    0 0 0.45rem rgba(255, 255, 235, 1),
+    0 0 0.95rem rgba(255, 202, 91, 1),
+    0 0 1.45rem rgba(255, 115, 0, 0.85);
+  filter: brightness(1.35) saturate(1.25);
   opacity: 0;
   transform-origin: center;
 }
 
 .edit-login-sparks.edit-login-spark-burst-a > span {
-  animation: edit-login-spark-burst-a 620ms cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
+  animation: edit-login-spark-burst-a var(--spark-duration, 620ms) cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
 }
 
 .edit-login-sparks.edit-login-spark-burst-b > span {
-  animation: edit-login-spark-burst-b 620ms cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
+  animation: edit-login-spark-burst-b var(--spark-duration, 620ms) cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
 }
 
 @keyframes edit-login-spark-burst-a {
   0% {
     opacity: 0;
-    transform: rotate(var(--spark-angle)) translateY(0) scale(0.35);
+    transform: rotate(var(--spark-angle)) translateY(-1.48rem) scale(0.45);
   }
   16% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--spark-angle)) translateY(-2.7rem) scale(0.08);
+    transform: rotate(var(--spark-angle)) translateY(calc(var(--spark-distance, 3.05rem) * -1)) scale(0.06);
   }
 }
 
 @keyframes edit-login-spark-burst-b {
   0% {
     opacity: 0;
-    transform: rotate(var(--spark-angle)) translateY(0) scale(0.35);
+    transform: rotate(var(--spark-angle)) translateY(-1.48rem) scale(0.45);
   }
   16% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--spark-angle)) translateY(-2.95rem) scale(0.08);
+    transform: rotate(var(--spark-angle)) translateY(calc(var(--spark-distance, 3.35rem) * -1)) scale(0.06);
   }
 }
 

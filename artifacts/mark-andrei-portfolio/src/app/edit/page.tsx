@@ -104,7 +104,16 @@ async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
-function PortfolioSurface({ children }: { children: ReactNode }) {
+function PortfolioSurface({
+  children,
+  backgroundBurstCycle = 0,
+}: {
+  children: ReactNode;
+  backgroundBurstCycle?: number;
+}) {
+  const backgroundSparkCount =
+    backgroundBurstCycle > 0 ? Math.min(360, 300 + backgroundBurstCycle * 20) : 0;
+
   return (
     <>
       <video
@@ -123,6 +132,75 @@ function PortfolioSurface({ children }: { children: ReactNode }) {
         <div className="cloud-light one" />
         <div className="cloud-light two" />
         <div className="cloud-light three" />
+        {backgroundSparkCount > 0 && (
+          <div
+            key={backgroundBurstCycle}
+            className={`edit-background-spark-field ${
+              backgroundBurstCycle % 2 === 0
+                ? "edit-background-spark-burst-a"
+                : "edit-background-spark-burst-b"
+            }`}
+            aria-hidden="true"
+          >
+            {Array.from({ length: backgroundSparkCount }, (_, index) => {
+              // The paths are seeded instead of truly random so every burst is
+              // reproducible, but still has the uneven spread of real sparks.
+              const launchAngle = (index * 137.508 + ((index * 29) % 19) - 9) % 360;
+              const angleRadians = (launchAngle * Math.PI) / 180;
+              const radialDistance = 38 + ((index * 47) % 145);
+              const burstX = Math.cos(angleRadians) * radialDistance;
+              const burstY = Math.sin(angleRadians) * (26 + ((index * 31) % 106));
+              const gravityFall = 28 + ((index * 61) % 72);
+              const originX = ((index * 47) % 15) - 7.5;
+              const originY = ((index * 31) % 11) - 5.5;
+              const flightTime = 5.8 + ((index * 41) % 28) / 10;
+              const delay = (index * 19) % 520;
+              const size = 0.055 + ((index * 13) % 8) * 0.014;
+              const trail = 0.55 + ((index * 17) % 10) * 0.085;
+              const pathPoint = (progress: number) =>
+                `${burstX * progress}vw`;
+              const fallPoint = (progress: number) =>
+                `${burstY * progress + gravityFall * progress * progress}vh`;
+
+              return (
+                <span
+                  key={`background-spark-${backgroundBurstCycle}-${index}`}
+                  style={
+                    {
+                      "--bg-origin-x": `${originX}vw`,
+                      "--bg-origin-y": `${originY}vh`,
+                      "--bg-x-06": pathPoint(0.06),
+                      "--bg-y-06": fallPoint(0.06),
+                      "--bg-x-14": pathPoint(0.14),
+                      "--bg-y-14": fallPoint(0.14),
+                      "--bg-x-25": pathPoint(0.25),
+                      "--bg-y-25": fallPoint(0.25),
+                      "--bg-x-35": pathPoint(0.35),
+                      "--bg-y-35": fallPoint(0.35),
+                      "--bg-x-48": pathPoint(0.48),
+                      "--bg-y-48": fallPoint(0.48),
+                      "--bg-x-62": pathPoint(0.62),
+                      "--bg-y-62": fallPoint(0.62),
+                      "--bg-x-74": pathPoint(0.74),
+                      "--bg-y-74": fallPoint(0.74),
+                      "--bg-x-86": pathPoint(0.86),
+                      "--bg-y-86": fallPoint(0.86),
+                      "--bg-x-94": pathPoint(0.94),
+                      "--bg-y-94": fallPoint(0.94),
+                      "--bg-x-100": `${burstX}vw`,
+                      "--bg-y-100": `${burstY + gravityFall}vh`,
+                      "--bg-spark-duration": `${flightTime}s`,
+                      "--bg-spark-delay": `${delay}ms`,
+                      "--bg-spark-size": `${size}rem`,
+                      "--bg-spark-trail": `${trail}rem`,
+                      "--bg-spark-angle": `${launchAngle + 90}deg`,
+                    } as React.CSSProperties
+                  }
+                />
+              );
+            })}
+          </div>
+        )}
         {children}
       </div>
     </>
@@ -583,9 +661,12 @@ export default function EditPage() {
   }
 
   if (auth === false) {
+    const sparkCount = loginAuraMomentum >= 4 ? Math.min(96, 12 + loginAuraMomentum * 6) : 0;
+    const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
+
     return (
       <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
-        <PortfolioSurface>
+        <PortfolioSurface backgroundBurstCycle={backgroundBurstCycle}>
           {solarIntroActive && (
             <div className="edit-solar-reveal" role="status" aria-live="polite">
               <div className="edit-solar-reveal-visual" aria-hidden="true">
@@ -652,7 +733,7 @@ export default function EditPage() {
                       </span>
                       <span
                         className={`edit-login-sparks ${
-                          loginAuraMomentum >= 10
+                          sparkCount > 0
                             ? loginAuraClickTick % 2 === 0
                               ? "edit-login-spark-burst-a"
                               : "edit-login-spark-burst-b"
@@ -660,17 +741,27 @@ export default function EditPage() {
                         }`}
                         aria-hidden="true"
                       >
-                        {Array.from({ length: 10 }, (_, index) => (
-                          <span
-                            key={`eclipse-spark-${index}`}
-                            style={
-                              {
-                                "--spark-angle": `${index * 36}deg`,
-                                "--spark-delay": `${index * 18}ms`,
-                              } as React.CSSProperties
-                            }
-                          />
-                        ))}
+                        {Array.from({ length: sparkCount }, (_, index) => {
+                          const angleJitter = (index * 17) % 13 - 6;
+                          const angle = index * (360 / Math.max(1, sparkCount)) + angleJitter;
+                          const distance = 2.55 + ((index * 7) % 13) * 0.12 + loginAuraMomentum * 0.06;
+                          const duration = 430 + ((index * 11) % 7) * 38 - loginAuraMomentum * 6;
+                          const length = 0.58 + ((index * 13) % 7) * 0.11;
+                          return (
+                            <span
+                              key={`eclipse-spark-${index}`}
+                              style={
+                                {
+                                  "--spark-angle": `${angle}deg`,
+                                  "--spark-delay": `${(index * 13) % 120}ms`,
+                                  "--spark-distance": `${distance}rem`,
+                                  "--spark-duration": `${duration}ms`,
+                                  "--spark-length": `${length}rem`,
+                                } as React.CSSProperties
+                              }
+                            />
+                          );
+                        })}
                       </span>
                     </button>
                     <div className="edit-login-heading-copy hero-copy-block">
