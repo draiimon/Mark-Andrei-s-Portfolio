@@ -21,8 +21,8 @@ The homepage should use the original `site-shell` styling path without the newer
 
 **How to apply:** Do not re-add broad refinement classes to the homepage unless every mobile override is checked against the original source at the same viewport.
 
-The editor background sparkle field should read as persistent air-dragged dust: each batch spreads once from the eclipse into the whole viewport, then settles into bounded wind/Brownian drift and firefly-like shimmer. It must not orbit, use long streak trails, expire, or reset.
+The editor background sparkle field should read as persistent air-dragged dust: it stays dormant until the tenth eclipse click, each ten-click batch spreads once into the whole viewport, then settles into bounded wind/Brownian drift and firefly-like shimmer. It must not orbit, use long streak trails, expire, wrap around, or reset.
 
-**Why:** The intended effect needs the visual excitement of an initial star spread plus an always-present star-dust atmosphere that gradually gains density with clicks.
+**Why:** The intended effect needs a deliberate buildup before the star spread, followed by an always-present star-dust atmosphere that gradually gains density; page load and early clicks should remain clean without unbounded particle growth.
 
-**How to apply:** Launch each batch from the eclipse toward random full-viewport settle points, keep every particle alive after settling, move it only with small local wind drift, and append new sparkles without slicing or replacing the existing field.
+**How to apply:** Keep the initial field empty, trigger the first and later batches at ten-click intervals, launch each batch from the eclipse toward random full-viewport settle points, keep particles alive after settling, move them only with small local wind drift, cap the pool by removing only the oldest particles, and clamp edges instead of wrapping.

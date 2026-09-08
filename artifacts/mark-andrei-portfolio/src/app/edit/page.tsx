@@ -169,7 +169,7 @@ function BackgroundSparkBurst({
   const wakeRendererRef = useRef<(() => void) | null>(null);
   const rendererRunningRef = useRef(false);
   const animationFrameRef = useRef<number | null>(null);
-  const lastBurstCycleRef = useRef(-1);
+  const lastBurstCycleRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -210,16 +210,23 @@ function BackgroundSparkBurst({
         const windTime = spreadTime * particle.driftSpeed;
         const settledX = particle.x + (particle.settleX - particle.x) * spreadEase;
         const settledY = particle.y + (particle.settleY - particle.y) * spreadEase;
-        const x =
-          ((settledX +
-            Math.sin(windTime + particle.phase) * particle.drift +
-            width) %
-            width);
-        const y =
-          ((settledY +
-            Math.cos(windTime * 0.73 + particle.phase * 1.7) * particle.drift * 0.58 +
-            height) %
-            height);
+        const x = Math.max(
+          -16,
+          Math.min(
+            width + 16,
+            settledX + Math.sin(windTime + particle.phase) * particle.drift
+          )
+        );
+        const y = Math.max(
+          -16,
+          Math.min(
+            height + 16,
+            settledY +
+              Math.cos(windTime * 0.73 + particle.phase * 1.7) *
+                particle.drift *
+                0.58
+          )
+        );
         const shimmer =
           0.18 +
           0.82 *
@@ -273,7 +280,7 @@ function BackgroundSparkBurst({
   }, []);
 
   useEffect(() => {
-    if (burstCycle < 0 || burstCycle <= lastBurstCycleRef.current) return;
+    if (burstCycle <= 0 || burstCycle <= lastBurstCycleRef.current) return;
     lastBurstCycleRef.current = burstCycle;
 
     const { width, height } = viewportRef.current;
@@ -310,10 +317,11 @@ function BackgroundSparkBurst({
       }
     );
 
+    const maxParticles = 2200;
     particlesRef.current = [
       ...particlesRef.current,
       ...newParticles,
-    ];
+    ].slice(-maxParticles);
     wakeRendererRef.current?.();
   }, [burstCycle, intensity]);
 
@@ -782,7 +790,7 @@ export default function EditPage() {
   if (auth === false) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const sparkCount =
-      loginAuraMomentum >= 4
+      loginAuraClickTick >= 10
         ? Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
         : 0;
     const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
