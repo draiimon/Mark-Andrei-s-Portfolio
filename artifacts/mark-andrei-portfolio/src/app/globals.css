@@ -17,7 +17,10 @@ html {
 body {
   @apply text-white;
   overflow-x: hidden;
-  background: #07090d;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255, 153, 0, 0.12), transparent 38%),
+    radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.08), transparent 35%),
+    linear-gradient(170deg, #050608 0%, #0a0c11 45%, #11141a 100%);
 }
 
 .font-body {
@@ -694,6 +697,217 @@ body {
   }
 }
 
+/* new-preview branch interaction surface */
+.portfolio-refinement {
+  background:
+    radial-gradient(ellipse at 8% 13%, rgba(143, 74, 10, 0.2), transparent 40%),
+    radial-gradient(ellipse at 90% 35%, rgba(46, 68, 93, 0.23), transparent 45%),
+    linear-gradient(165deg, #0c0d11 0%, #101722 48%, #090c13 100%);
+}
+
+.portfolio-refinement .cloud-light.one { width: 24rem; height: 24rem; left: -5rem; opacity: .58; }
+.portfolio-refinement .cloud-light.two { width: 24rem; height: 24rem; opacity: .38; background: rgba(134, 166, 205, .27); }
+.portfolio-refinement .cloud-light.three { opacity: .5; }
+
+.portfolio-refinement .feature-card,
+.portfolio-refinement .snap-card {
+  border-radius: 0.2rem;
+  background: rgba(255, 255, 255, 0.018);
+  box-shadow: none;
+}
+
+.portfolio-refinement .feature-card { border-left-color: rgba(255, 255, 255, 0.14); }
+.portfolio-refinement .snap-card:hover,
+.portfolio-refinement .feature-card:hover { border-color: rgba(255, 153, 0, 0.46); }
+
+.portfolio-chat {
+  position: fixed;
+  right: 1.25rem;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .8rem;
+}
+
+.portfolio-chat .chat-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 50px;
+  padding: .5rem 1rem .5rem .55rem;
+  border: 1px solid #edaa4a85;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #39220fec, #191b22f5);
+  color: #fff1d9;
+  box-shadow: 0 0 24px #ff990026, inset 0 1px 0 #ffd49c20;
+  backdrop-filter: blur(15px);
+  font-size: .82rem;
+  font-weight: 600;
+  transition: border-color 180ms, box-shadow 180ms;
+}
+
+.portfolio-chat .chat-launcher:hover { border-color: #ffd197; box-shadow: 0 0 32px #ff990050, inset 0 1px 0 #ffd49c35; }
+.portfolio-chat .chat-launcher-arrow { color: #ebb36a; }
+.portfolio-chat .chat-launcher-open { padding: .6rem .9rem; min-height: 40px; gap: .5rem; font-size: .74rem; }
+.portfolio-chat .chat-window {
+  width: min(390px, calc(100vw - 2rem));
+  height: min(600px, calc(100dvh - 110px - env(safe-area-inset-bottom)));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #db9d535e;
+  border-radius: 1.3rem;
+  background: radial-gradient(ellipse at 90% 0%, #b2661726, transparent 47%), linear-gradient(150deg, #151923f5, #10141cf7);
+  box-shadow: 0 25px 80px #0009, 0 0 42px #ff990012, inset 0 1px 0 #ffe1b52b;
+  backdrop-filter: blur(24px);
+  animation: chat-reveal 220ms ease-out both;
+}
+
+.portfolio-chat .chat-top { display: flex; align-items: center; gap: .65rem; padding: .9rem 1rem; border-bottom: 1px solid #ffd99b14; flex-shrink: 0; background: transparent; }
+.portfolio-chat .chat-heading { flex: 1; min-width: 0; }
+.portfolio-chat .chat-heading h2 { font-size: .85rem; font-weight: 650; display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; color: #f8efe2; }
+.portfolio-chat .chat-heading h2 > span { font-size: .46rem; letter-spacing: .13em; color: #e8b875; background: #ffb84e0c; padding: .2rem .3rem; border-radius: .25rem; border: 1px solid #ffcb7f24; }
+.portfolio-chat .chat-heading p { margin-top: .2rem; font-size: .64rem; color: #a7a8b0; }
+.portfolio-chat .chat-icon-button { display: grid; place-items: center; width: 30px; height: 32px; border-radius: .45rem; color: #b1b3be; }
+.portfolio-chat .chat-icon-button:hover { color: #ffe0b2; background: #ffffff09; }
+.portfolio-chat .chat-icon-button:disabled { opacity: .3; }
+.portfolio-chat .chat-scroll { min-height: 0; flex: 1; overflow-y: auto; padding: 1.15rem; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #795332 transparent; }
+.portfolio-chat .chat-welcome { padding: .1rem .15rem .5rem; }
+.portfolio-chat .chat-welcome-aura { width: 90px; height: 90px; position: relative; display: grid; place-items: center; margin: .25rem 0 1.15rem; }
+.portfolio-chat .chat-orbit { position: absolute; inset: 0; border: 1px solid #f6b25724; border-radius: 50%; transform: rotate(-30deg) scaleY(.78); display: block; }
+.portfolio-chat .chat-orbit::after { content: ''; position: absolute; top: 14px; right: 7px; width: 4px; height: 4px; border-radius: 50%; background: #ffcf88; box-shadow: 0 0 8px #ffb64e; }
+.portfolio-chat .chat-aura { position: relative; display: inline-block; width: 57px; height: 57px; flex-shrink: 0; border-radius: 50%; background: radial-gradient(circle at 35% 27%, #fff8e5, #ffd393 12%, #eea942 32%, #a75a17 58%, #382526 80%); box-shadow: 0 0 24px #ffb64d44, inset -7px -9px 16px #29131e75; animation: chat-aura-breathe 5s ease-in-out infinite; }
+.portfolio-chat .chat-aura > span { position: absolute; inset: 5px; border: 1px solid #fff3d56b; border-radius: 50%; transform: rotate(-32deg) scaleX(.5); }
+.portfolio-chat .chat-aura > span:nth-child(2) { transform: rotate(35deg) scaleX(.5); }
+.portfolio-chat .chat-aura > span:nth-child(3) { transform: rotate(80deg) scaleX(.5); opacity: .6; }
+.portfolio-chat .chat-aura-small { width: 32px; height: 32px; box-shadow: 0 0 15px #ffb64d37, inset -3px -5px 8px #29131e75; }
+.portfolio-chat .chat-aura-small > span { inset: 3px; }
+.portfolio-chat .chat-kicker { color: #d4a366; font-size: .57rem; letter-spacing: .17em; text-transform: uppercase; margin-bottom: .6rem; }
+.portfolio-chat .chat-welcome h3 { font-size: 1.85rem; line-height: 1.15; font-weight: 550; letter-spacing: -.04em; color: #fbf2e8; }
+.portfolio-chat .chat-welcome h3 > span { color: #ffbd6c; }
+.portfolio-chat .chat-welcome-copy { color: #acadb9; font-size: .75rem; line-height: 1.75; margin-top: .85rem; }
+.portfolio-chat .chat-suggestions { display: grid; gap: .5rem; margin-top: 1.15rem; }
+.portfolio-chat .chat-suggestions button { display: flex; align-items: center; gap: .7rem; padding: .7rem .8rem; border: 1px solid #ffd39b1c; border-radius: .6rem; color: #d4a366; background: linear-gradient(100deg, #ffbf7008, #ffffff02); font-size: .75rem; transition: border-color 160ms, background 160ms; }
+.portfolio-chat .chat-suggestions button > span { flex: 1; text-align: left; color: #e5e0db; }
+.portfolio-chat .chat-suggestions button:hover { border-color: #ffc07566; background: #ffad5510; }
+.portfolio-chat .chat-messages { display: grid; gap: 1.3rem; padding: .2rem 0; }
+.portfolio-chat .chat-message { animation: chat-reveal 180ms ease-out; }
+.portfolio-chat .chat-speaker { color: #c0935b; font-size: .51rem; letter-spacing: .14em; margin-bottom: .45rem; }
+.portfolio-chat .chat-message-user { margin-left: 1.3rem; }
+.portfolio-chat .chat-message-user .chat-speaker { text-align: right; color: #9497a6; }
+.portfolio-chat .chat-message-content { color: #dbdce3; font-size: .79rem; line-height: 1.75; overflow-wrap: anywhere; }
+.portfolio-chat .chat-message-user .chat-message-content { background: linear-gradient(120deg, #734b232e, #4f392333); border: 1px solid #ebb57030; border-radius: .8rem .8rem .2rem .8rem; padding: .7rem .85rem; color: #f2e4d2; white-space: pre-wrap; }
+.portfolio-chat .chat-message-content p + p { margin-top: .65rem; }
+.portfolio-chat .chat-message-content ul, .portfolio-chat .chat-message-content ol { padding-left: 1.15rem; margin: .5rem 0; }
+.portfolio-chat .chat-message-content ul { list-style: disc; }
+.portfolio-chat .chat-message-content ol { list-style: decimal; }
+.portfolio-chat .chat-message-content li { margin: .3rem 0; }
+.portfolio-chat .chat-message-content a, .portfolio-chat .chat-error a { color: #ffc980; text-decoration: underline; text-underline-offset: 3px; }
+.portfolio-chat .chat-message-content strong { color: #ffe1b6; font-weight: 600; }
+.portfolio-chat .chat-message-content pre { overflow-x: auto; padding: .65rem; background: #080a10; border-radius: .4rem; }
+.portfolio-chat .chat-bottom { flex-shrink: 0; padding: .85rem 1rem .7rem; border-top: 1px solid #ffd99b12; background: #0d111ac9; }
+.portfolio-chat .chat-composer { display: flex; align-items: center; gap: .4rem; border: 1px solid #8a796453; border-radius: .8rem; background: #090d15; padding: .45rem; }
+.portfolio-chat .chat-composer:focus-within { border-color: #d3a05e; box-shadow: 0 0 0 2px #edaa4a0a; }
+.portfolio-chat .chat-composer input { flex: 1; min-width: 0; padding: .3rem; font-size: .75rem; color: #fff0dc; background: transparent; outline: none; }
+.portfolio-chat .chat-composer input::placeholder { color: #9293a1; }
+.portfolio-chat .chat-composer button { display: grid; place-items: center; width: 33px; height: 33px; flex-shrink: 0; border-radius: .6rem; background: linear-gradient(140deg, #ffd293, #ffa331); color: #231608; box-shadow: 0 0 12px #ffad3e1c; }
+.portfolio-chat .chat-composer button:disabled { background: #35302a; color: #92816b; box-shadow: none; }
+.portfolio-chat .chat-bottom > p { text-align: center; margin-top: .55rem; color: #92929f; font-size: .55rem; }
+.portfolio-chat .chat-bottom > p > span { margin: 0 .4rem; color: #d3a05e; }
+.portfolio-chat .chat-loading { display: flex; gap: 5px; margin: 1rem 0 .2rem; }
+.portfolio-chat .chat-loading i { width: 5px; height: 5px; border-radius: 50%; background: #eab166; animation: chat-dot-pulse 1.2s ease-in-out infinite; }
+.portfolio-chat .chat-error { padding: .75rem; margin-top: .9rem; border: 1px solid #e3aa4940; border-radius: .6rem; font-size: .75rem; line-height: 1.6; color: #ddc8ab; }
+
+.portfolio-chat .chat-launcher .chat-aura { display: inline-block; }
+
+.music-edge-controller {
+  border-radius: 999px;
+  border-color: rgba(255, 153, 0, 0.5);
+  background:
+    linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
+    rgba(10, 10, 14, 0.78);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow:
+    0 0 22px rgba(255, 153, 0, 0.24),
+    0 0 34px rgba(255, 153, 0, 0.1),
+    inset 0 0 18px rgba(255, 153, 0, 0.16);
+}
+
+.music-edge-controller::before {
+  display: block;
+  opacity: 1;
+  filter: blur(8px);
+}
+
+.music-speaker-pill,
+.music-edge-button {
+  border-radius: 999px;
+}
+
+.music-speaker-pill {
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
+    inset 0 0 10px rgba(255, 153, 0, 0.12);
+}
+
+.music-edge-button {
+  background: rgba(255, 153, 0, 0.12);
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .portfolio-chat { right: .75rem; bottom: calc(.75rem + env(safe-area-inset-bottom)); }
+  .portfolio-chat .chat-window { width: min(390px, calc(100vw - 1.5rem)); height: min(600px, calc(100dvh - 100px - env(safe-area-inset-bottom))); }
+  .portfolio-chat .chat-composer input { font-size: 16px; }
+  .portfolio-chat .chat-launcher { min-height: 46px; font-size: .76rem; }
+}
+
+/* GitHub source interaction treatment. Keep the original glow, depth, and
+   rounded controls after the portfolio surface overrides above. */
+.music-edge-controller {
+  border-radius: 999px;
+  border-color: rgba(255, 153, 0, 0.5);
+  background:
+    linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
+    rgba(10, 10, 14, 0.78);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow:
+    0 0 22px rgba(255, 153, 0, 0.24),
+    0 0 34px rgba(255, 153, 0, 0.1),
+    inset 0 0 18px rgba(255, 153, 0, 0.16);
+}
+
+.music-edge-controller::before {
+  display: block;
+  opacity: 1;
+  filter: blur(8px);
+}
+
+.music-speaker-pill,
+.music-edge-button {
+  border-radius: 999px;
+}
+
+.music-speaker-pill {
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
+    inset 0 0 10px rgba(255, 153, 0, 0.12);
+}
+
+.music-edge-button {
+  background: rgba(255, 153, 0, 0.12);
+  box-shadow: none;
+}
+
+.music-edge-button:hover:not(:disabled) {
+  transform: scale(1.07);
+  filter: drop-shadow(0 0 10px rgba(255, 153, 0, 0.65));
+}
+
 /* Restore the expressive interaction layer: the portfolio should feel alive,
    even while the page surface stays dark, clean, and grid-free. */
 .portfolio-refinement .reveal {
@@ -704,12 +918,17 @@ body {
     opacity 560ms ease,
     transform 620ms cubic-bezier(0.2, 0.8, 0.2, 1),
     filter 560ms ease;
+  will-change: transform, opacity, filter;
 }
 
 .portfolio-refinement .reveal.reveal-in {
   opacity: 1;
   transform: translateY(0) scale(1);
   filter: blur(0);
+}
+
+.portfolio-refinement #experience .snap-card {
+  height: 100%;
 }
 
 .portfolio-chat .chat-launcher {

@@ -1,0 +1,133 @@
+API.
+
+
+
+Worked for 2 minutes
+
+Checkpoint made
+18 minutes ago
+PINAG SASABI MO DI KO MAKITA UNG GINAWA MONG CHANGES!!!! SA PREVIEW!!
+
+HG
+HamzahGriffith
+HamzahGriffith
+Free
+17 minutes ago
+Examining artifact presentation issues
+
+Examining artifact presentation issues
+Naiintindihan ko — hindi sapat na sabihin kong “na-update na” kung ang nakikita mo sa preview ay hindi nagbabago. I’m checking why the preview is still showing the intro/old state and will make the updated interaction layer directly visible in the live preview, not just in the code.
+
+
+
+12 actions
+Nakita ko na yung dahilan: ang preview screenshot na kinukuha ng Replit ay naka-lock sa Enter profile overlay. Habang active iyon, intentionally nakatago ang music controller at chatbot, kaya mukhang walang pagbabago kahit loaded na ang CSS. I’m checking the route shell so I can give you a preview state where those exact changes are actually visible.
+
+
+
+4 actions
+The web workflow is healthy; the blocker is only the intro gate hiding the rest of the page in the preview snapshot. I’m going to verify the post-intro state directly so I can show you the actual music/chat UI, not another screenshot of the covered page.
+
+
+
+2 actions
+Gets ko na yung nakikita mo. Naka-display pa yung Enter profile intro overlay, kaya natatakpan niya ang buong page—kasama ang music controller, chatbot, at scroll animations. Kaya mukhang walang nagbago sa preview.
+
+Para makita agad:
+
+Click kahit saan sa preview, lalo na sa “To the clouds.”
+Hintayin yung short loading fade.
+Lalabas na yung:
+original glowing music controller sa left side
+original aura-based chatbot sa lower-right
+scroll reveal animations habang bumababa ka sa page
+Mali ko na dapat ipinakita ko agad ang post-intro state imbes na screenshot na natatakpan ng intro. The web workflow itself is running; yung API lang ang separate na 502 issue.
+
+
+
+Worked for 1 minute
+I DONT FUCKING SEE THE CHANGES BITCH!
+
+HG
+HamzahGriffith
+HamzahGriffith
+Free
+15 minutes ago
+Inspecting CSS import order
+
+Inspecting CSS import order
+Hindi na kita pipilitin na mag-click sa overlay para lang mapatunayan ko. I’m adding a preview-only interaction view so the actual music UI, chatbot UI, and scroll-reveal page are directly visible in the preview snapshot, while keeping the normal Enter profile behavior unchanged for the real portfolio.
+
+
+
+2 actions
+The direct interaction preview flag is added; default portfolio behavior is untouched. I’m compiling it now, then I’ll capture the page with the intro bypassed so you can actually see the restored music/chat UI and the animated sections.
+
+
+
+3 actions
+The preview-only view builds cleanly. I’m restarting the web workflow and capturing the direct interaction state now—this time the intro overlay won’t cover the page.
+
+
+
+3 actions
+Ayan — ngayon visible na mismo yung actual post-intro UI, hindi na yung covered intro screen. The screenshot shows the glowing music controller on the left, the original aura chatbot button on the lower-right, the dark atmospheric background, and the restored hero/section reveal state. I’m attaching this exact visible state now.
+
+
+
+Portfolio interactions visible
+Image
+portfolio-interactions-visible.jpg
+Use a more capable model when needed for this request?
+Got it, staying on Free.
+HG
+HamzahGriffith
+HamzahGriffith
+
+Worked for 1 minute
+
+Checkpoint made
+14 minutes ago
+
+Presented output
+Mark Andrei’s Portfolio
+Website
+Ayan. This time actual visible post-intro preview na ang ginawa ko at na-attach ko na yung screenshot.
+
+Makikita na mismo:
+
+Original glowing music controller sa left
+Original aura-based chatbot launcher sa lower-right
+Atmospheric glow background
+Hero animation
+Featured card at scroll-reveal sections
+May preview-only URL din para hindi matakpan ng intro:
+
+/?preview=interactions
+
+Normal portfolio behavior remains unchanged—may Enter profile intro pa rin sa regular / route. Passed ang typecheck, build, at diff check; running ang web workflow.
+
+
+
+Worked for 19 seconds
+ung container Experience Snapshot Mar - May 2025
+
+Cloud DevOps Intern Oaktree Innovations
+
+Supported AWS deployments and infrastructure using ECS, S3, and serverless services. Worked with Docker, GitHub Actions, and Terraform to automate delivery, configure environments, and troubleshoot applications.
+
+Apr - May 2025
+
+Freelance Full-Stack / AI Developer School Web Portal
+
+Built a school portal with student information, appointments, and admin features. Integrated a RAG chatbot that retrieves relevant student manual content to answer school questions, and handled database features and deployment setup. di pantay! pero sa original ko pantay naman! tapos nawala ung animation bobo kaba?
+
+HG
+HamzahGriffith
+HamzahGriffith
+Free
+13 minutes ago
+Addressing experience card issues
+
+Addressing experience card issues
+Tama ka — may regression sa experience section: na-override ko yung original card geometry, kaya hindi pantay ang dalawang entries, at yung scroll-reveal override din ang nag-flatten sa animation. I’ll compare the exact snap-card and ScrollReveal styles against new-preview, then restore the original spacing/animation without touching the content.
