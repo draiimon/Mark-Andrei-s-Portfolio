@@ -1,1 +1,2 @@
 - [Legacy Tailwind migration](legacy-tailwind-port.md) — v3 `@apply` styles need a v4 theme reference and custom utility declarations.
+- [Root Docker setup](root-docker-setup.md) — preserve the main project's root Docker files during cleanup; archival copies are not a substitute.
