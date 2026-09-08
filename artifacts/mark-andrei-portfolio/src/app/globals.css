@@ -62,9 +62,9 @@ body {
   z-index: 0;
   object-fit: cover;
   object-position: center center;
-  opacity: 0.74;
+  opacity: 0.78;
   transform: scale(1.04);
-  filter: blur(7px) saturate(0.94) brightness(0.62) contrast(0.96);
+  filter: blur(10px) saturate(0.92) brightness(0.6) contrast(0.94);
   will-change: transform, filter;
 }
 
