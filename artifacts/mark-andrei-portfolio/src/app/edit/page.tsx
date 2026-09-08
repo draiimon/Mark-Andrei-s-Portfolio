@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
+const EDIT_SOLAR_INTRO_DURATION_MS = 3000;
+
 type Profile = {
   id: number;
   fullName: string;
@@ -490,7 +492,7 @@ export default function EditPage() {
       return;
     }
 
-    const timer = window.setTimeout(() => setSolarIntroActive(false), 1850);
+    const timer = window.setTimeout(() => setSolarIntroActive(false), EDIT_SOLAR_INTRO_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [auth]);
 
