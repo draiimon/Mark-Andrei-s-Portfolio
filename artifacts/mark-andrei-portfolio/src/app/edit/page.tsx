@@ -325,14 +325,24 @@ function BackgroundSparkBurst({
           y: sourceY + (seeded(index + 31) - 0.5) * height * 0.04,
           settleX: seeded(index + 40) * width,
           settleY: seeded(index + 50) * height,
-          spreadDuration: 2.4 + seeded(index + 60) * 1.4,
-          drift: 2.5 + seeded(index + 80) * 8.5,
+           spreadDuration: isMobile
+             ? 1.35 + seeded(index + 60) * 0.9
+             : 2.4 + seeded(index + 60) * 1.4,
+           drift: isMobile
+             ? 2.5 + seeded(index + 80) * 6.5
+             : 2.5 + seeded(index + 80) * 8.5,
           driftSpeed: 0.18 + seeded(index + 90) * 0.36,
           phase: seeded(index + 100) * Math.PI * 2,
-          size: 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
-          trail: 0.3 + seeded(index + 120) * 1.2,
+           size: isMobile
+             ? 0.8 + seeded(index + 110) * 1.35 + Math.min(1, intensity) * 0.45
+             : 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
+           trail: isMobile
+             ? 0.6 + seeded(index + 120) * 1.4
+             : 0.3 + seeded(index + 120) * 1.2,
           life: -seeded(index + 130) * 0.18,
-          brightness: 0.62 + Math.min(1, intensity) * 0.3 + seeded(index + 140) * 0.2,
+           brightness: isMobile
+             ? 0.88 + Math.min(1, intensity) * 0.18 + seeded(index + 140) * 0.2
+             : 0.62 + Math.min(1, intensity) * 0.3 + seeded(index + 140) * 0.2,
         };
       }
     );
@@ -369,6 +379,7 @@ export default function EditPage() {
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [deckScrolling, setDeckScrolling] = useState(false);
+  const scrollAnimationRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (loginAuraMomentum <= 0) return;
@@ -482,6 +493,25 @@ export default function EditPage() {
     const timer = window.setTimeout(() => setSolarIntroActive(false), 1850);
     return () => window.clearTimeout(timer);
   }, [auth]);
+
+  useEffect(() => {
+    const cancelDeckScroll = () => {
+      if (scrollAnimationRef.current === null) return;
+      window.cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+      setDeckScrolling(false);
+    };
+
+    window.addEventListener("wheel", cancelDeckScroll, { passive: true });
+    window.addEventListener("touchstart", cancelDeckScroll, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", cancelDeckScroll);
+      window.removeEventListener("touchstart", cancelDeckScroll);
+      if (scrollAnimationRef.current !== null) {
+        window.cancelAnimationFrame(scrollAnimationRef.current);
+      }
+    };
+  }, []);
 
   async function loadData() {
     try {
@@ -725,6 +755,11 @@ export default function EditPage() {
     const target = document.getElementById(id);
     if (!target) return;
 
+    if (scrollAnimationRef.current !== null) {
+      window.cancelAnimationFrame(scrollAnimationRef.current);
+      scrollAnimationRef.current = null;
+    }
+
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const targetY = target.getBoundingClientRect().top + window.scrollY - 96;
 
@@ -750,13 +785,14 @@ export default function EditPage() {
       window.scrollTo(0, startY + distance * eased);
 
       if (t < 1) {
-        requestAnimationFrame(step);
+        scrollAnimationRef.current = requestAnimationFrame(step);
       } else {
+        scrollAnimationRef.current = null;
         window.setTimeout(() => setDeckScrolling(false), 120);
       }
     };
 
-    requestAnimationFrame(step);
+    scrollAnimationRef.current = requestAnimationFrame(step);
   }
 
   async function handleLogin(e: React.FormEvent) {
@@ -811,11 +847,19 @@ export default function EditPage() {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const compactLogin =
       typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
+    const mobileSparkActive = compactLogin ? loginAuraClickTick > 0 : loginAuraClickTick >= 10;
     const sparkCount =
-      loginAuraClickTick >= 10
-        ? Math.min(compactLogin ? 48 : 180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
+      mobileSparkActive
+        ? Math.min(
+            compactLogin ? 48 : 180,
+            compactLogin
+              ? 10 + loginAuraMomentum * 2 + loginAuraClickTick
+              : 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2
+          )
         : 0;
-    const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
+    const backgroundBurstCycle = compactLogin
+      ? loginAuraClickTick
+      : Math.floor(loginAuraClickTick / 10);
 
     return (
       <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
@@ -830,8 +874,6 @@ export default function EditPage() {
                 <span className="edit-solar-halo edit-solar-halo-two" />
                 <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
               </div>
-              <p className="edit-solar-reveal-label">SOLAR / EDIT</p>
-              <p className="edit-solar-reveal-status">Entering control center</p>
               <button type="button" className="edit-solar-skip" onClick={() => setSolarIntroActive(false)}>
                 Skip intro
               </button>

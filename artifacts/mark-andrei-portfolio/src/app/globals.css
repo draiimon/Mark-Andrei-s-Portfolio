@@ -283,7 +283,10 @@ body {
 }
 
 .edit-page {
-  scroll-behavior: smooth;
+  /* smoothScrollToId owns the animation; a second browser smooth-scroll
+     animation makes touch navigation feel delayed and can keep moving after
+     the finger has stopped. */
+  scroll-behavior: auto;
 }
 
 .cloud-light {
@@ -6198,7 +6201,7 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (max-width: 760px) {
   .edit-background-spark-canvas {
-    opacity: 0.08;
+    opacity: 0.32;
   }
 
   .edit-login-mark {
@@ -6568,7 +6571,9 @@ html:has(.pre-intro) .ask-ai-wrap {
   --edit-glass-deep: rgba(7, 10, 14, 0.64);
   --edit-warm: #d6a566;
   color: var(--edit-ink);
-  background: #080b0f;
+  /* Keep the fixed cinematic background visible behind the quieter editor
+     surfaces, including while a long page is being scrolled on mobile. */
+  background: transparent;
 }
 
 .edit-control-center .site-video-background {
@@ -7163,5 +7168,44 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-control-center .edit-dashboard-stats {
     gap: 0.9rem;
     margin-top: 1.5rem;
+  }
+}
+
+/* These overrides intentionally sit after the shared spark rules so the
+   compact phone treatment is not overwritten by the desktop defaults above. */
+@media (max-width: 760px) {
+  .edit-page:not(.edit-control-center) .edit-login-sparks {
+    inset: -3.4rem;
+  }
+
+  .edit-page:not(.edit-control-center) .edit-login-sparks > span {
+    width: 0.1rem;
+    box-shadow:
+      0 0 0.3rem rgba(255, 255, 235, 0.95),
+      0 0 0.7rem rgba(255, 202, 91, 0.9),
+      0 0 1rem rgba(255, 115, 0, 0.68);
+  }
+}
+
+/* Android home surface: keep the same immediate blurred atmosphere as the
+   editor without bringing back the heavier desktop cloud motion. */
+@media (max-width: 768px) {
+  .site-shell:not(.edit-page) .site-video-background {
+    opacity: 0.82;
+    transform: scale(1.06);
+    filter: blur(11px) saturate(0.96) brightness(0.66) contrast(0.92);
+    will-change: auto;
+  }
+
+  .site-shell:not(.edit-page)::before {
+    opacity: 0.48 !important;
+    filter: blur(42px) !important;
+    transform: none !important;
+  }
+
+  .site-shell:not(.edit-page)::after {
+    opacity: 0.28 !important;
+    filter: blur(58px) !important;
+    transform: none !important;
   }
 }
