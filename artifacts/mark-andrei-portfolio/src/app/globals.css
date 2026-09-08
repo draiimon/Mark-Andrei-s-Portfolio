@@ -4758,3 +4758,13 @@ html:has(.pre-intro) .ask-ai-wrap {
     display: none !important;
   }
 }
+
+/* A tapped mobile button can keep :focus-within after the tap. During a
+   touch scroll, that focus must not override the floating-control hide state. */
+@media (max-width: 960px) {
+  :root[data-floating-ui-state="scrolling"] .music-edge-controller-solar:focus-within {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    filter: blur(0.2px) !important;
+  }
+}

@@ -41,7 +41,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     const handlePointerMove = (event: PointerEvent) => {
       // A touch drag is page scrolling, not pointer activity. Let touchmove
       // keep the floating music control hidden instead of revealing it again.
-      if (event.pointerType === "touch") return;
+      if (event.pointerType === "touch" || window.matchMedia("(pointer: coarse)").matches) return;
       showControls();
     };
 
