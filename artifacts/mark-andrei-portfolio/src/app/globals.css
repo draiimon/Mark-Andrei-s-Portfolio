@@ -7301,4 +7301,14 @@ html:has(.pre-intro) .ask-ai-wrap {
     border-color: transparent !important;
     box-shadow: none !important;
   }
+
+  /* Some low-end Android Chromium builds expose backdrop-filter but do not
+     composite it reliably. Blur the real page layer as a fallback instead of
+     trusting the glass surface alone. */
+  :root[data-android="true"] .app-route-content:has(.pre-intro) > .site-shell {
+    filter: blur(10px) saturate(112%);
+    transform: scale(1.012);
+    transform-origin: center center;
+    transition: filter 180ms ease, transform 180ms ease;
+  }
 }

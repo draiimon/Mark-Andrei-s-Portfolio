@@ -9,6 +9,9 @@ import "@/app/globals.css";
 document.body.className = "font-body antialiased";
 
 const initialPerformanceProfile = getPerformanceProfile();
+if (initialPerformanceProfile.android) {
+  document.documentElement.dataset.android = "true";
+}
 if (initialPerformanceProfile.lowPower) {
   document.documentElement.dataset.mobileLite = "true";
 }
