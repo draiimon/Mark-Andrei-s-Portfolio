@@ -5,11 +5,13 @@ import ReactMarkdown from "react-markdown";
 import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Mail, RotateCcw, X } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; content: string };
+type TypingReply = { index: number; fullText: string; visibleText: string };
 const questions = [
   { label: "Explore my projects", text: "Tell me about Andrei's projects, starting with PanicSense PH.", icon: Code2 },
   { label: "Experience & skills", text: "What work experience and technical skills does Andrei have?", icon: BriefcaseBusiness },
   { label: "Get in touch", text: "How can I contact Andrei about a job opportunity?", icon: Mail },
 ];
+const thinkingSteps = ["Reading the portfolio", "Connecting the details", "Thinking it through", "Crafting a reply"];
 
 function Aura({ small = false }: { small?: boolean }) {
   return <span className={`chat-aura ${small ? "chat-aura-small" : ""}`} aria-hidden="true"><span /><span /><span /></span>;
@@ -21,11 +23,14 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [typingReply, setTypingReply] = useState<TypingReply | null>(null);
+  const [thinkingIndex, setThinkingIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<AbortController | null>(null);
   const inFlightRef = useRef(false);
+  const typingActiveRef = useRef(false);
 
   useEffect(() => () => requestRef.current?.abort(), []);
   useEffect(() => {
@@ -40,16 +45,52 @@ export default function Chatbot() {
   }, [open]);
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, loading, error, open]);
+  }, [messages, loading, error, open, typingReply]);
+  useEffect(() => {
+    if (!loading) {
+      setThinkingIndex(0);
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setThinkingIndex((current) => (current + 1) % thinkingSteps.length);
+    }, 760);
+    return () => window.clearInterval(timer);
+  }, [loading]);
+  useEffect(() => {
+    if (!typingReply) {
+      typingActiveRef.current = false;
+      return;
+    }
+
+    typingActiveRef.current = true;
+    const { index, fullText } = typingReply;
+    const step = fullText.length > 700 ? 3 : fullText.length > 320 ? 2 : 1;
+    let cursor = 0;
+    const timer = window.setInterval(() => {
+      cursor = Math.min(fullText.length, cursor + step);
+      if (cursor >= fullText.length) {
+        setMessages((previous) => previous.map((message, messageIndex) => (
+          messageIndex === index ? { ...message, content: fullText } : message
+        )));
+        typingActiveRef.current = false;
+        setTypingReply(null);
+        window.clearInterval(timer);
+        return;
+      }
+      setTypingReply((current) => current ? { ...current, visibleText: fullText.slice(0, cursor) } : null);
+    }, 16);
+    return () => window.clearInterval(timer);
+  }, [typingReply?.index, typingReply?.fullText]);
 
   async function send(text: string, retry = false) {
-    if (!text.trim() || inFlightRef.current) return;
+    if (!text.trim() || inFlightRef.current || typingActiveRef.current) return;
     inFlightRef.current = true;
     const nextMessages = retry ? messages : [...messages, { role: "user" as const, content: text.trim() }];
     setMessages(nextMessages);
     setInput("");
     setLoading(true);
     setError(false);
+    setTypingReply(null);
     const controller = new AbortController();
     requestRef.current = controller;
     const timeout = window.setTimeout(() => controller.abort(), 30_000);
@@ -60,7 +101,9 @@ export default function Chatbot() {
       });
       const data = await response.json();
       if (!response.ok || typeof data.reply !== "string" || !data.reply.trim()) throw new Error("Chat unavailable");
-      setMessages(previous => [...previous, { role: "assistant", content: data.reply }]);
+      const assistantIndex = nextMessages.length;
+      setMessages((previous) => [...previous, { role: "assistant", content: "" }]);
+      setTypingReply({ index: assistantIndex, fullText: data.reply, visibleText: "" });
     } catch { setError(true); }
     finally { window.clearTimeout(timeout); setLoading(false); inFlightRef.current = false; }
   }
@@ -73,8 +116,8 @@ export default function Chatbot() {
         <section className="chat-window" role="dialog" aria-labelledby="chat-title" id="portfolio-chat-window">
           <header className="chat-top">
             <Aura small />
-            <div className="chat-heading"><h2 id="chat-title">Ask my AI <span>PORTFOLIO</span></h2><p>A little more about Andrei.</p></div>
-            {messages.length > 0 && <button className="chat-icon-button" aria-label="New conversation" disabled={loading} onClick={() => { setMessages([]); setError(false); inputRef.current?.focus(); }}><RotateCcw size={15} /></button>}
+            <div className="chat-heading"><h2 id="chat-title">Ask my AI</h2><p>A little more about Andrei.</p></div>
+            {messages.length > 0 && <button className="chat-icon-button" aria-label="New conversation" disabled={loading || Boolean(typingReply)} onClick={() => { setMessages([]); setError(false); setTypingReply(null); typingActiveRef.current = false; inputRef.current?.focus(); }}><RotateCcw size={15} /></button>}
             <button className="chat-icon-button" aria-label="Close chat" onClick={close}><X size={19} /></button>
           </header>
 
@@ -88,14 +131,20 @@ export default function Chatbot() {
                 <div className="chat-suggestions">{questions.map(({ label, text, icon: Icon }) => <button key={label} onClick={() => void send(text)}><Icon size={16} /><span>{label}</span><ArrowUpRight size={15} /></button>)}</div>
               </div>
             ) : (
-              <div className="chat-messages" role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions">
+              <div className="chat-messages" role="log" aria-label="Conversation" aria-live="polite" aria-busy={loading || Boolean(typingReply)} aria-relevant="additions">
                 {messages.map((message, index) => <div className={`chat-message chat-message-${message.role}`} key={index}>
                   <p className="chat-speaker">{message.role === "assistant" ? "ANDREI’S AI" : "YOU"}</p>
-                  <div className="chat-message-content">{message.role === "user" ? <p>{message.content}</p> : <ReactMarkdown components={{ a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a> }}>{message.content.replace(/^[•●◦]\s?/gm, "- ")}</ReactMarkdown>}</div>
+                  <div className="chat-message-content">
+                    {message.role === "user" ? <p>{message.content}</p> : typingReply?.index === index ? (
+                      <p className="chat-typing-copy">{typingReply.visibleText}<span className="chat-typing-cursor" aria-hidden="true" /></p>
+                    ) : (
+                      <ReactMarkdown components={{ a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a> }}>{message.content.replace(/^[•●◦]\s?/gm, "- ")}</ReactMarkdown>
+                    )}
+                  </div>
                 </div>)}
               </div>
             )}
-            {loading && <div className="chat-loading" role="status"><i /><i /><i /><span className="sr-only">Preparing a reply</span></div>}
+            {loading && <div className="chat-thinking" role="status" aria-live="polite"><span className="chat-thinking-orb" aria-hidden="true" /><span>{thinkingSteps[thinkingIndex]}</span><span className="chat-thinking-dots" aria-hidden="true">•••</span><span className="sr-only">The assistant is reading the current portfolio and preparing a reply</span></div>}
             {error && <div className="chat-error" role="alert"><p>Couldn’t connect just now. Try again or <a href="mailto:andreicastillofficial@gmail.com">email Andrei</a>.</p><button onClick={() => void send(messages[messages.length - 1]?.content || "", true)}><RotateCcw size={13} /> Try again</button></div>}
           </div>
 
@@ -103,7 +152,7 @@ export default function Chatbot() {
             <form className="chat-composer" onSubmit={submit}>
               <label className="sr-only" htmlFor="portfolio-chat-input">Your question</label>
               <input ref={inputRef} id="portfolio-chat-input" value={input} onChange={event => setInput(event.target.value)} placeholder="Ask something about Andrei…" maxLength={1200} autoComplete="off" />
-              <button type="submit" aria-label="Send message" disabled={loading || !input.trim()}><ArrowUp size={19} /></button>
+              <button type="submit" aria-label="Send message" disabled={loading || Boolean(typingReply) || !input.trim()}><ArrowUp size={19} /></button>
             </form>
             <p>AI assistant <span>·</span> Grounded in this portfolio</p>
           </div>

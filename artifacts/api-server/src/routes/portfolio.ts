@@ -368,23 +368,22 @@ router.post("/chat", async (req, res) => {
   ) {
     return res.status(400).json({ error: "Invalid message" });
   }
-  if (!process.env.GROQ_API_KEY) return res.status(503).json({ error: "Assistant unavailable" });
+  if (!process.env.GROQ_API_KEY) {
+    console.error("[chat] GROQ_API_KEY is not available to the API runtime");
+    return res.status(503).json({ error: "Assistant unavailable" });
+  }
 
-  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 sentences and use short Markdown lists when useful. Use only these portfolio facts; never invent employers, certifications, metrics, or infrastructure details. If a detail is unavailable, say so and suggest contacting Andrei.
-Portfolio facts: ${JSON.stringify({
-    profile: {
-      fullName: profile.fullName,
-      headline: profile.headline,
-      about: profile.about,
-      email: profile.email,
-      github: profile.github,
-    },
-    projects: projects.map(({ name, description, techStack, githubUrl, link }) => ({ name, description, techStack, githubUrl, link })),
+  const currentPortfolio = {
+    profile,
+    projects,
     experience,
     leadership,
     achievements,
-  })}`;
+    taglines,
+  };
+  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 sentences and use short Markdown lists when useful. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
 
+Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -397,12 +396,16 @@ Portfolio facts: ${JSON.stringify({
       }),
       signal: AbortSignal.timeout(25_000),
     });
-    if (!response.ok) return res.status(502).json({ error: "Assistant temporarily unavailable" });
+    if (!response.ok) {
+      console.error(`[chat] Groq request returned HTTP ${response.status}`);
+      return res.status(502).json({ error: "Assistant temporarily unavailable" });
+    }
     const data = (await response.json()) as { choices?: Array<{ message?: { content?: unknown } }> };
     const reply = data.choices?.[0]?.message?.content;
     if (typeof reply !== "string" || !reply.trim()) return res.status(502).json({ error: "No reply received" });
     return res.json({ reply });
-  } catch {
+  } catch (error) {
+    console.error("[chat] Groq request failed before a reply was received", error instanceof Error ? error.message : "unknown error");
     return res.status(503).json({ error: "Assistant temporarily unavailable" });
   }
 });
