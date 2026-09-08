@@ -6,6 +6,8 @@ type GlobalBackgroundMusicProps = {
   music: ResolvedMusic | null;
 };
 
+const MUSIC_VISUAL_STRENGTH = 0.5;
+
 export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const srcRef = useRef<string | null>(null);
@@ -165,10 +167,10 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       const vibeSmooth = isMobileRef.current ? 0.9 : 0.82;
       vibeRef.current = vibeRef.current * vibeSmooth + target * (1 - vibeSmooth);
 
-      const nextVibe = vibeRef.current;
-      const nextBeat = beatRef.current;
-      if (Math.abs(nextVibe - renderedVibeRef.current) > 0.008) {
-        setVibe(nextVibe);
+        const nextVibe = vibeRef.current * MUSIC_VISUAL_STRENGTH;
+        const nextBeat = beatRef.current * MUSIC_VISUAL_STRENGTH;
+        if (Math.abs(nextVibe - renderedVibeRef.current) > 0.008) {
+          setVibe(nextVibe);
       }
       if (Math.abs(nextBeat - renderedBeatRef.current) > 0.01) {
         setBeat(nextBeat);
