@@ -696,6 +696,63 @@ body {
   }
 }
 
+/* GitHub main mobile guardrails: keep the interaction surfaces touch-friendly. */
+@media (max-width: 640px) {
+  .portfolio-refinement h1 {
+    font-size: clamp(2.8rem, 8vw, 6.6rem);
+    line-height: 0.96;
+  }
+
+  .portfolio-refinement .music-edge-controller {
+    left: 0.6rem;
+    top: auto;
+    bottom: calc(0.6rem + env(safe-area-inset-bottom));
+    transform: none;
+    flex-direction: row;
+    gap: 0.38rem;
+    padding: 0.34rem 0.55rem;
+    border-radius: 999px !important;
+    z-index: 40;
+    max-width: calc(100vw - 1.2rem);
+  }
+
+  .portfolio-refinement .music-speaker-pill,
+  .portfolio-refinement .music-edge-volume {
+    display: none !important;
+  }
+
+  .portfolio-refinement .music-edge-button {
+    width: 2.3rem;
+    height: 2.3rem;
+    transform: scale(1);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .portfolio-chat {
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  .portfolio-chat .chat-window {
+    width: min(390px, calc(100vw - 1.5rem));
+    height: min(600px, calc(100dvh - 100px - env(safe-area-inset-bottom)));
+  }
+
+  .portfolio-chat .chat-composer input {
+    font-size: 16px;
+  }
+
+  .portfolio-chat .chat-launcher {
+    min-height: 46px;
+    font-size: 0.76rem;
+  }
+
+  .portfolio-refinement #featured.feature-card:hover,
+  .portfolio-refinement #experience .snap-card:hover {
+    transform: none;
+  }
+}
+
 /* Restore the original rounded interaction layer after the flat surface pass. */
 .portfolio-refinement .feature-card,
 .portfolio-refinement .snap-card {
