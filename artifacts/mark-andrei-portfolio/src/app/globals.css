@@ -3562,3 +3562,102 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* Match the music rail to the chatbot again: warm, translucent, and
+   restrained rather than a cold silver treatment. */
+.music-edge-controller {
+  border-color: rgba(255, 206, 133, 0.22);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(3, 5, 9, 0.94) 0 43%, rgba(255, 153, 0, 0.11) 59%, rgba(255, 153, 0, 0) 77%),
+    rgba(4, 6, 10, 0.34);
+  box-shadow:
+    0 0 0 1px rgba(255, 206, 133, 0.025),
+    0 0 20px rgba(255, 153, 0, 0.12),
+    inset 0 0 14px rgba(255, 153, 0, 0.045);
+}
+
+.music-edge-controller::before {
+  opacity: 0.72;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 153, 0, 0.16), rgba(255, 153, 0, 0) 72%);
+  filter: blur(12px);
+}
+
+.music-edge-controller::after {
+  border-color: rgba(255, 224, 170, 0.12);
+}
+
+.music-edge-controller.is-playing {
+  box-shadow:
+    0 0 calc(12px + (var(--music-vibe) * 16px)) rgba(255, 153, 0, calc(0.1 + (var(--music-vibe) * 0.18))),
+    0 0 calc(24px + (var(--music-beat) * 16px)) rgba(255, 182, 77, calc(0.045 + (var(--music-beat) * 0.12))),
+    inset 0 0 calc(12px + (var(--music-vibe) * 8px)) rgba(255, 153, 0, calc(0.045 + (var(--music-vibe) * 0.08)));
+}
+
+.music-edge-button {
+  border-color: rgba(255, 206, 133, 0.24);
+  background: rgba(255, 153, 0, 0.045);
+  color: #ffc275;
+  box-shadow: 0 0 10px rgba(255, 153, 0, 0.06);
+}
+
+.music-edge-button.is-playing {
+  background: rgba(255, 153, 0, 0.08);
+  box-shadow:
+    0 0 calc(7px + (var(--music-vibe) * 9px)) rgba(255, 153, 0, calc(0.12 + (var(--music-vibe) * 0.16))),
+    inset 0 0 calc(7px + (var(--music-beat) * 6px)) rgba(255, 153, 0, calc(0.04 + (var(--music-beat) * 0.08)));
+}
+
+.music-edge-button:hover:not(:disabled) {
+  filter: drop-shadow(0 0 8px rgba(255, 182, 77, 0.38));
+}
+
+.music-edge-volume input[type="range"] {
+  accent-color: #e3a44e;
+  filter: drop-shadow(0 0 5px rgba(255, 153, 0, 0.18));
+}
+
+.music-volume-icon,
+.music-edge-icon {
+  color: #ebb36a !important;
+}
+
+.music-edge-button.is-playing {
+  animation: musicButtonChatBeat 0.9s ease-in-out infinite;
+}
+
+@keyframes musicButtonChatBeat {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(255, 153, 0, 0.14));
+  }
+  50% {
+    filter: drop-shadow(0 0 9px rgba(255, 182, 77, 0.42));
+  }
+}
+
+/* Restore the warm formal hero: cream lettering with a controlled amber
+   corona, not the cold metallic treatment. */
+.music-reactive-hero {
+  filter: drop-shadow(
+    0 0 calc(4px + (var(--music-vibe) * 6px) + (var(--music-beat) * 6px))
+    rgba(255, 153, 0, calc(0.1 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.12)))
+  );
+}
+
+.music-reactive-hero strong {
+  text-shadow:
+    0 0 calc(4px + (var(--music-vibe) * 5px) + (var(--music-beat) * 5px))
+    rgba(255, 153, 0, calc(0.1 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.12))),
+    0 0 calc(1px + (var(--music-vibe) * 2px))
+    rgba(255, 240, 213, 0.22),
+    0 2px 18px rgba(0, 0, 0, 0.7);
+}
+
+.hero-cloud-wave .hero-letter {
+  background: linear-gradient(180deg, #fffaf0 0%, #f4ede2 48%, #d7c8b6 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  filter: drop-shadow(
+    0 0 calc(2px + (var(--music-vibe) * 5px) + (var(--music-beat) * 6px))
+    rgba(255, 153, 0, calc(0.12 + (var(--music-vibe) * 0.12) + (var(--music-beat) * 0.14)))
+  );
+}
+
