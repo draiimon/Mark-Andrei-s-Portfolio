@@ -247,10 +247,7 @@ export default function Home() {
               <div className="space-y-3 border-l border-white/20 pl-4 md:pl-6">
                 {achievements.map((item, idx) => (
                   <ScrollReveal key={item.id} delayMs={140 + idx * 35}>
-                    <p className="flex items-start gap-2 break-words text-sm leading-relaxed text-slate-300">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-awsOrange" />
-                      <span>{item.text}</span>
-                    </p>
+                    <p className="break-words text-sm leading-relaxed text-awsOrange">{item.text}</p>
                   </ScrollReveal>
                 ))}
               </div>

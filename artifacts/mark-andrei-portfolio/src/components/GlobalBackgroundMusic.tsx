@@ -362,14 +362,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
 
   return (
     <aside className={`music-edge-controller ${isPlaying ? "is-playing" : ""}`}>
-      <div className={`music-speaker-pill ${isPlaying ? "is-playing" : ""}`} aria-hidden="true">
-        <span className="speaker-pill-bars" aria-hidden="true">
-          {[0, 1, 2, 3].map((i) => (
-            <span key={i} className={`speaker-pill-bar ${isPlaying ? "is-playing" : ""}`} style={{ animationDelay: `${i * 0.08}s` }} />
-          ))}
-        </span>
-      </div>
-
       <button
         type="button"
         onClick={() => void togglePlay()}

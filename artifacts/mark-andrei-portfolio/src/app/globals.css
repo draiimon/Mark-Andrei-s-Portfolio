@@ -3262,3 +3262,148 @@ html:has(.pre-intro) .ask-ai-wrap {
   transform: translateY(-4px);
 }
 
+/* Interaction surface: a minimal solar-eclipse treatment. Keep the controls
+   readable and animated, but remove the opaque framed-widget feeling. */
+.music-edge-controller {
+  border: 1px solid rgba(255, 206, 133, 0.2);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(1, 3, 7, 0.92) 0 42%, rgba(255, 153, 0, 0.1) 58%, rgba(255, 153, 0, 0) 76%),
+    rgba(4, 6, 10, 0.36);
+  box-shadow:
+    0 0 0 1px rgba(255, 153, 0, 0.035),
+    0 0 20px rgba(255, 153, 0, 0.12),
+    inset 0 0 14px rgba(255, 153, 0, 0.06);
+  backdrop-filter: blur(16px) saturate(118%);
+  -webkit-backdrop-filter: blur(16px) saturate(118%);
+}
+
+.music-edge-controller::after {
+  border-color: rgba(255, 224, 170, 0.12);
+  opacity: 0.7;
+}
+
+.music-speaker-pill {
+  border-color: rgba(255, 206, 133, 0.28);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(2, 4, 8, 0.98) 0 43%, rgba(255, 153, 0, 0.12) 58%, rgba(255, 153, 0, 0) 78%),
+    rgba(5, 7, 11, 0.34);
+  box-shadow:
+    0 0 14px rgba(255, 153, 0, calc(0.1 + (var(--music-vibe) * 0.28))),
+    inset 0 0 10px rgba(255, 153, 0, 0.06);
+}
+
+.music-edge-button {
+  border-color: rgba(255, 206, 133, 0.25);
+  background: rgba(4, 6, 10, 0.28);
+  box-shadow: 0 0 12px rgba(255, 153, 0, 0.08);
+}
+
+.music-edge-button.is-playing {
+  background: rgba(255, 153, 0, 0.07);
+}
+
+.music-edge-volume input[type="range"] {
+  filter: drop-shadow(0 0 5px rgba(255, 153, 0, 0.22));
+}
+
+.portfolio-chat .chat-launcher {
+  border: 1px solid rgba(255, 206, 133, 0.22);
+  background:
+    radial-gradient(circle at 16% 50%, rgba(255, 153, 0, 0.14), transparent 40%),
+    rgba(4, 6, 10, 0.34);
+  box-shadow:
+    0 0 18px rgba(255, 153, 0, 0.12),
+    inset 0 0 12px rgba(255, 153, 0, 0.035);
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+}
+
+.portfolio-chat .chat-launcher:hover {
+  border-color: rgba(255, 213, 153, 0.42);
+  box-shadow:
+    0 0 26px rgba(255, 153, 0, 0.2),
+    inset 0 0 16px rgba(255, 153, 0, 0.06);
+}
+
+.portfolio-chat .chat-window {
+  border: 1px solid rgba(255, 206, 133, 0.22);
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(255, 153, 0, 0.11), transparent 38%),
+    radial-gradient(circle at 50% -12%, rgba(1, 3, 7, 0.96) 0 28%, transparent 64%),
+    linear-gradient(150deg, rgba(8, 11, 17, 0.8), rgba(4, 6, 10, 0.68));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.52),
+    0 0 28px rgba(255, 153, 0, 0.08),
+    inset 0 0 22px rgba(255, 153, 0, 0.025);
+  backdrop-filter: blur(24px) saturate(122%);
+  -webkit-backdrop-filter: blur(24px) saturate(122%);
+}
+
+.portfolio-chat .chat-top,
+.portfolio-chat .chat-bottom {
+  background: rgba(4, 6, 10, 0.3);
+}
+
+.portfolio-chat .chat-top {
+  border-bottom-color: rgba(255, 220, 170, 0.08);
+}
+
+.portfolio-chat .chat-bottom {
+  border-top-color: rgba(255, 220, 170, 0.08);
+}
+
+.portfolio-chat .chat-heading h2 > span {
+  border: 1px solid rgba(255, 206, 133, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 153, 0, 0.045);
+}
+
+.portfolio-chat .chat-suggestions button {
+  border-color: rgba(255, 206, 133, 0.14);
+  border-radius: 0.8rem;
+  background: rgba(4, 6, 10, 0.22);
+}
+
+.portfolio-chat .chat-suggestions button:hover {
+  border-color: rgba(255, 206, 133, 0.34);
+  background: rgba(255, 153, 0, 0.075);
+}
+
+.portfolio-chat .chat-message-user .chat-message-content {
+  border-color: rgba(255, 206, 133, 0.16);
+  border-radius: 0.9rem 0.9rem 0.25rem 0.9rem;
+  background: rgba(255, 153, 0, 0.065);
+}
+
+.portfolio-chat .chat-composer {
+  border-color: rgba(255, 206, 133, 0.18);
+  border-radius: 0.85rem;
+  background: rgba(2, 4, 8, 0.34);
+}
+
+.portfolio-chat .chat-composer:focus-within {
+  border-color: rgba(255, 206, 133, 0.42);
+  box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.06), 0 0 18px rgba(255, 153, 0, 0.08);
+}
+
+.portfolio-chat .chat-composer button {
+  border-radius: 999px;
+  background: rgba(255, 153, 0, 0.78);
+  box-shadow: 0 0 14px rgba(255, 153, 0, 0.16);
+}
+
+.portfolio-chat .chat-error {
+  border-color: rgba(255, 206, 133, 0.2);
+  border-radius: 0.8rem;
+  background: rgba(255, 153, 0, 0.035);
+}
+
+.portfolio-chat .chat-aura {
+  background:
+    radial-gradient(circle at 50% 50%, #05070b 0 40%, #1a130d 48%, #ffca78 57%, #a75a17 68%, rgba(56, 37, 38, 0) 78%);
+  box-shadow:
+    0 0 22px rgba(255, 182, 77, 0.28),
+    inset 0 0 12px rgba(255, 225, 171, 0.12);
+}
+
