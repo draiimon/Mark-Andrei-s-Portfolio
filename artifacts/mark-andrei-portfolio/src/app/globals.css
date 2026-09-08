@@ -5003,6 +5003,12 @@ html:has(.pre-intro) .ask-ai-wrap {
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 29rem);
   gap: clamp(3rem, 8vw, 9rem);
   align-items: center;
+  /*
+   * Keep the login foreground calm while the Edit page's video, clouds, and
+   * surrounding atmosphere continue to respond to the background music.
+   */
+  --music-vibe: 0 !important;
+  --music-beat: 0 !important;
 }
 
 .edit-login-copy {
@@ -5228,6 +5234,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   z-index: 2;
   width: clamp(7rem, 25vw, 11rem);
   height: clamp(7rem, 25vw, 11rem);
+  position: relative;
+  isolation: isolate;
   background:
     radial-gradient(circle at 50% 50%, #030507 0 43%, #0c0b0a 51%, #ffd89e 58%, #c16c22 68%, rgba(56, 37, 38, 0) 80%);
   box-shadow:
@@ -5235,6 +5243,31 @@ html:has(.pre-intro) .ask-ai-wrap {
     0 0 90px rgba(255, 153, 0, 0.2),
     inset 0 0 18px rgba(255, 225, 171, 0.14);
   animation: edit-solar-breathe 2.4s ease-in-out infinite;
+}
+
+.edit-solar-aura::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -13%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from var(--solar-angle, 0deg),
+    transparent 0 18%,
+    rgba(255, 231, 186, 0.68) 26%,
+    rgba(255, 167, 61, 0.3) 38%,
+    transparent 50% 72%,
+    rgba(255, 207, 126, 0.42) 84%,
+    transparent 92%
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 67%, #000 70% 75%, transparent 79%);
+  mask: radial-gradient(circle, transparent 0 67%, #000 70% 75%, transparent 79%);
+  filter: blur(1px);
+  opacity: 0.86;
+  transform: translateZ(0) rotate(var(--solar-angle, 0deg)) scale(0.96);
+  transform-origin: center;
+  pointer-events: none;
+  will-change: transform;
 }
 
 .edit-solar-aura > span {
@@ -5712,7 +5745,7 @@ html:has(.pre-intro) .ask-ai-wrap {
   inset: -18%;
   border-radius: 50%;
   background: conic-gradient(
-    from 0deg,
+    from var(--solar-angle, 0deg),
     transparent 0 18%,
     rgba(255, 231, 186, 0.7) 26%,
     rgba(255, 167, 61, 0.32) 38%,
@@ -6162,8 +6195,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
-/* Interactive eclipse mark: hover scales the whole mark, while a click
-   toggles a faster corona/core cycle. */
+/* Interactive eclipse mark: hover changes light only, while a click changes
+   the rotation momentum without resizing the control. */
 .edit-login-mark {
   display: grid;
   appearance: none;
@@ -6191,7 +6224,20 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .edit-login-mark.has-momentum {
   filter: brightness(1.18) saturate(1.1);
-  transform: scale(1.1);
+  transform: none;
+}
+
+/* Pointer hover remains active during rapid clicking. Never let that state
+   enlarge the eclipse or make the button look like it is inflating. */
+.edit-login-mark,
+.edit-login-mark:hover,
+.edit-login-mark:focus-visible,
+.edit-login-mark:active,
+.edit-login-mark.has-momentum,
+.edit-login-mark.has-momentum:hover,
+.edit-login-mark.has-momentum:focus-visible,
+.edit-login-mark.has-momentum:active {
+  transform: none !important;
 }
 
 .edit-login-mark .edit-login-aura {

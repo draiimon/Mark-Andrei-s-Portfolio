@@ -22,8 +22,9 @@ export default function SolarAura({
   const momentumRef = useRef(clampedMomentum);
   const solarStyle = {
     ...style,
-    "--solar-breathe-duration": `${Math.max(0.9, 5 - clampedMomentum * 0.28)}s`,
-    "--solar-core-duration": `${Math.max(0.5, 2.8 - clampedMomentum * 0.18)}s`,
+    "--solar-angle": "0deg",
+    "--solar-breathe-duration": "5s",
+    "--solar-core-duration": "2.8s",
   } as CSSProperties;
 
   useEffect(() => {
