@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Chatbot from "@/components/Chatbot";
 import PreProfileIntro from "@/components/PreProfileIntro";
-import PingPongVideo from "@/components/PingPongVideo";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
@@ -122,10 +121,16 @@ export default function Home() {
   const footerRightText = profile?.footerRightText || "Thank you!";
   return (
     <main className="site-shell min-h-screen text-white antialiased">
-      <PingPongVideo
+      <video
         className="site-video-background"
-        forwardSrc="/assets/solar-eclipse-background.mp4"
-        reverseSrc="/assets/solar-eclipse-background-reverse.mp4"
+        src="/assets/solar-eclipse-background-pingpong.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        tabIndex={-1}
+        aria-hidden="true"
       />
       <div className="site-video-shade" aria-hidden="true" />
       <div className="site-content-layer">
