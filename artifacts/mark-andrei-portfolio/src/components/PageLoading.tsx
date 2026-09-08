@@ -46,30 +46,25 @@ function GlobalPageLoader({
     >
       <div className="global-page-loader-panel" role={active ? "status" : undefined} aria-live="polite">
         <div className="global-page-loader-mark" aria-hidden="true">
+          <span className="global-page-loader-progress-ring" />
           <span className="edit-login-mark global-page-loader-eclipse-shell">
             <span className="edit-login-aura-bounce">
               <SolarAura small className="edit-login-aura" state={isError ? "thinking" : "idle"} showOrbits={false} />
             </span>
           </span>
         </div>
-        <p className="global-page-loader-kicker">
-          {isError ? "Unable to prepare page" : "Preparing profile"}
-        </p>
-        <div className="global-page-loader-track" aria-hidden="true">
-          <span />
-        </div>
-        <p className="global-page-loader-message">
-          {isError ? state.error : "Loading the essentials…"}
-        </p>
         {isError && (
-          <button
-            type="button"
-            className="global-page-loader-retry"
-            onClick={onRetry}
-            tabIndex={active ? 0 : -1}
-          >
-            Try again
-          </button>
+          <div className="global-page-loader-error" role="alert">
+            <p>{state.error}</p>
+            <button
+              type="button"
+              className="global-page-loader-retry"
+              onClick={onRetry}
+              tabIndex={active ? 0 : -1}
+            >
+              Try again
+            </button>
+          </div>
         )}
       </div>
     </div>
