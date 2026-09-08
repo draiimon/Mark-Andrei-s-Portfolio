@@ -33,10 +33,10 @@
   overflow: visible;
   isolation: isolate;
   background:
-    radial-gradient(circle at 50% 50%, #05070b 0 38%, #17110d 47%, #ffca78 58%, #a75a17 69%, rgba(56, 37, 38, 0) 79%);
+    radial-gradient(circle at 50% 50%, #010204 0 42%, #100c09 50%, #ff9900 58%, #7c3f13 69%, rgba(56, 37, 38, 0) 80%);
   box-shadow:
-    0 0 16px rgba(255, 182, 77, 0.3),
-    inset 0 0 8px rgba(255, 225, 171, 0.14);
+    0 0 16px rgba(255, 153, 0, 0.34),
+    inset 0 0 8px rgba(255, 153, 0, 0.12);
   will-change: transform, opacity, filter;
 }
 
@@ -49,10 +49,10 @@
   background: conic-gradient(
     from 0deg,
     transparent 0 18%,
-    rgba(255, 231, 186, 0.72) 27%,
-    rgba(255, 167, 61, 0.28) 39%,
+    rgba(255, 185, 74, 0.72) 27%,
+    rgba(255, 153, 0, 0.28) 39%,
     transparent 51% 72%,
-    rgba(255, 207, 126, 0.42) 84%,
+    rgba(255, 174, 43, 0.42) 84%,
     transparent 93%
   );
   -webkit-mask: radial-gradient(circle, transparent 0 58%, #000 64% 74%, transparent 83%);
@@ -66,9 +66,8 @@
   position: absolute;
   inset: 14%;
   border-radius: 50%;
-  background: radial-gradient(circle at 33% 25%, rgba(255, 247, 222, 0.2), transparent 18% 52%, rgba(0, 0, 0, 0.32) 78%);
-  mix-blend-mode: screen;
-  opacity: 0.78;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 153, 0, 0.08), transparent 24% 52%, rgba(0, 0, 0, 0.5) 78%);
+  opacity: 0.88;
   animation: moonCursorCore 2.8s ease-in-out infinite;
 }
 
@@ -76,7 +75,7 @@
   position: absolute;
   inset: 4px;
   z-index: 1;
-  border: 1px solid rgba(255, 243, 213, 0.82);
+  border: 1px solid rgba(255, 171, 48, 0.58);
   border-radius: 50%;
   transform: rotate(-32deg) scaleX(0.5);
   animation: moonCursorOrbit 6.5s linear infinite;
@@ -131,10 +130,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .moon-cursor::before,
-  .moon-cursor::after,
+  .moon-cursor::before {
+    animation: moonCursorCorona 12s linear infinite !important;
+  }
+
+  .moon-cursor::after {
+    animation: moonCursorCore 5s ease-in-out infinite !important;
+  }
+
   .moon-cursor > span {
-    animation: none;
+    animation: moonCursorOrbit 14s linear infinite !important;
   }
 }
 
