@@ -3730,3 +3730,73 @@ html:has(.pre-intro) .ask-ai-wrap {
   );
 }
 
+/* Chat launcher parity for the music rail. The shared dark glass surface and
+   amber outer edge are intentional; all warm light is kept outside the
+   controls so the interior stays clean and readable. */
+.music-edge-controller {
+  border: 1px solid #edaa4a85;
+  border-radius: 999px;
+  background: rgba(4, 6, 10, 0.34);
+  color: #fff1d9;
+  box-shadow:
+    0 0 24px #ff990026,
+    inset 0 1px 0 #ffd49c20;
+  backdrop-filter: blur(15px) saturate(118%);
+  -webkit-backdrop-filter: blur(15px) saturate(118%);
+}
+
+.music-edge-controller::before,
+.music-edge-controller::after {
+  display: none;
+}
+
+.music-edge-controller.is-playing {
+  background: rgba(4, 6, 10, 0.34);
+  box-shadow:
+    0 0 calc(24px + (var(--music-vibe) * 10px)) rgba(255, 153, 0, calc(0.15 + (var(--music-vibe) * 0.08))),
+    inset 0 1px 0 rgba(255, 212, 156, 0.12);
+}
+
+.music-edge-button,
+.music-edge-button.is-playing {
+  border: 1px solid rgba(255, 212, 156, 0.26);
+  background: rgba(255, 255, 255, 0.035);
+  color: #fff1d9;
+  box-shadow: none;
+}
+
+.music-edge-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: #ffd197;
+  filter: none;
+  transform: scale(1.05);
+}
+
+.music-edge-button.is-playing {
+  animation: musicButtonChatParity 0.9s ease-in-out infinite;
+}
+
+.music-edge-button.is-playing .music-edge-icon,
+.music-volume-icon.is-playing {
+  filter: none;
+}
+
+.music-volume-icon,
+.music-edge-icon {
+  color: #fff1d9 !important;
+}
+
+.music-edge-volume input[type="range"] {
+  accent-color: #d9dce2;
+  filter: none;
+}
+
+@keyframes musicButtonChatParity {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(255, 153, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.16);
+  }
+}
+
