@@ -242,7 +242,7 @@ export default function EditPage() {
       return;
     }
 
-    const timer = window.setTimeout(() => setSolarIntroActive(false), 5000);
+    const timer = window.setTimeout(() => setSolarIntroActive(false), 1850);
     return () => window.clearTimeout(timer);
   }, [auth]);
 
