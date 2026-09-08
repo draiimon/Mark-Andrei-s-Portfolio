@@ -15,34 +15,7 @@ const questions = [
 const thinkingSteps = ["Reading the portfolio", "Connecting the details", "Thinking it through", "Crafting a reply"];
 
 function Aura({ small = false, state = "idle" }: { small?: boolean; state?: AuraState }) {
-  const auraRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    let frame = 0;
-    const startedAt = performance.now();
-    const speed = state === "thinking" ? 2.8 : state === "typing" ? 1.7 : 0.9;
-    const distance = state === "thinking" ? 3.4 : state === "typing" ? 2.4 : 1.5;
-    const scaleAmount = state === "thinking" ? 0.075 : state === "typing" ? 0.05 : 0.028;
-
-    const animate = (now: number) => {
-      const elapsed = (now - startedAt) / 1000;
-      const node = auraRef.current;
-      if (node) {
-        const wave = Math.sin(elapsed * Math.PI * speed);
-        const secondaryWave = Math.sin(elapsed * Math.PI * speed * 0.63);
-        node.style.setProperty("--aura-y", `${wave * distance}px`);
-        node.style.setProperty("--aura-scale", `${1 + wave * scaleAmount}`);
-        node.style.setProperty("--aura-rotation", `${elapsed * (state === "thinking" ? 42 : state === "typing" ? 25 : 11)}deg`);
-        node.style.setProperty("--aura-core-scale", `${1 + secondaryWave * scaleAmount * 0.72}`);
-      }
-      frame = window.requestAnimationFrame(animate);
-    };
-
-    frame = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frame);
-  }, [state]);
-
-  return <span ref={auraRef} className={`chat-aura ${small ? "chat-aura-small" : ""}`} data-aura-state={state} aria-hidden="true"><span /><span /><span /></span>;
+  return <span className={`chat-aura ${small ? "chat-aura-small" : ""}`} data-aura-state={state} aria-hidden="true"><span /><span /><span /></span>;
 }
 
 export default function Chatbot() {

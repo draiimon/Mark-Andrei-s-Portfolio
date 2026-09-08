@@ -4408,6 +4408,24 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* The chat assistant is a fixed UI control, not part of the page's ambient
+   motion. Keep its orb grounded and still; the music/background layer owns
+   the expressive bounce elsewhere on the portfolio. */
+.portfolio-chat .chat-aura,
+.portfolio-chat .chat-aura::before,
+.portfolio-chat .chat-aura::after,
+.portfolio-chat .chat-aura > span {
+  animation: none !important;
+  transform: none !important;
+}
+
+.portfolio-chat .chat-aura {
+  --aura-y: 0px;
+  --aura-scale: 1;
+  --aura-rotation: 0deg;
+  --aura-core-scale: 1;
+}
+
 /* Conversation bubbles: give the assistant a real surface instead of leaving
    its reply as loose text, while keeping the visitor message lighter and
    visually subordinate. */
