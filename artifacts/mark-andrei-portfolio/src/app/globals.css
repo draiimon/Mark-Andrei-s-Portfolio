@@ -195,7 +195,7 @@ body {
 
 .site-shell {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
 }
 
@@ -362,8 +362,8 @@ body {
 }
 
 .topbar {
-  position: sticky;
-  top: 0.75rem;
+  position: relative;
+  top: auto;
   z-index: 20;
   padding: 0.5rem 0;
   background: transparent;
@@ -3062,10 +3062,22 @@ html:has(.pre-intro) .ask-ai-wrap {
   :root[data-mobile-lite="true"] .snap-card,
   :root[data-mobile-lite="true"] #featured,
   :root[data-mobile-lite="true"] #experience,
-  :root[data-mobile-lite="true"] #leadership,
-  :root[data-mobile-lite="true"] #achievements {
+  :root[data-mobile-lite="true"] #leadership {
     content-visibility: auto;
     contain-intrinsic-size: 1px 520px;
+  }
+}
+
+/* Never virtualize the final achievements section on low-memory Android.
+   Its last line must contribute its real height to the scroll range. */
+:root[data-mobile-lite="true"] .site-shell #achievements {
+  content-visibility: visible;
+  contain-intrinsic-size: none;
+}
+
+@media (max-width: 768px) {
+  .site-shell .portfolio-page-content {
+    padding-bottom: max(5rem, calc(5rem + env(safe-area-inset-bottom)));
   }
 }
 
@@ -3444,10 +3456,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 /* Current portfolio surface: darker than the parity pass, with the current
    justified copy and borderless cards that still respond on hover. */
 .site-shell {
-  background:
-    radial-gradient(ellipse at 10% 18%, rgba(92, 55, 13, 0.16), transparent 38%),
-    radial-gradient(ellipse at 88% 22%, rgba(36, 54, 78, 0.14), transparent 42%),
-    linear-gradient(165deg, #040609 0%, #070a0f 52%, #0a0d13 100%);
+  /* The video and atmospheric pseudo-layers are the surface. Keeping the
+     shell transparent prevents a hard dark rectangle around the top profile
+     container, especially on low-power Android devices. */
+  background: transparent;
 }
 
 .site-shell .portfolio-copy {
