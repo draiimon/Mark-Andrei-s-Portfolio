@@ -3006,3 +3006,117 @@ body {
   }
 }
 
+/* Final parity pass with the original mobile interaction layer. */
+.portfolio-refinement .pre-intro {
+  background: rgba(8, 10, 14, 0.2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.portfolio-refinement .music-edge-controller {
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 153, 0, 0.5);
+  background:
+    linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
+    rgba(10, 10, 14, 0.78);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow:
+    0 0 22px rgba(255, 153, 0, 0.24),
+    0 0 34px rgba(255, 153, 0, 0.1),
+    inset 0 0 18px rgba(255, 153, 0, 0.16);
+}
+
+.portfolio-refinement .music-edge-controller::before {
+  display: block;
+  opacity: 1;
+  filter: blur(8px);
+}
+
+.portfolio-refinement .music-speaker-pill,
+.portfolio-refinement .music-edge-button {
+  border-radius: 999px !important;
+}
+
+.portfolio-refinement .music-speaker-pill {
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
+    inset 0 0 10px rgba(255, 153, 0, 0.12);
+}
+
+.portfolio-refinement .music-edge-button {
+  background: rgba(255, 153, 0, 0.12);
+}
+
+.portfolio-refinement .music-edge-button:hover:not(:disabled) {
+  filter: drop-shadow(0 0 10px rgba(255, 153, 0, 0.65));
+  transform: scale(1.07);
+}
+
+.portfolio-refinement .music-edge-controller.is-playing {
+  box-shadow:
+    0 0 calc(20px + (var(--music-vibe) * 20px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.35))),
+    0 0 calc(36px + (var(--music-vibe) * 24px)) rgba(255, 153, 0, calc(0.11 + (var(--music-vibe) * 0.22))),
+    inset 0 0 calc(16px + (var(--music-vibe) * 10px)) rgba(255, 153, 0, calc(0.17 + (var(--music-vibe) * 0.2)));
+}
+
+.portfolio-refinement .portfolio-copy {
+  text-align: left;
+  text-justify: auto;
+}
+
+.portfolio-refinement .feature-card,
+.portfolio-refinement .snap-card {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.1rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1.2rem;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .portfolio-refinement .pre-intro {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+@media (max-width: 640px) {
+  .portfolio-refinement .topbar {
+    margin-bottom: 1rem;
+  }
+
+  .portfolio-refinement .music-edge-controller {
+    left: 0.6rem;
+    top: auto;
+    bottom: calc(0.6rem + env(safe-area-inset-bottom));
+    transform: none;
+    flex-direction: row;
+    gap: 0.38rem;
+    padding: 0.34rem 0.55rem;
+    border-radius: 999px !important;
+    z-index: 55;
+    max-width: calc(100vw - 1.2rem);
+  }
+
+  .portfolio-refinement .music-speaker-pill,
+  .portfolio-refinement .music-edge-volume {
+    display: none !important;
+  }
+
+  .portfolio-refinement .music-edge-button {
+    width: 2.3rem;
+    height: 2.3rem;
+    transform: scale(1);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .portfolio-refinement .music-edge-button:active {
+    transform: scale(1.1);
+  }
+
+  :root[data-pre-intro="active"] .portfolio-refinement .music-edge-controller {
+    transform: translateY(8px);
+  }
+}
+
