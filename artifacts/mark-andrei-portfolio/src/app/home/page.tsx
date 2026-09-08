@@ -1,4 +1,5 @@
 import { lazy, startTransition, Suspense, useEffect, useState } from "react";
+import PreProfileIntro from "@/components/PreProfileIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
@@ -13,7 +14,9 @@ function DeferredChatbot({ interactionPreview }: { interactionPreview: boolean }
 
   useEffect(() => {
     if (ready) return;
-    return runWhenIdle(() => setReady(true), 1600);
+    const onEnterProfile = () => setReady(true);
+    window.addEventListener("portfolio:enter-profile", onEnterProfile, { once: true });
+    return () => window.removeEventListener("portfolio:enter-profile", onEnterProfile);
   }, [ready]);
 
   if (!ready) return null;
@@ -324,6 +327,7 @@ export default function Home() {
         </div>
 
         <DeferredChatbot interactionPreview={interactionPreview} />
+        {!interactionPreview && <PreProfileIntro brand={brandName} />}
       </div>
     </main>
   );

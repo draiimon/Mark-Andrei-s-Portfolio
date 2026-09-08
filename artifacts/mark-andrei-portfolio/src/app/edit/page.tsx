@@ -831,19 +831,7 @@ export default function EditPage() {
     setLoginError("");
   }
 
-  if (auth === null) {
-    return (
-      <main className="edit-page site-shell min-h-screen text-white">
-        <PortfolioSurface>
-          <div className="flex min-h-screen items-center justify-center">
-            <span className="text-neutral-500">Loading...</span>
-          </div>
-        </PortfolioSurface>
-      </main>
-    );
-  }
-
-  if (auth === false) {
+  if (auth !== true) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const compactLogin =
       typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;

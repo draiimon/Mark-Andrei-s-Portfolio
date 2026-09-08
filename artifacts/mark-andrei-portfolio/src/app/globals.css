@@ -2987,6 +2987,14 @@ html:has(.pre-intro) .ask-ai-wrap {
     -webkit-backdrop-filter: blur(8px) saturate(115%);
   }
 
+  :root[data-mobile-lite="true"] .topbar {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
   :root[data-mobile-lite="true"] .music-edge-controller,
   :root[data-mobile-lite="true"] .music-edge-controller.is-playing {
     box-shadow:
@@ -7215,6 +7223,22 @@ html:has(.pre-intro) .ask-ai-wrap {
 .portfolio-page-content > section[id] {
   content-visibility: auto;
   contain-intrinsic-size: auto 420px;
+}
+
+/* Some older Android WebViews can partially paint text inside an auto-visible
+   section while it is entering the viewport. Keep the award list fully
+   paintable on narrow phones; the section is small, so this costs very little. */
+@media (max-width: 640px) {
+  .portfolio-page-content #achievements {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+  }
+
+  .portfolio-page-content #achievements,
+  .portfolio-page-content #achievements .reveal,
+  .portfolio-page-content #achievements p {
+    overflow: visible;
+  }
 }
 
 .site-video-background,

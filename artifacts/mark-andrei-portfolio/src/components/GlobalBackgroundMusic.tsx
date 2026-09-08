@@ -291,6 +291,9 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setBeat(0);
     };
     const isEditorRoute = EDITOR_ROUTE_RE.test(window.location.pathname);
+    const handleEnterProfile = () => {
+      void tryPlay(true);
+    };
     const handleEditorInteraction = () => {
       void tryPlay(true);
     };
@@ -305,11 +308,13 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       window.addEventListener("pointerdown", handleEditorInteraction, { once: true, passive: true });
       window.addEventListener("keydown", handleEditorInteraction, { once: true });
     }
+    window.addEventListener("portfolio:enter-profile", handleEnterProfile);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
+      window.removeEventListener("portfolio:enter-profile", handleEnterProfile);
       if (isEditorRoute) {
         window.removeEventListener("pointerdown", handleEditorInteraction);
         window.removeEventListener("keydown", handleEditorInteraction);
