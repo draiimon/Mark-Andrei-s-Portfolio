@@ -14,6 +14,7 @@ export default function TypewriterTagline({ lines }: TypewriterTaglineProps) {
     const full = safeLines[lineIndex % safeLines.length];
     const minChars = full.length > 0 ? 1 : 0;
     const delay = deleting ? 40 : 70;
+    let pauseTimer: number | null = null;
 
     const timer = setTimeout(() => {
       if (!deleting && text.length < full.length) {
@@ -21,7 +22,7 @@ export default function TypewriterTagline({ lines }: TypewriterTaglineProps) {
         return;
       }
       if (!deleting && text.length === full.length) {
-        setTimeout(() => setDeleting(true), 800);
+        pauseTimer = window.setTimeout(() => setDeleting(true), 800);
         return;
       }
       if (deleting && text.length > minChars) {
@@ -35,7 +36,10 @@ export default function TypewriterTagline({ lines }: TypewriterTaglineProps) {
       }
     }, delay);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (pauseTimer !== null) window.clearTimeout(pauseTimer);
+    };
   }, [text, deleting, lineIndex, safeLines]);
 
   const reserve = safeLines.reduce((longest, line) => (line.length > longest.length ? line : longest), safeLines[0]);

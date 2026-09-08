@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ClientTabMeta from "@/components/ClientTabMeta";
 import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
 import MoonCursor from "@/components/MoonCursor";
@@ -7,11 +7,33 @@ import { resolveMusicEmbed } from "@/lib/music";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const music = resolveMusicEmbed("/uploads/music/1772698457967-vuu52gsd.mp3");
+  const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
 
   useEffect(() => {
     const root = document.documentElement;
     let idleTimer: number | null = null;
     let scrollTimer: number | null = null;
+    const coarsePointer = window.matchMedia("(pointer: coarse)");
+    let lastPointerMove = 0;
+    const connection = (navigator as Navigator & {
+      connection?: { effectiveType?: string; saveData?: boolean };
+    }).connection;
+    const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+    const cores = navigator.hardwareConcurrency || 8;
+    const constrainedNetwork =
+      Boolean(connection?.saveData) ||
+      connection?.effectiveType === "slow-2g" ||
+      connection?.effectiveType === "2g";
+    const lowPower =
+      constrainedNetwork ||
+      (coarsePointer.matches && ((memory ?? 8) <= 4 || cores <= 4));
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (lowPower) root.dataset.mobileLite = "true";
+    else delete root.dataset.mobileLite;
+    root.dataset.performanceTier = lowPower ? "lite" : "full";
+    if (constrainedNetwork) root.dataset.networkConstrained = "true";
+    if (reducedMotion) root.dataset.reducedMotion = "true";
 
     const clearTimer = (timer: number | null) => {
       if (timer !== null) window.clearTimeout(timer);
@@ -39,34 +61,56 @@ export default function AppShell({ children }: { children: ReactNode }) {
     };
 
     const handlePointerMove = (event: PointerEvent) => {
-      // A touch drag is page scrolling, not pointer activity. Let touchmove
-      // keep the floating music control hidden instead of revealing it again.
-      if (event.pointerType === "touch" || window.matchMedia("(pointer: coarse)").matches) return;
+      if (event.pointerType === "touch" || coarsePointer.matches) return;
+      const now = performance.now();
+      if (now - lastPointerMove < 100) return;
+      lastPointerMove = now;
       showControls();
     };
 
+    const handleVisibility = () => {
+      root.dataset.pageVisibility = document.hidden ? "hidden" : "visible";
+    };
+
     root.dataset.floatingUiState = "visible";
+    handleVisibility();
     scheduleIdle();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    window.addEventListener("touchmove", handleScroll, { passive: true });
+    if (!coarsePointer.matches) {
+      window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    }
     window.addEventListener("pointerdown", showControls, { passive: true });
-    window.addEventListener("touchstart", showControls, { passive: true });
     window.addEventListener("keydown", showControls);
     window.addEventListener("focusin", showControls);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
       clearTimer(idleTimer);
       clearTimer(scrollTimer);
       delete root.dataset.floatingUiState;
+      delete root.dataset.pageVisibility;
+      delete root.dataset.performanceTier;
+      delete root.dataset.networkConstrained;
+      delete root.dataset.reducedMotion;
+      delete root.dataset.mobileLite;
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("touchmove", handleScroll);
       window.removeEventListener("pointerdown", showControls);
-      window.removeEventListener("touchstart", showControls);
       window.removeEventListener("keydown", showControls);
       window.removeEventListener("focusin", showControls);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onOnline = () => setOffline(false);
+    const onOffline = () => setOffline(true);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
     };
   }, []);
 
@@ -91,6 +135,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <GlobalBackgroundMusic music={music} />
       <MoonCursor />
       {children}
+      {offline && (
+        <div className="offline-status" role="status" aria-live="polite">
+          Offline — showing the saved portfolio
+        </div>
+      )}
     </>
   );
 }

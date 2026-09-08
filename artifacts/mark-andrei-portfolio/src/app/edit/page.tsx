@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
+import AmbientBackgroundVideo from "@/components/AmbientBackgroundVideo";
 import SolarAura from "@/components/SolarAura";
 
 type Profile = {
@@ -117,17 +118,7 @@ function PortfolioSurface({
 }) {
   return (
     <>
-      <video
-        className="site-video-background"
-        src="/assets/solar-eclipse-background-pingpong.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        tabIndex={-1}
-        aria-hidden="true"
-      />
+      <AmbientBackgroundVideo />
       <div className="site-video-shade" aria-hidden="true" />
       <div className="site-content-layer">
         <div className="cloud-light one" />

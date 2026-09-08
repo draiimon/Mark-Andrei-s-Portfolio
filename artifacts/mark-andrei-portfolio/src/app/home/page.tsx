@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import AmbientBackgroundVideo from "@/components/AmbientBackgroundVideo";
 import PreProfileIntro from "@/components/PreProfileIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
@@ -119,7 +120,7 @@ export default function Home() {
       }
     };
 
-    fetch("/api/public/portfolio", { cache: "no-store" })
+    fetch("/api/public/portfolio", { cache: "default" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (cancelled || !data) return;
@@ -157,17 +158,7 @@ export default function Home() {
   const footerRightText = profile?.footerRightText || "Thank you!";
   return (
     <main className="site-shell min-h-screen text-white antialiased">
-      <video
-        className="site-video-background"
-        src="/assets/solar-eclipse-background-pingpong.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        tabIndex={-1}
-        aria-hidden="true"
-      />
+      <AmbientBackgroundVideo />
       <div className="site-video-shade" aria-hidden="true" />
       <div className="site-content-layer">
         <div className="cloud-light one" />

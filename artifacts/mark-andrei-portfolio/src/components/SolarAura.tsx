@@ -39,8 +39,20 @@ export default function SolarAura({
     let lastTime = performance.now();
     let angle = 0;
     let velocity = 30;
+    let visible = true;
+    let lastPaint = 0;
+    const frameInterval = document.documentElement.dataset.mobileLite === "true" ? 50 : 16;
 
     const animate = (time: number) => {
+      if (!visible || document.hidden) {
+        frame = 0;
+        return;
+      }
+      if (lastPaint && time - lastPaint < frameInterval) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
+      lastPaint = time;
       const delta = Math.min(40, Math.max(0, time - lastTime));
       lastTime = time;
 
@@ -54,8 +66,28 @@ export default function SolarAura({
       frame = requestAnimationFrame(animate);
     };
 
-    frame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frame);
+    const updateRunning = () => {
+      if (visible && !document.hidden && !frame) {
+        lastTime = performance.now();
+        frame = requestAnimationFrame(animate);
+      } else if ((!visible || document.hidden) && frame) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+      }
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      updateRunning();
+    }, { rootMargin: "96px" });
+
+    observer.observe(aura);
+    document.addEventListener("visibilitychange", updateRunning);
+    updateRunning();
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateRunning);
+    };
   }, []);
 
   return (

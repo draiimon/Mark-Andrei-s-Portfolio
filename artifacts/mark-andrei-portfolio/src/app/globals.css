@@ -223,6 +223,26 @@ body {
   will-change: transform, filter;
 }
 
+.offline-status {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 80;
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(255, 190, 104, 0.28);
+  border-radius: 999px;
+  background: rgba(4, 7, 12, 0.86);
+  color: rgba(255, 237, 207, 0.88);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
 .site-video-shade {
   z-index: 1;
   background:
@@ -2954,6 +2974,15 @@ html:has(.pre-intro) .ask-ai-wrap {
     transition: opacity 260ms ease, filter 260ms ease;
   }
 
+  :root[data-mobile-lite="true"] .site-video-background {
+    will-change: auto;
+    transition: none;
+  }
+
+  :root[data-mobile-lite="true"] .cloud-light {
+    will-change: auto;
+  }
+
   :root[data-mobile-lite="true"] .cloud-light {
     transform: scale(0.78) !important;
     filter: blur(42px) saturate(112%);
@@ -3065,6 +3094,12 @@ html:has(.pre-intro) .ask-ai-wrap {
     content-visibility: auto;
     contain-intrinsic-size: 1px 520px;
   }
+}
+
+:root[data-page-visibility="hidden"] .site-shell *,
+:root[data-page-visibility="hidden"] .site-shell::before,
+:root[data-page-visibility="hidden"] .site-shell::after {
+  animation-play-state: paused !important;
 }
 
 /* Final portfolio surface pass: intentionally flat, quiet, and high contrast. */

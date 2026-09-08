@@ -469,10 +469,14 @@ router.get("/edit/me", (req, res) => {
 });
 
 router.get("/public/portfolio", async (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=60");
   return res.json({ profile, projects, experience, leadership, achievements, taglines });
 });
 
-router.get("/public/site-meta", (_req, res) => res.json({ tabTitle: profile.tabTitle, faviconUrl: "/solar-eclipse-logo.svg" }));
+router.get("/public/site-meta", (_req, res) => {
+  res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+  return res.json({ tabTitle: profile.tabTitle, faviconUrl: "/solar-eclipse-logo.svg" });
+});
 router.get("/public/site-media/:key", (req, res) => {
   if (req.params.key === "favicon") return res.redirect("/solar-eclipse-logo.svg");
   const key = req.params.key === "favicon" ? "faviconUrl" : "socialImageUrl";

@@ -126,6 +126,7 @@ export default function Chatbot() {
     typingActiveRef.current = true;
     const { index, fullText } = typingReply;
     const step = fullText.length > 700 ? 3 : fullText.length > 320 ? 2 : 1;
+    const intervalMs = document.documentElement.dataset.mobileLite === "true" ? 36 : 20;
     let cursor = 0;
     const timer = window.setInterval(() => {
       cursor = Math.min(fullText.length, cursor + step);
@@ -139,7 +140,7 @@ export default function Chatbot() {
         return;
       }
       setTypingReply((current) => current ? { ...current, visibleText: fullText.slice(0, cursor) } : null);
-    }, 16);
+    }, intervalMs);
     return () => window.clearInterval(timer);
   }, [typingReply?.index, typingReply?.fullText]);
 

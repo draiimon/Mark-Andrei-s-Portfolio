@@ -12,3 +12,17 @@ createRoot(document.getElementById('root')!, {
     console.error(error, errorInfo.componentStack);
   },
 }).render(<App />);
+
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener(
+    "load",
+    () => {
+      void navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`, {
+        scope: import.meta.env.BASE_URL,
+      }).catch(() => {
+        // Offline support is progressive enhancement; never block the app.
+      });
+    },
+    { once: true },
+  );
+}
