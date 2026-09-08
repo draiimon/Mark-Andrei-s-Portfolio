@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
+import SolarAura from "@/components/SolarAura";
 
 type Profile = {
   id: number;
@@ -137,6 +138,7 @@ export default function EditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [solarIntroActive, setSolarIntroActive] = useState(true);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [deckScrolling, setDeckScrolling] = useState(false);
@@ -231,6 +233,18 @@ export default function EditPage() {
 
     void bootstrapAuth();
   }, []);
+
+  useEffect(() => {
+    if (auth !== false) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSolarIntroActive(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setSolarIntroActive(false), 1850);
+    return () => window.clearTimeout(timer);
+  }, [auth]);
 
   async function loadData() {
     try {
@@ -558,67 +572,103 @@ export default function EditPage() {
 
   if (auth === false) {
     return (
-      <main className="edit-page site-shell min-h-screen text-white">
+      <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
         <PortfolioSurface>
-          <div className="mx-auto flex min-h-screen max-w-md items-center p-6">
-            <div className="login-shell w-full rounded-3xl p-7 md:p-8 fade-rise">
-              <div className="edit-orb one" />
-              <div className="edit-orb two" />
-              <div className="relative z-10">
-                <div className="mb-6 flex items-center gap-2">
-                  <span className="rounded-full border border-awsOrange/45 bg-awsOrange/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-awsOrange">
-                    Internal
-                  </span>
-                </div>
-                <div className="mb-5 flex items-center gap-3">
-                  <div>
-                    <p className="text-xl font-semibold leading-tight text-white">Sign in to edit portfolio</p>
-                    <p className="text-xs text-neutral-400">Use your admin credentials to continue.</p>
+          {solarIntroActive && (
+            <div className="edit-solar-reveal" role="status" aria-live="polite">
+              <div className="edit-solar-reveal-visual" aria-hidden="true">
+                <span className="edit-solar-halo edit-solar-halo-one" />
+                <span className="edit-solar-halo edit-solar-halo-two" />
+                <span className="edit-solar-orbit edit-solar-orbit-one" />
+                <span className="edit-solar-orbit edit-solar-orbit-two" />
+                <SolarAura className="edit-solar-aura" state="idle" />
+              </div>
+              <p className="edit-solar-reveal-label">SOLAR / EDIT</p>
+              <p className="edit-solar-reveal-status">Entering control center</p>
+              <button type="button" className="edit-solar-skip" onClick={() => setSolarIntroActive(false)}>
+                Skip intro
+              </button>
+            </div>
+          )}
+
+          <div
+            className={`edit-login-stage mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6 lg:px-8 ${solarIntroActive ? "edit-login-stage-muted" : ""}`}
+            aria-hidden={solarIntroActive}
+          >
+            <div className="edit-login-copy">
+              <a href="/" className="edit-login-back">
+                <span aria-hidden="true">←</span>
+                Return to public profile
+              </a>
+              <p className="edit-login-identity">Mark Andrei / Portfolio</p>
+              <h1 className="edit-login-display">
+                Shape the story
+                <span>behind the work.</span>
+              </h1>
+            </div>
+
+            <div className="edit-login-panel">
+              <div className="login-shell edit-login-shell w-full p-7 md:p-8 fade-rise">
+                <div className="edit-orb one" />
+                <div className="edit-orb two" />
+                <div className="relative z-10">
+                  <div className="edit-login-heading">
+                    <div className="edit-login-mark">
+                        <img
+                          src="/solar-eclipse-logo.svg"
+                          alt=""
+                          className="edit-login-main-icon"
+                          aria-hidden="true"
+                        />
+                    </div>
+                    <div>
+                      <p className="edit-login-title">Sign in to edit portfolio</p>
+                    </div>
                   </div>
+
+                  <form onSubmit={handleLogin} className="edit-login-form space-y-3.5">
+                    <label className="block space-y-1">
+                      <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Username</span>
+                      <div className="field-shell edit-login-field rounded-xl px-3 py-2.5">
+                        <input
+                          type="text"
+                          placeholder="draiimon"
+                          autoComplete="username"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                        />
+                      </div>
+                    </label>
+
+                    <label className="block space-y-1">
+                      <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Password</span>
+                      <div className="field-shell edit-login-field flex items-center rounded-xl px-3 py-2.5">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter password"
+                          autoComplete="current-password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          className="ml-2 rounded p-1 text-neutral-400 hover:text-awsOrange"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </label>
+
+                    {loginError && <p className="text-xs text-red-400">{loginError}</p>}
+                    <button type="submit" className="edit-login-submit w-full rounded-xl px-4 py-2.5 font-semibold transition">
+                      Enter Edit Mode
+                    </button>
+                  </form>
                 </div>
-
-                <form onSubmit={handleLogin} className="space-y-3.5">
-                  <label className="block space-y-1">
-                    <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Username</span>
-                    <div className="field-shell rounded-xl px-3 py-2.5">
-                      <input
-                        type="text"
-                        placeholder="draiimon"
-                        autoComplete="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
-                      />
-                    </div>
-                  </label>
-
-                  <label className="block space-y-1">
-                    <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Password</span>
-                    <div className="field-shell flex items-center rounded-xl px-3 py-2.5">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter password"
-                        autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((v) => !v)}
-                        className="ml-2 rounded p-1 text-neutral-400 hover:text-awsOrange"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </label>
-
-                  {loginError && <p className="text-xs text-red-400">{loginError}</p>}
-                  <button type="submit" className="w-full rounded-xl bg-awsOrange px-4 py-2.5 font-semibold text-black shadow-[0_10px_28px_rgba(255,153,0,0.35)] transition hover:brightness-110">
-                    Enter Edit Mode
-                  </button>
-                </form>
               </div>
             </div>
           </div>

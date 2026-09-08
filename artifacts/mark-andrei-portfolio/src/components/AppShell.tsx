@@ -70,6 +70,21 @@ export default function AppShell({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(window.location.pathname);
+
+    if (isEditorRoute) {
+      root.dataset.editorRoute = "true";
+    } else {
+      delete root.dataset.editorRoute;
+    }
+
+    return () => {
+      delete root.dataset.editorRoute;
+    };
+  }, []);
+
   return (
     <>
       <ClientTabMeta />
