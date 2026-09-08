@@ -7258,9 +7258,41 @@ html:has(.pre-intro) .ask-ai-wrap {
   filter: drop-shadow(0 0 1.8rem rgba(255, 153, 0, 0.28));
 }
 
-.global-page-loader-progress-ring {
+.global-page-loader-mark::before {
+  content: "";
   position: absolute;
   z-index: 0;
+  inset: -1.05rem;
+  overflow: hidden;
+  border: 1px solid rgba(224, 239, 255, 0.28);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.2), transparent 24%),
+    radial-gradient(circle at 68% 78%, rgba(255, 165, 69, 0.12), transparent 48%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(175, 202, 228, 0.035) 48%, rgba(255, 255, 255, 0.075));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1rem 1.6rem rgba(4, 10, 17, 0.2),
+    0 0 1.8rem rgba(180, 213, 240, 0.08);
+  backdrop-filter: blur(9px) saturate(125%);
+  -webkit-backdrop-filter: blur(9px) saturate(125%);
+}
+
+.global-page-loader-mark::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: -0.82rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left-color: rgba(255, 221, 178, 0.42);
+  border-radius: 50%;
+  transform: rotate(-28deg) scaleX(0.58);
+  pointer-events: none;
+}
+
+.global-page-loader-progress-ring {
+  position: absolute;
+  z-index: 1;
   inset: -1.05rem;
   border: 1px solid rgba(255, 218, 170, 0.16);
   border-top-color: rgba(255, 153, 0, 0.95);
@@ -7271,7 +7303,7 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .global-page-loader-eclipse-shell {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   width: 5.4rem;
   height: 5.4rem;

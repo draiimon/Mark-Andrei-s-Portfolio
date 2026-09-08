@@ -135,12 +135,19 @@ export function PageLoadingProvider({ children }: { children: ReactNode }) {
     retry();
   };
 
+  const browserPath = typeof window !== "undefined" ? window.location.pathname : "";
+  const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(state.route || browserPath);
+  const showGlobalLoader = !isEditorRoute;
+
   return (
     <PageLoadingContext.Provider value={contextValue}>
-      <div className="app-route-content" data-route-loading={state.status === "ready" ? "false" : "true"}>
+      <div
+        className="app-route-content"
+        data-route-loading={showGlobalLoader && state.status !== "ready" ? "true" : "false"}
+      >
         {children}
       </div>
-      <GlobalPageLoader state={state} onRetry={retryCurrentPage} />
+      {showGlobalLoader && <GlobalPageLoader state={state} onRetry={retryCurrentPage} />}
     </PageLoadingContext.Provider>
   );
 }

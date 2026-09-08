@@ -880,11 +880,17 @@ export default function EditPage() {
 
   if (auth === null) {
     return (
-      <main className="edit-page site-shell min-h-screen text-white">
+      <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
         <PortfolioSurface>
-          <div className="flex min-h-screen items-center justify-center">
-            <span className="text-neutral-500">Loading...</span>
-          </div>
+          {solarIntroActive && (
+            <div className="edit-solar-reveal" role="status" aria-live="polite">
+              <div className="edit-solar-reveal-visual" aria-hidden="true">
+                <span className="edit-solar-halo edit-solar-halo-one" />
+                <span className="edit-solar-halo edit-solar-halo-two" />
+                <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
+              </div>
+            </div>
+          )}
         </PortfolioSurface>
       </main>
     );
