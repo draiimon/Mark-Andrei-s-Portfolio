@@ -20,3 +20,9 @@ The homepage should use the original `site-shell` styling path without the newer
 **Why:** The original responsive utility classes already produce the correct mobile title, card, and interaction geometry.
 
 **How to apply:** Do not re-add broad refinement classes to the homepage unless every mobile override is checked against the original source at the same viewport.
+
+The editor background sparkle field should read as persistent air-dragged dust: each batch spreads once from the eclipse into the whole viewport, then settles into bounded wind/Brownian drift and firefly-like shimmer. It must not orbit, use long streak trails, expire, or reset.
+
+**Why:** The intended effect needs the visual excitement of an initial star spread plus an always-present star-dust atmosphere that gradually gains density with clicks.
+
+**How to apply:** Launch each batch from the eclipse toward random full-viewport settle points, keep every particle alive after settling, move it only with small local wind drift, and append new sparkles without slicing or replacing the existing field.

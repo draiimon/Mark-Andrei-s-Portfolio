@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
@@ -107,13 +107,12 @@ async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
 function PortfolioSurface({
   children,
   backgroundBurstCycle = 0,
+  backgroundSparkIntensity = 0,
 }: {
   children: ReactNode;
   backgroundBurstCycle?: number;
+  backgroundSparkIntensity?: number;
 }) {
-  const backgroundSparkCount =
-    backgroundBurstCycle > 0 ? Math.min(360, 300 + backgroundBurstCycle * 20) : 0;
-
   return (
     <>
       <video
@@ -132,78 +131,198 @@ function PortfolioSurface({
         <div className="cloud-light one" />
         <div className="cloud-light two" />
         <div className="cloud-light three" />
-        {backgroundSparkCount > 0 && (
-          <div
-            key={backgroundBurstCycle}
-            className={`edit-background-spark-field ${
-              backgroundBurstCycle % 2 === 0
-                ? "edit-background-spark-burst-a"
-                : "edit-background-spark-burst-b"
-            }`}
-            aria-hidden="true"
-          >
-            {Array.from({ length: backgroundSparkCount }, (_, index) => {
-              // The paths are seeded instead of truly random so every burst is
-              // reproducible, but still has the uneven spread of real sparks.
-              const launchAngle = (index * 137.508 + ((index * 29) % 19) - 9) % 360;
-              const angleRadians = (launchAngle * Math.PI) / 180;
-              const radialDistance = 38 + ((index * 47) % 145);
-              const burstX = Math.cos(angleRadians) * radialDistance;
-              const burstY = Math.sin(angleRadians) * (26 + ((index * 31) % 106));
-              const gravityFall = 28 + ((index * 61) % 72);
-              const originX = ((index * 47) % 15) - 7.5;
-              const originY = ((index * 31) % 11) - 5.5;
-              const flightTime = 5.8 + ((index * 41) % 28) / 10;
-              const delay = (index * 19) % 520;
-              const size = 0.055 + ((index * 13) % 8) * 0.014;
-              const trail = 0.55 + ((index * 17) % 10) * 0.085;
-              const pathPoint = (progress: number) =>
-                `${burstX * progress}vw`;
-              const fallPoint = (progress: number) =>
-                `${burstY * progress + gravityFall * progress * progress}vh`;
-
-              return (
-                <span
-                  key={`background-spark-${backgroundBurstCycle}-${index}`}
-                  style={
-                    {
-                      "--bg-origin-x": `${originX}vw`,
-                      "--bg-origin-y": `${originY}vh`,
-                      "--bg-x-06": pathPoint(0.06),
-                      "--bg-y-06": fallPoint(0.06),
-                      "--bg-x-14": pathPoint(0.14),
-                      "--bg-y-14": fallPoint(0.14),
-                      "--bg-x-25": pathPoint(0.25),
-                      "--bg-y-25": fallPoint(0.25),
-                      "--bg-x-35": pathPoint(0.35),
-                      "--bg-y-35": fallPoint(0.35),
-                      "--bg-x-48": pathPoint(0.48),
-                      "--bg-y-48": fallPoint(0.48),
-                      "--bg-x-62": pathPoint(0.62),
-                      "--bg-y-62": fallPoint(0.62),
-                      "--bg-x-74": pathPoint(0.74),
-                      "--bg-y-74": fallPoint(0.74),
-                      "--bg-x-86": pathPoint(0.86),
-                      "--bg-y-86": fallPoint(0.86),
-                      "--bg-x-94": pathPoint(0.94),
-                      "--bg-y-94": fallPoint(0.94),
-                      "--bg-x-100": `${burstX}vw`,
-                      "--bg-y-100": `${burstY + gravityFall}vh`,
-                      "--bg-spark-duration": `${flightTime}s`,
-                      "--bg-spark-delay": `${delay}ms`,
-                      "--bg-spark-size": `${size}rem`,
-                      "--bg-spark-trail": `${trail}rem`,
-                      "--bg-spark-angle": `${launchAngle + 90}deg`,
-                    } as React.CSSProperties
-                  }
-                />
-              );
-            })}
-          </div>
-        )}
+        <BackgroundSparkBurst
+          burstCycle={backgroundBurstCycle}
+          intensity={backgroundSparkIntensity}
+        />
         {children}
       </div>
     </>
+  );
+}
+
+type AmbientParticle = {
+  x: number;
+  y: number;
+  settleX: number;
+  settleY: number;
+  spreadDuration: number;
+  drift: number;
+  driftSpeed: number;
+  phase: number;
+  size: number;
+  trail: number;
+  life: number;
+  brightness: number;
+};
+
+function BackgroundSparkBurst({
+  burstCycle,
+  intensity = 0,
+}: {
+  burstCycle: number;
+  intensity?: number;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<AmbientParticle[]>([]);
+  const viewportRef = useRef({ width: 0, height: 0, pixelRatio: 1 });
+  const wakeRendererRef = useRef<(() => void) | null>(null);
+  const rendererRunningRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
+  const lastBurstCycleRef = useRef(-1);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context) return;
+
+    const resize = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      viewportRef.current = { width, height, pixelRatio };
+      canvas.width = Math.floor(width * pixelRatio);
+      canvas.height = Math.floor(height * pixelRatio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    let lastTimestamp = performance.now();
+    const draw = (timestamp: number) => {
+      const deltaSeconds = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
+      lastTimestamp = timestamp;
+      const { width, height } = viewportRef.current;
+      context.clearRect(0, 0, width, height);
+      context.globalCompositeOperation = "lighter";
+
+      const activeParticles: AmbientParticle[] = [];
+      for (const particle of particlesRef.current) {
+        particle.life += deltaSeconds;
+        activeParticles.push(particle);
+
+        const spreadTime = Math.max(0, particle.life);
+        const spreadProgress = Math.min(1, spreadTime / particle.spreadDuration);
+        const spreadEase = 1 - Math.pow(1 - spreadProgress, 3);
+        const windTime = spreadTime * particle.driftSpeed;
+        const settledX = particle.x + (particle.settleX - particle.x) * spreadEase;
+        const settledY = particle.y + (particle.settleY - particle.y) * spreadEase;
+        const x =
+          ((settledX +
+            Math.sin(windTime + particle.phase) * particle.drift +
+            width) %
+            width);
+        const y =
+          ((settledY +
+            Math.cos(windTime * 0.73 + particle.phase * 1.7) * particle.drift * 0.58 +
+            height) %
+            height);
+        const shimmer =
+          0.18 +
+          0.82 *
+            Math.pow(
+              Math.max(0, Math.sin(particle.life * (2.2 + particle.driftSpeed) + particle.phase)),
+              5
+            );
+        const alpha = shimmer * particle.brightness;
+        const tailX = x - Math.sin(windTime + particle.phase) * particle.trail;
+        const tailY = y - Math.cos(windTime * 0.73 + particle.phase * 1.7) * particle.trail;
+
+        context.lineWidth = particle.size;
+        context.strokeStyle = `rgba(255, 153, 32, ${alpha * 0.72})`;
+        context.beginPath();
+        context.moveTo(tailX, tailY);
+        context.lineTo(x, y);
+        context.stroke();
+
+        context.fillStyle = `rgba(255, 248, 211, ${Math.min(1, alpha * particle.brightness)})`;
+        context.beginPath();
+        context.arc(x, y, particle.size * 0.75, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      particlesRef.current = activeParticles;
+      context.globalCompositeOperation = "source-over";
+      if (activeParticles.length > 0) {
+        animationFrameRef.current = window.requestAnimationFrame(draw);
+      } else {
+        rendererRunningRef.current = false;
+      }
+    };
+
+    wakeRendererRef.current = () => {
+      if (rendererRunningRef.current) return;
+      rendererRunningRef.current = true;
+      lastTimestamp = performance.now();
+      animationFrameRef.current = window.requestAnimationFrame(draw);
+    };
+
+    return () => {
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+      wakeRendererRef.current = null;
+      rendererRunningRef.current = false;
+      particlesRef.current = [];
+      window.removeEventListener("resize", resize);
+      context.clearRect(0, 0, viewportRef.current.width, viewportRef.current.height);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (burstCycle < 0 || burstCycle <= lastBurstCycleRef.current) return;
+    lastBurstCycleRef.current = burstCycle;
+
+    const { width, height } = viewportRef.current;
+    const isInitialFill = particlesRef.current.length === 0;
+    const particleCount = isInitialFill
+      ? Math.round(1100 + Math.min(1, intensity) * 320)
+      : Math.round(180 + Math.min(1, intensity) * 280);
+    const seed = (burstCycle + 1) * 7919;
+    const seeded = (value: number) => {
+      const sample = Math.sin(value * 12.9898 + seed) * 43758.5453;
+      return sample - Math.floor(sample);
+    };
+    const sourceX = width * 0.6;
+    const sourceY = height * 0.36;
+    const newParticles: AmbientParticle[] = Array.from(
+      { length: particleCount },
+      (_, index) => {
+        return {
+          // Each batch spreads once from the eclipse to a random full-viewport
+          // settle point, then remains alive with only local air drift.
+          x: sourceX + (seeded(index + 30) - 0.5) * width * 0.04,
+          y: sourceY + (seeded(index + 31) - 0.5) * height * 0.04,
+          settleX: seeded(index + 40) * width,
+          settleY: seeded(index + 50) * height,
+          spreadDuration: 2.4 + seeded(index + 60) * 1.4,
+          drift: 2.5 + seeded(index + 80) * 8.5,
+          driftSpeed: 0.18 + seeded(index + 90) * 0.36,
+          phase: seeded(index + 100) * Math.PI * 2,
+          size: 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
+          trail: 0.3 + seeded(index + 120) * 1.2,
+          life: -seeded(index + 130) * 0.18,
+          brightness: 0.62 + Math.min(1, intensity) * 0.3 + seeded(index + 140) * 0.2,
+        };
+      }
+    );
+
+    particlesRef.current = [
+      ...particlesRef.current,
+      ...newParticles,
+    ];
+    wakeRendererRef.current?.();
+  }, [burstCycle, intensity]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="edit-background-spark-canvas"
+      aria-hidden="true"
+    />
   );
 }
 
@@ -661,12 +780,19 @@ export default function EditPage() {
   }
 
   if (auth === false) {
-    const sparkCount = loginAuraMomentum >= 4 ? Math.min(96, 12 + loginAuraMomentum * 6) : 0;
+    const starIntensity = Math.min(1, loginAuraClickTick / 40);
+    const sparkCount =
+      loginAuraMomentum >= 4
+        ? Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
+        : 0;
     const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
 
     return (
       <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
-        <PortfolioSurface backgroundBurstCycle={backgroundBurstCycle}>
+        <PortfolioSurface
+          backgroundBurstCycle={backgroundBurstCycle}
+          backgroundSparkIntensity={starIntensity}
+        >
           {solarIntroActive && (
             <div className="edit-solar-reveal" role="status" aria-live="polite">
               <div className="edit-solar-reveal-visual" aria-hidden="true">

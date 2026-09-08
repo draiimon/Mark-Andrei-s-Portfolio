@@ -348,116 +348,14 @@ body {
   --cloud-beat: 0.026;
 }
 
-.edit-background-spark-field {
+.edit-background-spark-canvas {
   position: fixed;
   z-index: 0;
   inset: 0;
-  overflow: hidden;
+  display: block;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
-  contain: strict;
-  isolation: isolate;
-}
-
-.edit-background-spark-field > span {
-  position: absolute;
-  top: calc(36% + var(--bg-origin-y, 0vh));
-  left: calc(60% + var(--bg-origin-x, 0vw));
-  width: var(--bg-spark-size, 0.12rem);
-  height: var(--bg-spark-trail, 0.8rem);
-  border-radius: 999px;
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fff8d7 16%, #ffd477 52%, #ff8a18 78%, transparent 100%);
-  box-shadow:
-    0 0 0.2rem rgba(255, 255, 240, 1),
-    0 0 0.65rem rgba(255, 220, 128, 0.98),
-    0 0 1.35rem rgba(255, 112, 0, 0.8);
-  filter: brightness(1.5) saturate(1.4);
-  opacity: 0;
-  transform: translate3d(0, 0, 0) rotate(var(--bg-spark-angle, 0deg)) scale(0.2);
-  transform-origin: center;
-  animation: edit-background-spark-flight
-    var(--bg-spark-duration, 3s)
-    linear
-    var(--bg-spark-delay, 0ms)
-    both;
-  will-change: transform, opacity, filter;
-}
-
-@keyframes edit-background-spark-flight {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(var(--bg-spark-angle, 0deg)) scale(0.2);
-    filter: brightness(2.4) saturate(1.8);
-  }
-  7% {
-    opacity: 1;
-    transform: translate3d(var(--bg-x-06, 0vw), var(--bg-y-06, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(1.1);
-    filter: brightness(2.9) saturate(2);
-  }
-  15% {
-    opacity: 0.3;
-    transform: translate3d(var(--bg-x-14, 0vw), var(--bg-y-14, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.72);
-  }
-  24% {
-    opacity: 0.95;
-    transform: translate3d(var(--bg-x-25, 0vw), var(--bg-y-25, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.92);
-  }
-  32% {
-    opacity: 0.2;
-    transform: translate3d(var(--bg-x-35, 0vw), var(--bg-y-35, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.62);
-  }
-  40% {
-    opacity: 0.88;
-    transform: translate3d(var(--bg-x-48, 0vw), var(--bg-y-48, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.86);
-  }
-  51% {
-    opacity: 0.12;
-    transform: translate3d(var(--bg-x-62, 0vw), var(--bg-y-62, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.54);
-  }
-  61% {
-    opacity: 0.72;
-    transform: translate3d(var(--bg-x-74, 0vw), var(--bg-y-74, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.74);
-  }
-  73% {
-    opacity: 0.08;
-    transform: translate3d(var(--bg-x-86, 0vw), var(--bg-y-86, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.42);
-  }
-  82% {
-    opacity: 0.34;
-    transform: translate3d(var(--bg-x-94, 0vw), var(--bg-y-94, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.5);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--bg-x-100, 0vw), var(--bg-y-100, 0vh), 0)
-      rotate(var(--bg-spark-angle, 0deg))
-      scale(0.04);
-    filter: brightness(0.72) saturate(0.7);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .edit-background-spark-field > span {
-    animation-duration: 1ms !important;
-    animation-delay: 0ms !important;
-  }
 }
 
 .topbar {
