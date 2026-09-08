@@ -6003,3 +6003,161 @@ html:has(.pre-intro) .ask-ai-wrap {
     width: 100%;
   }
 }
+
+/* Free-form editor login: the page is the surface, not a card. */
+.edit-login-shell {
+  overflow: visible !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.edit-login-shell .edit-orb {
+  display: none;
+}
+
+.edit-login-heading {
+  align-items: center;
+  gap: 1.35rem;
+  margin-bottom: 2.75rem;
+}
+
+.edit-login-mark {
+  width: 5.15rem;
+  height: 5.15rem;
+  margin: -0.35rem 0 0 -0.25rem;
+}
+
+.edit-login-mark .chat-aura,
+.edit-login-mark .chat-aura-small {
+  width: 4.7rem;
+  height: 4.7rem;
+}
+
+.edit-login-title {
+  max-width: 13ch;
+  font-size: clamp(1.8rem, 3.5vw, 2.45rem);
+  letter-spacing: -0.06em;
+  line-height: 0.96;
+}
+
+.edit-login-form {
+  gap: 1.35rem;
+}
+
+.edit-login-field {
+  min-height: 3.15rem;
+  padding: 0.55rem 0;
+  border: 0;
+  border-bottom: 1px solid rgba(231, 238, 246, 0.17);
+  border-radius: 0 !important;
+  background: transparent;
+  box-shadow: none;
+}
+
+.edit-login-field:focus-within {
+  border-bottom-color: rgba(255, 188, 99, 0.72);
+  background: transparent;
+  box-shadow: 0 1px 0 rgba(255, 153, 0, 0.26);
+  transform: none;
+}
+
+.edit-login-password-toggle {
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.edit-login-submit {
+  position: relative;
+  width: max-content;
+  min-width: 0;
+  min-height: 2.8rem;
+  justify-content: flex-start;
+  gap: 0.9rem;
+  margin-top: 0.75rem;
+  padding: 0.45rem 0 0.75rem;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 218, 159, 0.3);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 241, 214, 0.92);
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.075em;
+  text-transform: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.edit-login-submit::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: #ffb75c;
+  box-shadow: 0 0 12px rgba(255, 153, 0, 0.48);
+  transform: scaleX(0.22);
+  transform-origin: left;
+  transition: transform 220ms ease;
+}
+
+.edit-login-submit:hover:not(:disabled),
+.edit-login-submit:focus-visible {
+  border-bottom-color: rgba(255, 218, 159, 0.58);
+  background: transparent;
+  color: #fff8e9;
+  box-shadow: none;
+  filter: none;
+  outline: none;
+  transform: translateX(2px);
+}
+
+.edit-login-submit:hover:not(:disabled)::after,
+.edit-login-submit:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.edit-login-submit-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(255, 196, 108, 0.9);
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.edit-login-submit:hover:not(:disabled) .edit-login-submit-icon,
+.edit-login-submit:focus-visible .edit-login-submit-icon {
+  color: #ffd28d;
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 760px) {
+  .edit-login-mark {
+    width: 4.65rem;
+    height: 4.65rem;
+    margin-left: -0.15rem;
+  }
+
+  .edit-login-mark .chat-aura,
+  .edit-login-mark .chat-aura-small {
+    width: 4.25rem;
+    height: 4.25rem;
+  }
+
+  .edit-login-heading {
+    gap: 1rem;
+    margin-bottom: 2.2rem;
+  }
+}
