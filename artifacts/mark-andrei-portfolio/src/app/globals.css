@@ -696,6 +696,207 @@ body {
   }
 }
 
+/* Last-in-file mobile restore for the original main layout. */
+@media (max-width: 640px) {
+  .portfolio-refinement {
+    background: transparent;
+  }
+
+  .portfolio-refinement::before,
+  .portfolio-refinement::after {
+    transform: none !important;
+    opacity: 0.24;
+    filter: blur(24px);
+    animation: none;
+  }
+
+  .portfolio-refinement .topbar {
+    top: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .portfolio-refinement h1 {
+    font-size: 1.875rem;
+    line-height: 1.05;
+    letter-spacing: normal;
+  }
+
+  .portfolio-refinement h2,
+  .portfolio-refinement h3 {
+    letter-spacing: normal;
+  }
+
+  .portfolio-refinement .portfolio-copy {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .portfolio-refinement .music-edge-controller {
+    border-radius: 999px !important;
+  }
+
+  .portfolio-chat .chat-launcher {
+    min-height: 46px;
+    border-radius: 999px;
+    padding: 0.5rem 1rem 0.5rem 0.55rem;
+    border-color: #edaa4a85;
+    background: linear-gradient(120deg, #39220fec, #191b22f5);
+    box-shadow: 0 0 24px #ff990026, inset 0 1px 0 #ffd49c20;
+    backdrop-filter: blur(15px);
+  }
+
+  .portfolio-chat .chat-window {
+    border-radius: 1.3rem;
+    background:
+      radial-gradient(ellipse at 90% 0%, #b2661726, transparent 47%),
+      linear-gradient(150deg, #151923f5, #10141cf7);
+    box-shadow: 0 25px 80px #0009, 0 0 42px #ff990012, inset 0 1px 0 #ffe1b52b;
+    backdrop-filter: blur(24px);
+  }
+
+  .portfolio-chat .chat-top,
+  .portfolio-chat .chat-bottom {
+    background: transparent;
+  }
+
+  .portfolio-chat .chat-composer {
+    border-radius: 0.8rem;
+    background: #090d15;
+  }
+
+  .portfolio-chat .chat-composer button {
+    border-radius: 0.6rem;
+    background: linear-gradient(140deg, #ffd293, #ffa331);
+    box-shadow: 0 0 12px #ffad3e1c;
+  }
+}
+
+/* Original main mobile layout: compact type, natural spacing, and rounded
+   touch surfaces. Keep the requested justified copy and invisible card edges. */
+@media (max-width: 640px) {
+  .portfolio-refinement {
+    background: transparent;
+  }
+
+  .portfolio-refinement::before,
+  .portfolio-refinement::after {
+    transform: none !important;
+    opacity: 0.24;
+    filter: blur(24px);
+    animation: none;
+  }
+
+  .portfolio-refinement .cloud-light {
+    transform: scale(0.78) !important;
+    filter: blur(42px) saturate(112%);
+    opacity: 0.34;
+    animation: none;
+  }
+
+  .portfolio-refinement .cloud-light.one {
+    width: 12rem;
+    height: 12rem;
+  }
+
+  .portfolio-refinement .cloud-light.two {
+    width: 13rem;
+    height: 13rem;
+  }
+
+  .portfolio-refinement .cloud-light.three {
+    width: 14rem;
+    height: 14rem;
+  }
+
+  .portfolio-refinement .topbar {
+    top: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .portfolio-refinement h1 {
+    font-size: 1.875rem;
+    line-height: 1.05;
+    letter-spacing: normal;
+  }
+
+  .portfolio-refinement h2,
+  .portfolio-refinement h3 {
+    letter-spacing: normal;
+  }
+
+  .portfolio-refinement .reveal {
+    filter: none;
+    transform: translateY(24px) scale(0.99);
+    transition:
+      opacity 560ms ease,
+      transform 560ms ease,
+      filter 0ms ease;
+  }
+
+  .portfolio-refinement .reveal.reveal-in {
+    transform: translateY(0) scale(1);
+  }
+
+  .portfolio-refinement .feature-card,
+  .portfolio-refinement .snap-card {
+    border-radius: 1.1rem;
+    border-color: transparent !important;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: none;
+    padding: 1.2rem;
+  }
+
+  .portfolio-refinement .feature-card {
+    border-left-color: transparent !important;
+  }
+
+  .portfolio-refinement #featured.feature-card:hover,
+  .portfolio-refinement #experience .snap-card:hover {
+    border-color: transparent !important;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: none;
+    transform: none;
+  }
+
+  .portfolio-chat .chat-launcher {
+    min-height: 46px;
+    border-radius: 999px;
+    background: linear-gradient(120deg, #39220fec, #191b22f5);
+    box-shadow: 0 0 24px #ff990026, inset 0 1px 0 #ffd49c20;
+    backdrop-filter: blur(15px);
+  }
+
+  .portfolio-chat .chat-window {
+    border-radius: 1.3rem;
+    background:
+      radial-gradient(ellipse at 90% 0%, #b2661726, transparent 47%),
+      linear-gradient(150deg, #151923f5, #10141cf7);
+    box-shadow: 0 25px 80px #0009, 0 0 42px #ff990012, inset 0 1px 0 #ffe1b52b;
+    backdrop-filter: blur(24px);
+  }
+
+  .portfolio-chat .chat-top,
+  .portfolio-chat .chat-bottom {
+    background: transparent;
+  }
+
+  .portfolio-chat .chat-suggestions button {
+    border-radius: 0.65rem;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .portfolio-chat .chat-composer {
+    border-radius: 0.8rem;
+    background: #090d15;
+  }
+
+  .portfolio-chat .chat-composer button {
+    border-radius: 0.6rem;
+    background: linear-gradient(140deg, #ffd293, #ffa331);
+    box-shadow: 0 0 12px #ffad3e1c;
+  }
+}
+
 /* GitHub main mobile guardrails: keep the interaction surfaces touch-friendly. */
 @media (max-width: 640px) {
   .portfolio-refinement h1 {
@@ -712,8 +913,7 @@ body {
     gap: 0.38rem;
     padding: 0.34rem 0.55rem;
     border-radius: 999px !important;
-    z-index: 40;
-    max-width: calc(100vw - 1.2rem);
+    z-index: 55;
   }
 
   .portfolio-refinement .music-speaker-pill,
@@ -724,8 +924,6 @@ body {
   .portfolio-refinement .music-edge-button {
     width: 2.3rem;
     height: 2.3rem;
-    transform: scale(1);
-    -webkit-tap-highlight-color: transparent;
   }
 
   .portfolio-chat {
@@ -750,6 +948,54 @@ body {
   .portfolio-refinement #featured.feature-card:hover,
   .portfolio-refinement #experience .snap-card:hover {
     transform: none;
+  }
+}
+
+/* Restore the original draiimon/Mark-Andrei main header treatment. */
+.portfolio-refinement .topbar {
+  position: sticky;
+  top: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.portfolio-refinement .topbar .brand-wave {
+  display: inline-flex;
+  max-width: 100%;
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+.portfolio-refinement .topbar .brand-letter {
+  flex: initial;
+}
+
+.portfolio-refinement .topbar .glow-icon-link {
+  filter: drop-shadow(0 0 6px rgba(255, 173, 31, 0.45));
+  color: #ffad1f;
+}
+
+.portfolio-refinement .topbar .glow-icon-link:hover {
+  color: #f59e0b;
+}
+
+.portfolio-refinement .topbar .glow-icon-link:hover svg {
+  filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.95));
+  transform: translateY(-1px) scale(1.24);
+}
+
+.portfolio-refinement .topbar .lucide-cloud {
+  filter: none;
+}
+
+@media (min-width: 640px) {
+  .portfolio-refinement .topbar {
+    margin-bottom: 1.25rem;
   }
 }
 
@@ -910,7 +1156,8 @@ body {
 
 @media (max-width: 640px) {
   .portfolio-refinement .portfolio-copy {
-    text-align: left;
+    text-align: justify;
+    text-justify: inter-word;
   }
 }
 
@@ -2684,41 +2931,47 @@ body {
 }
 
 .music-edge-controller {
-  border-radius: 0;
-  border-color: rgba(255, 153, 0, 0.62);
-  background: #0d1117;
+  border-radius: 999px;
+  border-color: rgba(255, 153, 0, 0.5);
+  background:
+    linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
+    rgba(10, 10, 14, 0.78);
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.48),
-    0 0 18px rgba(255, 153, 0, 0.1);
-  backdrop-filter: none;
+    0 0 22px rgba(255, 153, 0, 0.24),
+    0 0 34px rgba(255, 153, 0, 0.1),
+    inset 0 0 18px rgba(255, 153, 0, 0.16);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
 }
 
 .music-edge-controller::before {
   display: block;
-  opacity: 0.22;
-  filter: blur(12px);
+  opacity: 1;
+  filter: blur(8px);
 }
 
-.music-speaker-pill,
-.music-edge-button {
-  border-radius: 0;
-  box-shadow: none;
+.music-speaker-pill {
+  border-radius: 999px;
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
+    inset 0 0 10px rgba(255, 153, 0, 0.12);
 }
 
 .music-edge-button {
-  background: rgba(255, 153, 0, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 153, 0, 0.12);
 }
 
 .music-edge-button:hover:not(:disabled) {
-  filter: drop-shadow(0 0 9px rgba(255, 153, 0, 0.58));
-  transform: translateY(-1px);
+  filter: drop-shadow(0 0 10px rgba(255, 153, 0, 0.65));
+  transform: scale(1.07);
 }
 
 .music-edge-controller.is-playing {
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.48),
-    0 0 calc(18px + (var(--music-vibe) * 18px))
-      rgba(255, 153, 0, calc(0.12 + (var(--music-vibe) * 0.18)));
+    0 0 calc(20px + (var(--music-vibe) * 20px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.35))),
+    0 0 calc(36px + (var(--music-vibe) * 24px)) rgba(255, 153, 0, calc(0.11 + (var(--music-vibe) * 0.22))),
+    inset 0 0 calc(16px + (var(--music-vibe) * 10px)) rgba(255, 153, 0, calc(0.17 + (var(--music-vibe) * 0.2)));
 }
 
 @keyframes portfolioAtmosphere {
