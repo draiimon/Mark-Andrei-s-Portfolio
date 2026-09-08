@@ -4701,3 +4701,60 @@ html:has(.pre-intro) .ask-ai-wrap {
   animation: none !important;
   transform: none !important;
 }
+
+/* Mobile header finish: keep the portfolio header visually integrated with
+   the eclipse atmosphere and prevent each animated brand letter from becoming
+   its own line on narrow Android browsers. */
+@media (max-width: 640px) {
+  .portfolio-refinement .topbar {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .portfolio-refinement .topbar > div:first-child {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .portfolio-refinement .topbar > div:first-child > span {
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .portfolio-refinement .topbar .brand-wave {
+    display: inline-flex !important;
+    width: max-content;
+    max-width: 100%;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+  }
+
+  .portfolio-refinement .topbar .brand-letter {
+    flex: 0 0 auto !important;
+    white-space: pre !important;
+  }
+
+  .portfolio-refinement .topbar > div:first-child > div {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .portfolio-refinement .topbar nav {
+    width: 100%;
+  }
+
+  /* Touch browsers can keep :hover active after tapping an icon. The
+     username labels are desktop hover helpers, not part of the mobile layout. */
+  .portfolio-refinement .topbar .glow-icon-link > span.pointer-events-none {
+    display: none !important;
+  }
+}
