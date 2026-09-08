@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Chatbot from "@/components/Chatbot";
 import PreProfileIntro from "@/components/PreProfileIntro";
+import PingPongVideo from "@/components/PingPongVideo";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
@@ -121,20 +122,27 @@ export default function Home() {
   const footerRightText = profile?.footerRightText || "Thank you!";
   return (
     <main className="site-shell min-h-screen text-white antialiased">
-      <div className="cloud-light one" />
-      <div className="cloud-light two" />
-      <div className="cloud-light three" />
+      <PingPongVideo
+        className="site-video-background"
+        forwardSrc="/assets/solar-eclipse-background.mp4"
+        reverseSrc="/assets/solar-eclipse-background-reverse.mp4"
+      />
+      <div className="site-video-shade" aria-hidden="true" />
+      <div className="site-content-layer">
+        <div className="cloud-light one" />
+        <div className="cloud-light two" />
+        <div className="cloud-light three" />
 
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 md:py-16">
-        <TopBar
-          brand={brandName}
-          linkedinUrl={profile?.linkedinUrl}
-          githubUrl={profile?.github}
-          discordUrl={profile?.discordUrl}
-          instagramUrl={profile?.instagramUrl}
-          spotifyUrl={profile?.spotifyUrl}
-          viewCount={profile?.viewCount ?? undefined}
-        />
+        <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12 md:py-16">
+          <TopBar
+            brand={brandName}
+            linkedinUrl={profile?.linkedinUrl}
+            githubUrl={profile?.github}
+            discordUrl={profile?.discordUrl}
+            instagramUrl={profile?.instagramUrl}
+            spotifyUrl={profile?.spotifyUrl}
+            viewCount={profile?.viewCount ?? undefined}
+          />
 
         <ScrollReveal className="mb-14" delayMs={20} repeat={false}>
           <section>
@@ -268,10 +276,11 @@ export default function Home() {
             <span className="sm:text-right">{footerRightText}</span>
           </div>
         </footer>
-      </div>
+        </div>
 
-      <Chatbot />
-      {!interactionPreview && <PreProfileIntro brand={brandName} />}
+        <Chatbot />
+        {!interactionPreview && <PreProfileIntro brand={brandName} />}
+      </div>
     </main>
   );
 }

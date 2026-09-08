@@ -49,6 +49,38 @@ body {
   isolation: isolate;
 }
 
+.site-video-background,
+.site-video-shade {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.site-video-background {
+  z-index: 0;
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0.74;
+  transform: scale(1.04);
+  filter: blur(7px) saturate(0.94) brightness(0.62) contrast(0.96);
+  will-change: transform, filter;
+}
+
+.site-video-shade {
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(3, 5, 9, 0.12) 0%, rgba(3, 5, 9, 0.28) 48%, rgba(3, 5, 9, 0.62) 100%),
+    radial-gradient(circle at 50% 38%, rgba(4, 6, 10, 0.03), rgba(4, 6, 10, 0.28) 82%);
+}
+
+.site-content-layer {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+}
+
 .site-shell::before,
 .site-shell::after {
   content: "";
@@ -2234,6 +2266,36 @@ body {
   border-color: rgb(255, 153, 0) !important;
 }
 
+/* Let the existing audio beat signal gently lift the portfolio's amber accents. */
+.site-content-layer .text-amber-300,
+.site-content-layer .text-amber-400,
+.site-content-layer .text-amber-500,
+.site-content-layer .text-amber-600,
+.site-content-layer .text-amber-700,
+.site-content-layer .text-awsOrange {
+  filter:
+    brightness(calc(1 + (var(--music-beat) * 0.16)))
+    drop-shadow(
+      0 0 calc(1px + (var(--music-beat) * 4px))
+      rgba(255, 177, 65, calc(0.05 + (var(--music-beat) * 0.16)))
+    );
+  transition: filter 160ms ease-out;
+}
+
+.site-content-layer .bg-amber-400,
+.site-content-layer .bg-amber-500,
+.site-content-layer .bg-awsOrange {
+  filter: brightness(calc(1 + (var(--music-beat) * 0.14)));
+  box-shadow: 0 0 calc(2px + (var(--music-beat) * 6px)) rgba(255, 153, 0, calc(0.1 + (var(--music-beat) * 0.2)));
+  transition: filter 160ms ease-out, box-shadow 160ms ease-out;
+}
+
+.site-content-layer .glow-icon-link {
+  filter:
+    brightness(calc(1 + (var(--music-beat) * 0.12)))
+    drop-shadow(0 0 calc(4px + (var(--music-beat) * 5px)) rgba(255, 173, 31, calc(0.22 + (var(--music-beat) * 0.2))));
+}
+
 .typewriter-shell {
   display: inline-grid;
   align-items: center;
@@ -3132,9 +3194,9 @@ html:has(.pre-intro) .ask-ai-wrap {
 /* Active homepage parity: preserve the current dark surface and containers while
    keeping the original opening depth and music interaction layer visible. */
 .pre-intro {
-  background: rgba(8, 10, 14, 0.12);
-  backdrop-filter: blur(12px) saturate(112%);
-  -webkit-backdrop-filter: blur(12px) saturate(112%);
+  background: rgba(8, 10, 14, 0.08);
+  backdrop-filter: blur(4px) saturate(108%);
+  -webkit-backdrop-filter: blur(4px) saturate(108%);
 }
 
 .pre-intro::before {
@@ -3146,7 +3208,7 @@ html:has(.pre-intro) .ask-ai-wrap {
     radial-gradient(ellipse at 12% 28%, rgba(255, 153, 0, 0.24), transparent 38%),
     radial-gradient(ellipse at 86% 24%, rgba(86, 125, 174, 0.22), transparent 42%),
     radial-gradient(ellipse at 52% 92%, rgba(255, 153, 0, 0.12), transparent 42%);
-  opacity: 0.92;
+  opacity: 0.72;
   mix-blend-mode: screen;
 }
 
@@ -3196,9 +3258,9 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (max-width: 768px) {
   .pre-intro {
-    background: rgba(8, 10, 14, 0.1);
-    backdrop-filter: blur(8px) saturate(112%);
-    -webkit-backdrop-filter: blur(8px) saturate(112%);
+    background: rgba(8, 10, 14, 0.07);
+    backdrop-filter: blur(3px) saturate(108%);
+    -webkit-backdrop-filter: blur(3px) saturate(108%);
   }
 }
 
@@ -3942,9 +4004,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 .portfolio-chat .chat-aura > span {
-  border-color: rgba(255, 243, 213, 0.78);
+  border: 1.5px solid rgba(255, 243, 213, 0.86);
   z-index: 3;
   animation-duration: 4.2s;
+  box-shadow: 0 0 6px rgba(255, 182, 77, 0.42);
   will-change: transform, opacity;
 }
 
@@ -3994,5 +4057,52 @@ html:has(.pre-intro) .ask-ai-wrap {
     transform: translate3d(0, -2px, 0) scale(1.06);
     filter: brightness(1.2) saturate(1.12);
   }
+}
+
+/* Keep the assistant's state feedback visible even when the browser's
+   reduced-motion preference disables the broader chat motion layer. */
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-chat .chat-aura {
+    animation: chat-aura-solar-breathe 3.2s ease-in-out infinite !important;
+    transform: none;
+  }
+
+  .portfolio-chat .chat-aura::before {
+    animation: chat-aura-corona 5.5s linear infinite !important;
+    transform: none;
+  }
+
+  .portfolio-chat .chat-aura::after {
+    animation: chat-aura-core 3.4s ease-in-out infinite !important;
+    transform: none;
+  }
+
+  .portfolio-chat .chat-aura > span {
+    animation: chat-aura-orbit 5.8s linear infinite !important;
+    transform: none;
+  }
+}
+
+/* The outer moon transform is driven from the assistant state in React so
+   the movement remains visible even when CSS animation playback is limited. */
+.portfolio-chat .chat-aura {
+  animation: chat-aura-light-breathe var(--chat-aura-speed) ease-in-out infinite !important;
+  transform: translate3d(0, var(--aura-y, 0px), 0) scale(var(--aura-scale, 1));
+  will-change: transform, filter;
+}
+
+.portfolio-chat .chat-aura::before {
+  transform: rotate(var(--aura-rotation, 0deg));
+  will-change: transform;
+}
+
+.portfolio-chat .chat-aura::after {
+  transform: scale(var(--aura-core-scale, 1));
+  will-change: transform;
+}
+
+@keyframes chat-aura-light-breathe {
+  0%, 100% { filter: brightness(0.96) saturate(0.98); }
+  50% { filter: brightness(1.2) saturate(1.12); }
 }
 
