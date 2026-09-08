@@ -108,10 +108,12 @@ function PortfolioSurface({
   children,
   backgroundBurstCycle = 0,
   backgroundSparkIntensity = 0,
+  backgroundBurstOrigin = null,
 }: {
   children: ReactNode;
   backgroundBurstCycle?: number;
   backgroundSparkIntensity?: number;
+  backgroundBurstOrigin?: { x: number; y: number } | null;
 }) {
   return (
     <>
@@ -134,6 +136,7 @@ function PortfolioSurface({
         <BackgroundSparkBurst
           burstCycle={backgroundBurstCycle}
           intensity={backgroundSparkIntensity}
+          burstOrigin={backgroundBurstOrigin}
         />
         {children}
       </div>
@@ -159,13 +162,17 @@ type AmbientParticle = {
 function BackgroundSparkBurst({
   burstCycle,
   intensity = 0,
+  burstOrigin = null,
 }: {
   burstCycle: number;
   intensity?: number;
+  burstOrigin?: { x: number; y: number } | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<AmbientParticle[]>([]);
   const viewportRef = useRef({ width: 0, height: 0, pixelRatio: 1 });
+  const burstOriginRef = useRef<{ x: number; y: number } | null>(null);
+  const mobileViewportRef = useRef(false);
   const wakeRendererRef = useRef<(() => void) | null>(null);
   const rendererRunningRef = useRef(false);
   const animationFrameRef = useRef<number | null>(null);
@@ -179,7 +186,14 @@ function BackgroundSparkBurst({
     const resize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      const isMobile = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+      mobileViewportRef.current = isMobile;
+      // A full-DPR canvas is disproportionately expensive on phones. The
+      // particles still read as sharp at 1x, while the page keeps scrolling
+      // without competing with a multi-megapixel repaint.
+      const pixelRatio = isMobile
+        ? 1
+        : Math.min(window.devicePixelRatio || 1, 1.5);
       viewportRef.current = { width, height, pixelRatio };
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
@@ -192,7 +206,14 @@ function BackgroundSparkBurst({
     window.addEventListener("resize", resize);
 
     let lastTimestamp = performance.now();
+    let lastDrawTimestamp = 0;
     const draw = (timestamp: number) => {
+      const frameInterval = mobileViewportRef.current ? 50 : 16;
+      if (lastDrawTimestamp && timestamp - lastDrawTimestamp < frameInterval) {
+        animationFrameRef.current = window.requestAnimationFrame(draw);
+        return;
+      }
+      lastDrawTimestamp = timestamp;
       const deltaSeconds = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
       lastTimestamp = timestamp;
       const { width, height } = viewportRef.current;
@@ -284,17 +305,24 @@ function BackgroundSparkBurst({
     lastBurstCycleRef.current = burstCycle;
 
     const { width, height } = viewportRef.current;
+    if (!width || !height) return;
+    if (burstOrigin) burstOriginRef.current = burstOrigin;
     const isInitialFill = particlesRef.current.length === 0;
-    const particleCount = isInitialFill
-      ? Math.round(1100 + Math.min(1, intensity) * 320)
-      : Math.round(180 + Math.min(1, intensity) * 280);
+    const isMobile = mobileViewportRef.current;
+    const particleCount = isMobile
+      ? isInitialFill
+        ? Math.round(180 + Math.min(1, intensity) * 80)
+        : Math.round(48 + Math.min(1, intensity) * 36)
+      : isInitialFill
+        ? Math.round(1100 + Math.min(1, intensity) * 320)
+        : Math.round(180 + Math.min(1, intensity) * 280);
     const seed = (burstCycle + 1) * 7919;
     const seeded = (value: number) => {
       const sample = Math.sin(value * 12.9898 + seed) * 43758.5453;
       return sample - Math.floor(sample);
     };
-    const sourceX = width * 0.6;
-    const sourceY = height * 0.36;
+    const sourceX = burstOriginRef.current?.x ?? width * 0.6;
+    const sourceY = burstOriginRef.current?.y ?? height * 0.36;
     const newParticles: AmbientParticle[] = Array.from(
       { length: particleCount },
       (_, index) => {
@@ -317,13 +345,17 @@ function BackgroundSparkBurst({
       }
     );
 
-    const maxParticles = 2200;
+    const maxParticles = isMobile ? 520 : 2200;
     particlesRef.current = [
       ...particlesRef.current,
       ...newParticles,
     ].slice(-maxParticles);
     wakeRendererRef.current?.();
-  }, [burstCycle, intensity]);
+  }, [burstCycle, intensity, burstOrigin]);
+
+  useEffect(() => {
+    burstOriginRef.current = burstOrigin;
+  }, [burstOrigin]);
 
   return (
     <canvas
@@ -346,9 +378,19 @@ export default function EditPage() {
   const [solarIntroActive, setSolarIntroActive] = useState(true);
   const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
+  const [isTouchViewport, setIsTouchViewport] = useState(false);
+  const [backgroundBurstOrigin, setBackgroundBurstOrigin] = useState<{ x: number; y: number } | null>(null);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [deckScrolling, setDeckScrolling] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 768px), (pointer: coarse)");
+    const update = () => setIsTouchViewport(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     if (loginAuraMomentum <= 0) return;
@@ -789,10 +831,11 @@ export default function EditPage() {
 
   if (auth === false) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
-    const sparkCount =
-      loginAuraClickTick >= 10
-        ? Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
-        : 0;
+    const sparkCount = loginAuraClickTick >= 10
+      ? isTouchViewport
+        ? Math.min(56, 8 + loginAuraMomentum * 2 + loginAuraClickTick)
+        : Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
+      : 0;
     const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
 
     return (
@@ -800,6 +843,7 @@ export default function EditPage() {
         <PortfolioSurface
           backgroundBurstCycle={backgroundBurstCycle}
           backgroundSparkIntensity={starIntensity}
+          backgroundBurstOrigin={backgroundBurstOrigin}
         >
           {solarIntroActive && (
             <div className="edit-solar-reveal" role="status" aria-live="polite">
@@ -840,7 +884,12 @@ export default function EditPage() {
                     <button
                       type="button"
                       className={`edit-login-mark ${loginAuraMomentum > 0 ? "has-momentum" : ""}`}
-                      onClick={() => {
+                      onClick={(event) => {
+                        const rect = event.currentTarget.getBoundingClientRect();
+                        setBackgroundBurstOrigin({
+                          x: rect.left + rect.width / 2,
+                          y: rect.top + rect.height / 2,
+                        });
                         setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
                         setLoginAuraClickTick((tick) => tick + 1);
                       }}

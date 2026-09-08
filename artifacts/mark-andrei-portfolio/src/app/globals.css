@@ -356,6 +356,7 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
+  contain: strict;
 }
 
 .topbar {
@@ -4894,6 +4895,10 @@ html:has(.pre-intro) .ask-ai-wrap {
   border-radius: 50%;
   background: transparent;
   box-shadow: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .edit-login-kicker {
@@ -6449,6 +6454,32 @@ html:has(.pre-intro) .ask-ai-wrap {
   filter: brightness(1.35) saturate(1.25);
   opacity: 0;
   transform-origin: center;
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .edit-login-mark {
+    /* Keep repeated taps on the eclipse from becoming a browser
+       double-tap-zoom gesture, without disabling pinch zoom on the page. */
+    touch-action: manipulation;
+  }
+
+  .edit-login-sparks {
+    inset: -3.55rem;
+    contain: layout style paint;
+  }
+
+  .edit-login-sparks > span {
+    width: 0.11rem;
+    box-shadow:
+      0 0 0.35rem rgba(255, 255, 235, 0.9),
+      0 0 0.7rem rgba(255, 202, 91, 0.82),
+      0 0 1rem rgba(255, 115, 0, 0.68);
+    filter: none;
+  }
+
+  .edit-login-mark .edit-login-aura::before {
+    filter: none;
+  }
 }
 
 .edit-login-sparks.edit-login-spark-burst-a > span {
