@@ -6197,6 +6197,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 @media (max-width: 760px) {
+  .edit-background-spark-canvas {
+    opacity: 0.08;
+  }
+
   .edit-login-mark {
     width: 4.65rem;
     height: 4.65rem;
@@ -6213,6 +6217,26 @@ html:has(.pre-intro) .ask-ai-wrap {
     gap: 1rem;
     margin-bottom: 2.2rem;
   }
+
+  /* Keep mobile Safari from zooming the page when a compact editor field gets
+     focus. The desktop scale stays intentionally compact. */
+  .edit-page input:not([type="file"]),
+  .edit-page textarea,
+  .edit-page select {
+    font-size: 16px !important;
+  }
+
+  .edit-login-sparks {
+    inset: -2.85rem;
+  }
+
+  .edit-login-sparks > span {
+    width: 0.1rem;
+    box-shadow:
+      0 0 0.3rem rgba(255, 255, 235, 0.95),
+      0 0 0.65rem rgba(255, 202, 91, 0.85),
+      0 0 0.95rem rgba(255, 115, 0, 0.62);
+  }
 }
 
 /* Interactive eclipse mark: hover changes light only, while a click changes
@@ -6228,6 +6252,9 @@ html:has(.pre-intro) .ask-ai-wrap {
   background: transparent;
   color: inherit;
   cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 280ms ease;
   -webkit-tap-highlight-color: transparent;
 }

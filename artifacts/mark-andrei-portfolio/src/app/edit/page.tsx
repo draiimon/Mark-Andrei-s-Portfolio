@@ -176,10 +176,13 @@ function BackgroundSparkBurst({
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
 
+    const mobileQuery = window.matchMedia("(max-width: 760px)");
+    let isMobile = mobileQuery.matches;
     const resize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      isMobile = mobileQuery.matches;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5);
       viewportRef.current = { width, height, pixelRatio };
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
@@ -192,9 +195,19 @@ function BackgroundSparkBurst({
     window.addEventListener("resize", resize);
 
     let lastTimestamp = performance.now();
+    let lastDrawTimestamp = 0;
     const draw = (timestamp: number) => {
-      const deltaSeconds = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
+      const elapsed = timestamp - lastTimestamp;
       lastTimestamp = timestamp;
+      // Keep the phone compositor from painting a full-screen glow field at
+      // 60fps. The burst remains animated, but the canvas only draws about
+      // 30fps on small touch devices.
+      if (isMobile && timestamp - lastDrawTimestamp < 32) {
+        animationFrameRef.current = window.requestAnimationFrame(draw);
+        return;
+      }
+      lastDrawTimestamp = timestamp;
+      const deltaSeconds = Math.min(0.05, Math.max(0.001, elapsed / 1000));
       const { width, height } = viewportRef.current;
       context.clearRect(0, 0, width, height);
       context.globalCompositeOperation = "lighter";
@@ -285,16 +298,23 @@ function BackgroundSparkBurst({
 
     const { width, height } = viewportRef.current;
     const isInitialFill = particlesRef.current.length === 0;
+    const isMobile = width <= 760;
     const particleCount = isInitialFill
-      ? Math.round(1100 + Math.min(1, intensity) * 320)
-      : Math.round(180 + Math.min(1, intensity) * 280);
+      ? isMobile
+        ? Math.round(150 + Math.min(1, intensity) * 40)
+        : Math.round(1100 + Math.min(1, intensity) * 320)
+      : isMobile
+        ? Math.round(44 + Math.min(1, intensity) * 70)
+        : Math.round(180 + Math.min(1, intensity) * 280);
     const seed = (burstCycle + 1) * 7919;
     const seeded = (value: number) => {
       const sample = Math.sin(value * 12.9898 + seed) * 43758.5453;
       return sample - Math.floor(sample);
     };
-    const sourceX = width * 0.6;
-    const sourceY = height * 0.36;
+    const solarMark = document.querySelector<HTMLElement>(".edit-login-mark");
+    const solarBounds = solarMark?.getBoundingClientRect();
+    const sourceX = solarBounds ? solarBounds.left + solarBounds.width / 2 : width * 0.6;
+    const sourceY = solarBounds ? solarBounds.top + solarBounds.height / 2 : height * 0.36;
     const newParticles: AmbientParticle[] = Array.from(
       { length: particleCount },
       (_, index) => {
@@ -317,7 +337,7 @@ function BackgroundSparkBurst({
       }
     );
 
-    const maxParticles = 2200;
+    const maxParticles = isMobile ? 420 : 2200;
     particlesRef.current = [
       ...particlesRef.current,
       ...newParticles,
@@ -789,9 +809,11 @@ export default function EditPage() {
 
   if (auth === false) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
+    const compactLogin =
+      typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
     const sparkCount =
       loginAuraClickTick >= 10
-        ? Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
+        ? Math.min(compactLogin ? 48 : 180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
         : 0;
     const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
 
