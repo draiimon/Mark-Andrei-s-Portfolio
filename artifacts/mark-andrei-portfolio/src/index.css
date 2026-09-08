@@ -1,6 +1,47 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+:root {
+  --background: 222 20% 5%;
+  --foreground: 210 18% 92%;
+  --card: 222 18% 8%;
+  --card-foreground: 210 18% 92%;
+  --popover: 222 18% 8%;
+  --popover-foreground: 210 18% 92%;
+  --primary: 34 100% 50%;
+  --primary-foreground: 222 20% 5%;
+  --secondary: 218 16% 13%;
+  --secondary-foreground: 210 18% 92%;
+  --muted: 218 14% 12%;
+  --muted-foreground: 215 12% 62%;
+  --accent: 34 100% 50%;
+  --accent-foreground: 222 20% 5%;
+  --border: 215 14% 20%;
+  --input: 215 14% 20%;
+  --ring: 34 100% 50%;
+  --radius: 0.125rem;
+}
+
+.dark {
+  --background: 222 20% 5%;
+  --foreground: 210 18% 92%;
+  --card: 222 18% 8%;
+  --card-foreground: 210 18% 92%;
+  --popover: 222 18% 8%;
+  --popover-foreground: 210 18% 92%;
+  --primary: 34 100% 50%;
+  --primary-foreground: 222 20% 5%;
+  --secondary: 218 16% 13%;
+  --secondary-foreground: 210 18% 92%;
+  --muted: 218 14% 12%;
+  --muted-foreground: 215 12% 62%;
+  --accent: 34 100% 50%;
+  --accent-foreground: 222 20% 5%;
+  --border: 215 14% 20%;
+  --input: 215 14% 20%;
+  --ring: 34 100% 50%;
+}
+
 @theme {
   --color-awsOrange: #ff9900;
   --color-awsBlack: #131a22;

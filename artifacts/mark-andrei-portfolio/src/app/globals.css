@@ -17,10 +17,7 @@ html {
 body {
   @apply text-white;
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at 16% 18%, rgba(255, 153, 0, 0.12), transparent 38%),
-    radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.08), transparent 35%),
-    linear-gradient(170deg, #050608 0%, #0a0c11 45%, #11141a 100%);
+  background: #07090d;
 }
 
 .font-body {
@@ -454,28 +451,248 @@ body {
   border-color: rgba(255, 255, 255, 0.14);
 }
 
-/* Restore the cloud atmosphere while preserving the homepage layout. */
+/* Homepage surface: dark and structured, with restrained atmospheric motion. */
 .portfolio-refinement {
-  background:
-    radial-gradient(ellipse at 8% 13%, rgba(143, 74, 10, 0.2), transparent 40%),
-    radial-gradient(ellipse at 90% 35%, rgba(46, 68, 93, 0.23), transparent 45%),
-    linear-gradient(165deg, #0c0d11 0%, #101722 48%, #090c13 100%);
+  min-height: 100dvh;
+  background: #07090d;
 }
 
-.portfolio-refinement .cloud-light.one { width: 24rem; height: 24rem; left: -5rem; opacity: .58; }
-.portfolio-refinement .cloud-light.two { width: 24rem; height: 24rem; opacity: .38; background: rgba(134, 166, 205, .27); }
-.portfolio-refinement .cloud-light.three { opacity: .5; }
+.portfolio-refinement .cloud-light {
+  display: block;
+  opacity: 0.34;
+  filter: blur(68px) saturate(128%);
+}
+
+.portfolio-refinement .cloud-light.one {
+  width: 24rem;
+  height: 24rem;
+  background: rgba(255, 153, 0, 0.34);
+}
+
+.portfolio-refinement .cloud-light.two {
+  width: 24rem;
+  height: 24rem;
+  background: rgba(105, 137, 180, 0.24);
+}
+
+.portfolio-refinement .cloud-light.three {
+  background: rgba(255, 153, 0, 0.18);
+}
 
 .portfolio-refinement .feature-card,
 .portfolio-refinement .snap-card {
-  border-radius: 0.2rem;
-  background: rgba(255, 255, 255, 0.018);
+  border-radius: 0;
+  border-color: rgba(190, 199, 211, 0.18);
+  background: rgba(15, 18, 24, 0.86);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.portfolio-refinement .feature-card {
+  border-left: 2px solid rgba(255, 153, 0, 0.8);
+  padding: 1.5rem 1.4rem;
+}
+
+.portfolio-refinement .snap-card { padding: 1.25rem 1.35rem; }
+
+.portfolio-refinement .feature-card { border-left-color: rgba(255, 153, 0, 0.8); }
+.portfolio-refinement .snap-card:hover,
+.portfolio-refinement .feature-card:hover { border-color: rgba(255, 153, 0, 0.46); }
+
+.portfolio-refinement .topbar {
+  top: 0;
+  margin-bottom: 4rem;
+  padding: 0.5rem 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.portfolio-refinement .topbar .brand-wave {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  max-width: none;
+}
+
+.portfolio-refinement .topbar .brand-letter {
+  flex: 0 0 auto;
+}
+
+.portfolio-refinement h1,
+.portfolio-refinement h2,
+.portfolio-refinement h3 {
+  letter-spacing: -0.035em;
+}
+
+.portfolio-refinement h1 {
+  font-size: clamp(2.8rem, 8vw, 6.6rem);
+  line-height: 0.96;
+}
+
+.portfolio-refinement section[id] { scroll-margin-top: 6rem; }
+
+.portfolio-refinement .reveal {
+  filter: none;
+  transform: translateY(14px);
+  transition: opacity 420ms ease, transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.portfolio-refinement .reveal.reveal-in {
+  transform: translateY(0);
+}
+
+.portfolio-refinement .hero-cloud-wave .hero-letter {
+  animation: heroCloudWave 1.9s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 153, 0, 0.2));
+}
+
+.portfolio-refinement .music-reactive-hero,
+.portfolio-refinement .music-reactive-hero strong,
+.portfolio-refinement .music-reactive-brand,
+.portfolio-refinement .music-reactive-brand .brand-letter {
+  filter: drop-shadow(0 0 8px rgba(255, 153, 0, 0.16));
+  text-shadow:
+    0 0 14px rgba(255, 153, 0, 0.18),
+    0 0 1px rgba(255, 240, 213, 0.18);
+}
+
+.portfolio-refinement .nav-link:focus-visible,
+.portfolio-refinement a:focus-visible,
+.portfolio-refinement button:focus-visible {
+  outline: 2px solid rgba(255, 153, 0, 0.92);
+  outline-offset: 4px;
+}
+
+.portfolio-refinement .glow-icon-link {
+  filter: drop-shadow(0 0 6px rgba(255, 173, 31, 0.34));
+  color: #c5cdd7;
+}
+
+.portfolio-refinement .glow-icon-link:hover {
+  color: #ff9900;
+}
+
+.portfolio-refinement .glow-icon-link:hover svg {
+  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.8));
+  transform: translateY(-2px) scale(1.14);
+}
+
+.portfolio-refinement .topbar .lucide-cloud {
+  filter: drop-shadow(0 0 9px rgba(255, 153, 0, 0.52));
+}
+
+/* Keep the assistant and player functional while removing the soft glass treatment. */
+.portfolio-chat .chat-launcher,
+.portfolio-chat .chat-window,
+.portfolio-chat .chat-suggestions button,
+.portfolio-chat .chat-message-user .chat-message-content,
+.portfolio-chat .chat-composer,
+.portfolio-chat .chat-error {
+  border-radius: 0;
+}
+
+.portfolio-chat .chat-launcher {
+  min-height: 42px;
+  padding: 0.45rem 0.8rem;
+  border-color: rgba(255, 153, 0, 0.55);
+  background: #11151c;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  backdrop-filter: none;
+}
+
+.portfolio-chat .chat-launcher:hover {
+  border-color: #ff9900;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.portfolio-chat .chat-window {
+  border-color: rgba(255, 153, 0, 0.55);
+  background: #0d1117;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.56);
+  backdrop-filter: none;
+}
+
+.portfolio-chat .chat-top,
+.portfolio-chat .chat-bottom {
+  background: #0d1117;
+}
+
+.portfolio-chat .chat-aura,
+.portfolio-chat .chat-welcome-aura,
+.portfolio-chat .chat-orbit,
+.portfolio-chat .chat-launcher .chat-aura { display: none; }
+
+.portfolio-chat .chat-heading h2 > span {
+  border-radius: 0;
+  background: transparent;
+}
+
+.portfolio-chat .chat-suggestions button {
+  background: #121821;
+}
+
+.portfolio-chat .chat-suggestions button:hover {
+  background: #18212b;
+}
+
+.portfolio-chat .chat-composer button {
+  border-radius: 0;
+  background: #ff9900;
   box-shadow: none;
 }
 
-.portfolio-refinement .feature-card { border-left-color: rgba(255, 255, 255, 0.14); }
-.portfolio-refinement .snap-card:hover,
-.portfolio-refinement .feature-card:hover { border-color: rgba(255, 153, 0, 0.46); }
+.music-edge-controller {
+  border-radius: 0;
+  border-color: rgba(255, 153, 0, 0.62);
+  background: #0d1117;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.48);
+  backdrop-filter: none;
+}
+
+.music-edge-controller::before { display: none; }
+.music-speaker-pill,
+.music-edge-button {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.music-edge-button {
+  background: rgba(255, 153, 0, 0.1);
+}
+
+.music-edge-button:hover:not(:disabled) {
+  filter: none;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .portfolio-refinement .topbar {
+    margin-bottom: 2.75rem;
+    padding-inline: 0.8rem;
+  }
+
+  .portfolio-refinement h1 {
+    font-size: clamp(2.8rem, 14vw, 4.8rem);
+  }
+
+  .music-edge-controller {
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-refinement .reveal,
+  .portfolio-refinement .music-reactive-hero,
+  .portfolio-refinement .music-reactive-hero strong,
+  .portfolio-refinement .music-reactive-brand,
+  .portfolio-refinement .music-reactive-brand .brand-letter {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
 
 /* Amber glass assistant: its own styles leave the homepage geometry intact. */
 .portfolio-chat { position: fixed; right: 1.25rem; bottom: calc(1.25rem + env(safe-area-inset-bottom)); z-index: 50; display: flex; flex-direction: column; align-items: flex-end; gap: .8rem; }
@@ -1688,4 +1905,167 @@ body {
   }
 }
 
+/* Final portfolio surface pass: intentionally flat, quiet, and high contrast. */
+.portfolio-refinement::before,
+.portfolio-refinement::after {
+  display: block;
+  pointer-events: none;
+}
+
+.portfolio-refinement::before {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 153, 0, 0.12), transparent 34%),
+    radial-gradient(circle at 88% 28%, rgba(93, 123, 167, 0.12), transparent 36%),
+    radial-gradient(circle at 54% 88%, rgba(255, 153, 0, 0.07), transparent 34%);
+  opacity: calc(0.46 + (var(--music-vibe) * 0.14) + (var(--music-beat) * 0.1));
+  filter: blur(16px);
+  transition: opacity 220ms ease-out, transform 220ms ease-out;
+}
+
+.portfolio-refinement::after {
+  background:
+    radial-gradient(circle at 26% 38%, rgba(255, 153, 0, 0.08), transparent 24%),
+    radial-gradient(circle at 76% 72%, rgba(129, 155, 190, 0.06), transparent 28%);
+  opacity: calc(0.4 + (var(--music-vibe) * 0.12));
+  filter: blur(32px);
+  animation: portfolioAtmosphere 18s ease-in-out infinite alternate;
+}
+
+.portfolio-refinement .pre-intro {
+  background: rgba(7, 9, 13, 0.98);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.portfolio-chat .chat-launcher,
+.portfolio-chat .chat-window,
+.portfolio-chat .chat-suggestions button,
+.portfolio-chat .chat-message-user .chat-message-content,
+.portfolio-chat .chat-composer,
+.portfolio-chat .chat-error,
+.portfolio-chat .chat-icon-button {
+  border-radius: 0;
+}
+
+.portfolio-chat .chat-launcher {
+  min-height: 42px;
+  padding: 0.45rem 0.8rem;
+  border-color: rgba(255, 153, 0, 0.55);
+  background: #11151c;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  backdrop-filter: none;
+}
+
+.portfolio-chat .chat-launcher:hover {
+  border-color: #ff9900;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.portfolio-chat .chat-window {
+  border-color: rgba(255, 153, 0, 0.55);
+  background: #0d1117;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.56);
+  backdrop-filter: none;
+}
+
+.portfolio-chat .chat-top,
+.portfolio-chat .chat-bottom {
+  background: #0d1117;
+}
+
+.portfolio-chat .chat-aura,
+.portfolio-chat .chat-welcome-aura,
+.portfolio-chat .chat-orbit {
+  display: block;
+}
+
+.portfolio-chat .chat-heading h2 > span {
+  border-radius: 0;
+  background: transparent;
+}
+
+.portfolio-chat .chat-suggestions button {
+  background: #121821;
+}
+
+.portfolio-chat .chat-suggestions button:hover {
+  background: #18212b;
+}
+
+.portfolio-chat .chat-composer button {
+  border-radius: 0;
+  background: #ff9900;
+  box-shadow: none;
+}
+
+.music-edge-controller {
+  border-radius: 0;
+  border-color: rgba(255, 153, 0, 0.62);
+  background: #0d1117;
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.48),
+    0 0 18px rgba(255, 153, 0, 0.1);
+  backdrop-filter: none;
+}
+
+.music-edge-controller::before {
+  display: block;
+  opacity: 0.22;
+  filter: blur(12px);
+}
+
+.music-speaker-pill,
+.music-edge-button {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.music-edge-button {
+  background: rgba(255, 153, 0, 0.1);
+}
+
+.music-edge-button:hover:not(:disabled) {
+  filter: drop-shadow(0 0 9px rgba(255, 153, 0, 0.58));
+  transform: translateY(-1px);
+}
+
+.music-edge-controller.is-playing {
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.48),
+    0 0 calc(18px + (var(--music-vibe) * 18px))
+      rgba(255, 153, 0, calc(0.12 + (var(--music-vibe) * 0.18)));
+}
+
+@keyframes portfolioAtmosphere {
+  0% { transform: translate3d(-1.5%, -1%, 0) scale(1); }
+  100% { transform: translate3d(1.5%, 1%, 0) scale(1.04); }
+}
+
+@media (max-width: 640px) {
+  .portfolio-refinement .topbar {
+    margin-bottom: 2.75rem;
+  }
+
+  .portfolio-refinement h1 {
+    font-size: clamp(2.8rem, 14vw, 4.8rem);
+  }
+
+  .music-edge-controller {
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-refinement .reveal,
+  .portfolio-refinement .music-reactive-hero,
+  .portfolio-refinement .music-reactive-hero strong,
+  .portfolio-refinement .music-reactive-brand,
+  .portfolio-refinement .music-reactive-brand .brand-letter,
+  .portfolio-chat *,
+  .music-edge-controller * {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
 
