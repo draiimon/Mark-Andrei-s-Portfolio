@@ -26,7 +26,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const lowPowerRef = useRef(false);
   const sampleTickRef = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.25);
+  const [volume, setVolume] = useState(0.05);
 
   const setVibe = (value: number) => {
     const clamped = Math.max(0, Math.min(1, value));

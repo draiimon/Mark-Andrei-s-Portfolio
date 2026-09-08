@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import ClientTabMeta from "@/components/ClientTabMeta";
 import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
+import MoonCursor from "@/components/MoonCursor";
 import { resolveMusicEmbed } from "@/lib/music";
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -10,6 +11,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <>
       <ClientTabMeta />
       <GlobalBackgroundMusic music={music} />
+      <MoonCursor />
       {children}
     </>
   );
