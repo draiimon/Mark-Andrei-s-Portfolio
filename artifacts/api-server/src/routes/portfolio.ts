@@ -17,6 +17,15 @@ type Experience = { id: number; role: string; company: string; period: string; s
 type Leadership = { id: number; org: string; role: string; period: string; sortOrder: number };
 type Achievement = { id: number; text: string; sortOrder: number };
 type Tagline = { id: number; text: string; sortOrder: number };
+type PortfolioState = {
+  profile: Profile;
+  projects: Project[];
+  experience: Experience[];
+  leadership: Leadership[];
+  achievements: Achievement[];
+  taglines: Tagline[];
+  _meta?: { viewCountResetTo6743?: boolean };
+};
 
 const profile: Profile = {
   id: 1,
@@ -37,7 +46,7 @@ const profile: Profile = {
   objective: "Self-driven Computer Science graduate with strong leadership experience and hands-on expertise in DevOps, full-stack development, and AI/ML.",
   about: "Computer Science graduate pursuing opportunities in software development and Cloud DevOps. Hands-on experience includes web application development, AWS infrastructure, CI/CD workflows, and AI integration. Seeking an entry-level role that applies this technical foundation to application delivery and automation while developing further industry experience.",
   skills: "Python, Java, C/C++, PHP, SQL, Django, Laravel, React (Next.js), Node.js, AWS, Docker, Terraform, PostgreSQL, MongoDB, Firebase, Selenium, Playwright, YOLOv8, NLTK, spaCy",
-  viewCount: 32718,
+  viewCount: 6743,
   availability: "Available for work",
   brandName: "To the clouds.",
   heroTagline: "builds in the cloud.",
@@ -172,22 +181,20 @@ const dbReady = pool ? (async () => {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
-  const result = await pool.query<{ state: {
-    profile: Profile;
-    projects: Project[];
-    experience: Experience[];
-    leadership: Leadership[];
-    achievements: Achievement[];
-    taglines: Tagline[];
-  } }>("SELECT state FROM portfolio_state WHERE id = 1");
+  const result = await pool.query<{ state: PortfolioState }>("SELECT state FROM portfolio_state WHERE id = 1");
   const saved = result.rows[0]?.state;
   if (saved) {
+    const needsViewCountReset = saved._meta?.viewCountResetTo6743 !== true;
     Object.assign(profile, saved.profile);
     projects.splice(0, projects.length, ...saved.projects);
     experience.splice(0, experience.length, ...saved.experience);
     leadership.splice(0, leadership.length, ...saved.leadership);
     achievements.splice(0, achievements.length, ...saved.achievements);
     taglines.splice(0, taglines.length, ...saved.taglines);
+    if (needsViewCountReset) {
+      profile.viewCount = 6743;
+      await persistState();
+    }
     if (!profile.faviconUrl) {
       profile.faviconUrl = "/favicon.svg";
       await persistState();
@@ -203,7 +210,7 @@ async function persistState() {
     `INSERT INTO portfolio_state (id, state, updated_at)
      VALUES (1, $1::jsonb, NOW())
      ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
-    [JSON.stringify({ profile, projects, experience, leadership, achievements, taglines })],
+    [JSON.stringify({ profile, projects, experience, leadership, achievements, taglines, _meta: { viewCountResetTo6743: true } })],
   );
 }
 
@@ -224,6 +231,24 @@ function cleanUrl(value: unknown) {
   if (value == null || String(value).trim() === "") return null;
   const valueString = String(value).trim();
   return /^https?:\/\//i.test(valueString) ? valueString : `https://${valueString}`;
+}
+
+function normalizedIp(value: string) {
+  return value.trim().replace(/^::ffff:/i, "").toLowerCase();
+}
+
+function shouldIgnoreView(req: Request) {
+  const userAgent = req.get("user-agent") ?? "";
+  const isUptimeMonitor = /better\s*stack|better\s*uptime|betterstack|uptime\s*robot|uptimerobot|pingdom|statuscake/i.test(userAgent);
+  if (isUptimeMonitor) return true;
+
+  const ignoredIps = new Set(
+    (process.env.VIEW_COUNTER_IGNORED_IPS ?? "")
+      .split(",")
+      .map(normalizedIp)
+      .filter(Boolean),
+  );
+  return ignoredIps.has(normalizedIp(req.ip ?? ""));
 }
 
 function replaceItem<T extends { id: number }>(items: T[], id: number, patch: Partial<T>) {
@@ -275,10 +300,13 @@ router.get("/public/site-media/:key", (req, res) => {
   if (typeof value === "string" && value) return res.redirect(value);
   return res.status(404).json({ error: "Media not found" });
 });
-router.post("/public/views", async (_req, res) => {
+router.post("/public/views", async (req, res) => {
+  if (shouldIgnoreView(req)) {
+    return res.json({ viewCount: profile.viewCount, counted: false });
+  }
   profile.viewCount += 1;
   await persistState();
-  return res.json({ viewCount: profile.viewCount });
+  return res.json({ viewCount: profile.viewCount, counted: true });
 });
 
 router.get("/edit/profile", (req, res) => {
