@@ -113,7 +113,7 @@ export default function Chatbot() {
 
     const timer = window.setTimeout(() => {
       setAuraMomentum((momentum) => Math.max(0, momentum - 1));
-    }, 160);
+    }, 220);
 
     return () => window.clearTimeout(timer);
   }, [auraMomentum, auraClickTick]);
@@ -188,7 +188,7 @@ export default function Chatbot() {
               className="chat-aura-button"
               onClick={spinAura}
               aria-label="Speed up eclipse"
-              title="Click repeatedly to build eclipse momentum"
+              title="Click repeatedly to speed up the eclipse; it gradually slows down"
             >
               <SolarAura small state={auraState} momentum={auraMomentum} />
             </button>

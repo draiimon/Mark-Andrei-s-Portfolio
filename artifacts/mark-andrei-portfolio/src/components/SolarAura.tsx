@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 
 export type SolarAuraState = "idle" | "thinking" | "typing";
 
@@ -18,18 +18,48 @@ export default function SolarAura({
   style?: CSSProperties;
 }) {
   const clampedMomentum = Math.max(0, Math.min(14, momentum));
+  const auraRef = useRef<HTMLSpanElement>(null);
+  const momentumRef = useRef(clampedMomentum);
   const solarStyle = {
     ...style,
-    "--solar-breathe-duration": `${Math.max(0.85, 5 - clampedMomentum * 0.3)}s`,
-    "--solar-corona-duration": `${Math.max(0.5, 4.6 - clampedMomentum * 0.29)}s`,
-    "--solar-core-duration": `${Math.max(0.46, 2.8 - clampedMomentum * 0.18)}s`,
-    "--solar-orbit-duration": `${Math.max(0.7, 4.2 - clampedMomentum * 0.26)}s`,
-    "--solar-orbit-duration-two": `${Math.max(0.82, 5.8 - clampedMomentum * 0.34)}s`,
-    "--solar-orbit-duration-three": `${Math.max(1, 7.2 - clampedMomentum * 0.42)}s`,
+    "--solar-breathe-duration": `${Math.max(0.9, 5 - clampedMomentum * 0.28)}s`,
+    "--solar-core-duration": `${Math.max(0.5, 2.8 - clampedMomentum * 0.18)}s`,
   } as CSSProperties;
+
+  useEffect(() => {
+    momentumRef.current = clampedMomentum;
+  }, [clampedMomentum]);
+
+  useEffect(() => {
+    const aura = auraRef.current;
+    if (!aura) return;
+
+    let frame = 0;
+    let lastTime = performance.now();
+    let angle = 0;
+    let velocity = 30;
+
+    const animate = (time: number) => {
+      const delta = Math.min(40, Math.max(0, time - lastTime));
+      lastTime = time;
+
+      // One rotating body with a soft velocity spring: clicks change the
+      // target speed, while the current angle keeps moving continuously.
+      const targetVelocity = 30 + momentumRef.current * 12;
+      velocity += (targetVelocity - velocity) * (1 - Math.exp(-delta / 180));
+      angle = (angle + (velocity * delta) / 1000) % 360;
+      aura.style.setProperty("--solar-angle", `${angle}deg`);
+      aura.style.setProperty("--solar-speed-energy", `${Math.min(1, velocity / 198)}`);
+      frame = requestAnimationFrame(animate);
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   return (
     <span
+      ref={auraRef}
       className={`chat-aura ${small ? "chat-aura-small" : ""} ${className}`.trim()}
       data-aura-state={state}
       data-aura-momentum={clampedMomentum}

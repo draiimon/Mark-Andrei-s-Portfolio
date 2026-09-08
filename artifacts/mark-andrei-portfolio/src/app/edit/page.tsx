@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 
@@ -150,7 +150,7 @@ export default function EditPage() {
 
     const timer = window.setTimeout(() => {
       setLoginAuraMomentum((momentum) => Math.max(0, momentum - 1));
-    }, 160);
+    }, 220);
 
     return () => window.clearTimeout(timer);
   }, [loginAuraMomentum, loginAuraClickTick]);
@@ -629,22 +629,15 @@ export default function EditPage() {
                         setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
                         setLoginAuraClickTick((tick) => tick + 1);
                       }}
-                       aria-label="Speed up eclipse"
-                       title="Click repeatedly to build momentum; it slows down when you stop"
+                      aria-label="Speed up eclipse"
+                      title="Click repeatedly to speed up the eclipse; it gradually slows down"
                     >
                       <SolarAura
                         small
                         state="idle"
                         className="edit-login-aura"
                         showOrbits={false}
-                         momentum={loginAuraMomentum}
-                        style={
-                          {
-                            "--login-aura-speed": `${Math.max(0.7, 5 - loginAuraMomentum * 0.32)}s`,
-                            "--login-aura-corona-speed": `${Math.max(0.42, 4.6 - loginAuraMomentum * 0.3)}s`,
-                            "--login-aura-core-speed": `${Math.max(0.38, 2.8 - loginAuraMomentum * 0.2)}s`,
-                          } as CSSProperties
-                        }
+                        momentum={loginAuraMomentum}
                       />
                     </button>
                     <div className="edit-login-heading-copy">
