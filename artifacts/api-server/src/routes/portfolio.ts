@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import express, { Router, type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
 import { pool } from "@workspace/db";
@@ -18,15 +17,6 @@ type Experience = { id: number; role: string; company: string; period: string; s
 type Leadership = { id: number; org: string; role: string; period: string; sortOrder: number };
 type Achievement = { id: number; text: string; sortOrder: number };
 type Tagline = { id: number; text: string; sortOrder: number };
-type PortfolioState = {
-  profile: Profile;
-  projects: Project[];
-  experience: Experience[];
-  leadership: Leadership[];
-  achievements: Achievement[];
-  taglines: Tagline[];
-  _meta?: { viewCountResetTo6743?: boolean; viewCountBaselineRestored?: boolean };
-};
 
 const profile: Profile = {
   id: 1,
@@ -174,46 +164,145 @@ const taglines: Tagline[] = [
   { id: 5, text: "improves delivery through automation.", sortOrder: 5 },
 ];
 
-const dbReady = pool ? (async () => {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS portfolio_state (
-      id INTEGER PRIMARY KEY,
-      state JSONB NOT NULL,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-  const result = await pool.query<{ state: PortfolioState }>("SELECT state FROM portfolio_state WHERE id = 1");
-  const saved = result.rows[0]?.state;
-  if (saved) {
-    const needsViewCountBaselineRestore = saved._meta?.viewCountBaselineRestored !== true;
-    Object.assign(profile, saved.profile);
-    projects.splice(0, projects.length, ...saved.projects);
-    experience.splice(0, experience.length, ...saved.experience);
-    leadership.splice(0, leadership.length, ...saved.leadership);
-    achievements.splice(0, achievements.length, ...saved.achievements);
-    taglines.splice(0, taglines.length, ...saved.taglines);
-    if (needsViewCountBaselineRestore) {
-      profile.viewCount = 6743;
-      await persistState();
-    }
-    if (!profile.faviconUrl) {
-      profile.faviconUrl = "/favicon.svg";
-      await persistState();
-    }
-  } else {
-    await persistState();
+async function hydrateFromDatabase() {
+  if (!pool) return;
+
+  const profileResult = await pool.query<Record<string, unknown>>(
+    `SELECT * FROM "Profile" ORDER BY "id" ASC LIMIT 1`,
+  );
+  const savedProfile = profileResult.rows[0];
+  if (savedProfile) {
+    Object.assign(profile, savedProfile, {
+      id: Number(savedProfile.id),
+      viewCount: Number(savedProfile.viewCount ?? 0),
+      updatedAt: savedProfile.updatedAt instanceof Date
+        ? savedProfile.updatedAt.toISOString()
+        : String(savedProfile.updatedAt ?? profile.updatedAt),
+    });
   }
-})() : Promise.resolve();
+
+  const projectResult = await pool.query<Project>(
+    `SELECT "id", "name", "tagline", "description", "techStack", "link", "githubUrl", "highlight"
+     FROM "Project"
+     ORDER BY "highlight" DESC, "createdAt" DESC, "id" ASC`,
+  );
+  projects.splice(0, projects.length, ...projectResult.rows.map((row) => ({
+    ...row,
+    id: Number(row.id),
+    highlight: Boolean(row.highlight),
+  })));
+
+  const experienceResult = await pool.query<Experience>(
+    `SELECT "id", "role", "company", "period", "summary", "sortOrder"
+     FROM "Experience"
+     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+  );
+  experience.splice(0, experience.length, ...experienceResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
+
+  const leadershipResult = await pool.query<Leadership>(
+    `SELECT "id", "org", "role", "period", "sortOrder"
+     FROM "Leadership"
+     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+  );
+  leadership.splice(0, leadership.length, ...leadershipResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
+
+  const achievementResult = await pool.query<Achievement>(
+    `SELECT "id", "text", "sortOrder"
+     FROM "Achievement"
+     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+  );
+  achievements.splice(0, achievements.length, ...achievementResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
+
+  const taglineResult = await pool.query<Tagline>(
+    `SELECT "id", "text", "sortOrder"
+     FROM "Tagline"
+     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+  );
+  taglines.splice(0, taglines.length, ...taglineResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
+}
+
+type SqlClient = {
+  query: (text: string, values?: unknown[]) => Promise<{ rowCount: number | null; rows: Array<Record<string, unknown>> }>;
+};
+
+async function syncCollection(
+  client: SqlClient,
+  table: "Project" | "Experience" | "Leadership" | "Achievement" | "Tagline",
+  columns: readonly string[],
+  rows: Array<Record<string, unknown>>,
+) {
+  const existing = await client.query(`SELECT "id" FROM "${table}"`);
+  const ids = rows.map((row) => Number(row.id));
+
+  for (const row of rows) {
+    const insertColumns = ["id", ...columns];
+    const placeholders = insertColumns.map((_, index) => `$${index + 1}`).join(", ");
+    const values = insertColumns.map((column) => row[column]);
+    const updates = columns.map((column) => `"${column}" = EXCLUDED."${column}"`).join(", ");
+    await client.query(
+      `INSERT INTO "${table}" (${insertColumns.map((column) => `"${column}"`).join(", ")})
+       VALUES (${placeholders})
+       ON CONFLICT ("id") DO UPDATE SET ${updates}, "updatedAt" = NOW()`,
+      values,
+    );
+  }
+
+  if (ids.length === 0) {
+    await client.query(`DELETE FROM "${table}"`);
+    return;
+  }
+
+  await client.query(`DELETE FROM "${table}" WHERE NOT ("id" = ANY($1::int[]))`, [ids]);
+  void existing;
+}
 
 async function persistState() {
   if (!pool) return;
-  await pool.query(
-    `INSERT INTO portfolio_state (id, state, updated_at)
-     VALUES (1, $1::jsonb, NOW())
-     ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
-    [JSON.stringify({ profile, projects, experience, leadership, achievements, taglines, _meta: { viewCountResetTo6743: true, viewCountBaselineRestored: true } })],
-  );
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const profileColumns = [
+      "fullName", "headline", "location", "email", "phone", "github",
+      "linkedinUrl", "facebookUrl", "discordUrl", "instagramUrl", "spotifyUrl",
+      "musicUrl", "cloudinaryCloudName", "cloudinaryUploadPreset", "objective",
+      "about", "skills", "viewCount", "availability", "brandName", "heroTagline",
+      "tabTitle", "faviconUrl", "socialImageUrl", "featuredLabel", "experienceTitle",
+      "leadershipTitle", "achievementsTitle", "contactLabel", "footerCenterText",
+      "footerRightText", "aiBehaviorPrompt",
+    ] as const;
+    const profileValues = profileColumns.map((column) => profile[column]);
+    const profileUpdate = profileColumns.map((column, index) => `"${column}" = $${index + 1}`).join(", ");
+    const profileResult = await client.query(
+      `UPDATE "Profile" SET ${profileUpdate}, "updatedAt" = NOW() WHERE "id" = $${profileValues.length + 1}`,
+      [...profileValues, profile.id],
+    );
+    if (profileResult.rowCount === 0) {
+      const insertColumns = ["id", ...profileColumns];
+      await client.query(
+        `INSERT INTO "Profile" (${insertColumns.map((column) => `"${column}"`).join(", ")})
+         VALUES (${insertColumns.map((_, index) => `$${index + 1}`).join(", ")})`,
+        [profile.id, ...profileValues],
+      );
+    }
+
+    await syncCollection(client, "Project", ["name", "tagline", "description", "techStack", "link", "githubUrl", "highlight"], projects);
+    await syncCollection(client, "Experience", ["role", "company", "period", "summary", "sortOrder"], experience);
+    await syncCollection(client, "Leadership", ["org", "role", "period", "sortOrder"], leadership);
+    await syncCollection(client, "Achievement", ["text", "sortOrder"], achievements);
+    await syncCollection(client, "Tagline", ["text", "sortOrder"], taglines);
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
 }
+
+const dbReady = pool ? hydrateFromDatabase() : Promise.resolve();
 
 function isAdmin(req: Request) {
   return req.cookies?.portfolio_admin === "true";
@@ -302,49 +391,6 @@ function generatedResumeHtml() {
   </html>`;
 }
 
-function parseStoragePath(path: string) {
-  const parts = path.replace(/^\/+/, "").split("/");
-  const bucketName = parts.shift();
-  if (!bucketName || parts.length === 0) throw new Error("Invalid object storage path");
-  return { bucketName, objectName: parts.join("/") };
-}
-
-async function signStorageUrl({
-  bucketName,
-  objectName,
-  method,
-  ttlSec,
-}: {
-  bucketName: string;
-  objectName: string;
-  method: "GET" | "PUT";
-  ttlSec: number;
-}) {
-  const response = await fetch("http://127.0.0.1:1106/object-storage/signed-object-url", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      bucket_name: bucketName,
-      object_name: objectName,
-      method,
-      expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
-    }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!response.ok) throw new Error(`Object storage signer returned HTTP ${response.status}`);
-  const data = (await response.json()) as { signed_url?: unknown };
-  if (typeof data.signed_url !== "string" || !data.signed_url) throw new Error("Object storage signer returned no URL");
-  return data.signed_url;
-}
-
-function getPrivateResumeTarget() {
-  const privateDir = process.env.PRIVATE_OBJECT_DIR;
-  if (!privateDir) throw new Error("PRIVATE_OBJECT_DIR is not configured");
-  const objectName = `uploads/resume-${randomUUID()}.pdf`;
-  const { bucketName } = parseStoragePath(`${privateDir}/${objectName}`);
-  return { bucketName, objectName, objectPath: `/objects/${objectName}` };
-}
-
 function normalizedIp(value: string) {
   return value.trim().replace(/^::ffff:/i, "").toLowerCase();
 }
@@ -409,7 +455,14 @@ router.get("/public/site-meta", (_req, res) => res.json({ tabTitle: profile.tabT
 router.get("/public/site-media/:key", (req, res) => {
   const key = req.params.key === "favicon" ? "faviconUrl" : "socialImageUrl";
   const value = profile[key];
-  if (typeof value === "string" && value) return res.redirect(value);
+  const ownMediaPath = `/api/public/site-media/${req.params.key}`;
+  if (typeof value === "string" && value) {
+    if (value === ownMediaPath || value.startsWith(`${ownMediaPath}?`)) {
+      if (key === "faviconUrl") return res.redirect("/favicon.svg");
+      return res.status(404).json({ error: "Media not found" });
+    }
+    return res.redirect(value);
+  }
   return res.status(404).json({ error: "Media not found" });
 });
 router.post("/public/views", async (req, res) => {
@@ -500,25 +553,25 @@ router.post(
     }
 
     try {
-      const target = getPrivateResumeTarget();
-      const uploadUrl = await signStorageUrl({
-        bucketName: target.bucketName,
-        objectName: target.objectName,
-        method: "PUT",
-        ttlSec: 900,
-      });
-      const uploadResponse = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": "application/pdf" },
-        body: new Uint8Array(req.body),
-      });
-      if (!uploadResponse.ok) {
-        req.log.error({ status: uploadResponse.status }, "Resume upload failed");
-        return res.status(502).json({ error: "Resume storage upload failed" });
+      if (!pool) {
+        return res.status(503).json({ error: "Database is unavailable" });
       }
 
-      profile.resumeObjectPath = target.objectPath;
-      await persistState();
+      const existing = await pool.query<{ id: number; fileName: string }>(
+        `SELECT "id", "fileName" FROM "Resume" ORDER BY "updatedAt" DESC, "id" DESC LIMIT 1`,
+      );
+      const fileName = existing.rows[0]?.fileName || "resume.pdf";
+      if (existing.rows[0]) {
+        await pool.query(
+          `UPDATE "Resume" SET "fileName" = $1, "content" = $2, "updatedAt" = NOW() WHERE "id" = $3`,
+          [fileName, req.body, existing.rows[0].id],
+        );
+      } else {
+        await pool.query(
+          `INSERT INTO "Resume" ("fileName", "content", "updatedAt") VALUES ($1, $2, NOW())`,
+          [fileName, req.body],
+        );
+      }
       return res.json({ ok: true, url: "/api/resume" });
     } catch (error) {
       req.log.error({ err: error }, "Resume upload failed");
@@ -528,27 +581,31 @@ router.post(
 );
 router.post("/edit/music", (req, res) => (isAdmin(req) ? res.json({ ok: true, url: profile.musicUrl }) : unauthorized(res)));
 router.get("/resume", async (req, res) => {
-  const objectPath = typeof profile.resumeObjectPath === "string" ? profile.resumeObjectPath : "";
-  if (!objectPath.startsWith("/objects/")) {
-    res.type("html").send(generatedResumeHtml());
-    return;
-  }
-
   try {
-    const privateDir = process.env.PRIVATE_OBJECT_DIR;
-    if (!privateDir) throw new Error("PRIVATE_OBJECT_DIR is not configured");
-    const objectName = objectPath.slice("/objects/".length);
-    const { bucketName } = parseStoragePath(`${privateDir}/${objectName}`);
-    const downloadUrl = await signStorageUrl({
-      bucketName,
-      objectName,
-      method: "GET",
-      ttlSec: 300,
+    if (!pool) {
+      res.type("html").send(generatedResumeHtml());
+      return;
+    }
+    const result = await pool.query<{ fileName: string; content: Buffer }>(
+      `SELECT "fileName", "content" FROM "Resume" ORDER BY "updatedAt" DESC, "id" DESC LIMIT 1`,
+    );
+    const resume = result.rows[0];
+    if (!resume) {
+      res.type("html").send(generatedResumeHtml());
+      return;
+    }
+    const safeFileName = String(resume.fileName || "resume.pdf").replace(/[^\w.\- ()]/g, "_");
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="${safeFileName}"`,
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
     });
-    return res.redirect(downloadUrl);
+    return res.send(resume.content);
   } catch (error) {
-    req.log.error({ err: error }, "Failed to create resume download URL");
-    return res.status(404).send("Resume is temporarily unavailable.");
+    req.log.error({ err: error }, "Failed to load resume from database");
+    return res.status(503).send("Resume is temporarily unavailable.");
   }
 });
 
@@ -579,7 +636,7 @@ router.post("/chat", async (req, res) => {
     achievements,
     taglines,
   };
-  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 sentences and use short Markdown lists when useful. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
+  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 short sentences. Use plain text only: never use Markdown, bold, headings, bullets, or numbered lists. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
 
 Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
   try {

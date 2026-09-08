@@ -194,14 +194,7 @@ export default function EditPage() {
   const [socialFile, setSocialFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
-    const isReload = nav?.type === "reload";
-
     async function bootstrapAuth() {
-      if (isReload) {
-        await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(() => {});
-      }
-
       const res = await fetch("/api/edit/me", { credentials: "include" }).catch(() => null);
       if (res?.ok) {
         setAuth(true);

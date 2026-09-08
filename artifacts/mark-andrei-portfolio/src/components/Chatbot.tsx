@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Mail, RotateCcw, X } from "lucide-react";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -13,6 +12,18 @@ const questions = [
   { label: "Get in touch", text: "How can I contact Andrei about a job opportunity?", icon: Mail },
 ];
 const thinkingSteps = ["Reading the portfolio", "Connecting the details", "Thinking it through", "Crafting a reply"];
+
+function plainAssistantReply(value: string) {
+  return value
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1")
+    .replace(/^(\s{0,3}#{1,6}\s+)/gm, "")
+    .replace(/^\s*(?:[-*+]|[•●◦])\s+/gm, "")
+    .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/(\*\*|__|\*|_|`)/g, "")
+    .replace(/^>\s?/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 
 function Aura({ small = false, state = "idle" }: { small?: boolean; state?: AuraState }) {
   return <span className={`chat-aura ${small ? "chat-aura-small" : ""}`} data-aura-state={state} aria-hidden="true"><span /><span /><span /></span>;
@@ -102,9 +113,11 @@ export default function Chatbot() {
       });
       const data = await response.json();
       if (!response.ok || typeof data.reply !== "string" || !data.reply.trim()) throw new Error("Chat unavailable");
+      const reply = plainAssistantReply(data.reply);
+      if (!reply) throw new Error("Chat unavailable");
       const assistantIndex = nextMessages.length;
       setMessages((previous) => [...previous, { role: "assistant", content: "" }]);
-      setTypingReply({ index: assistantIndex, fullText: data.reply, visibleText: "" });
+      setTypingReply({ index: assistantIndex, fullText: reply, visibleText: "" });
     } catch { setError(true); }
     finally { window.clearTimeout(timeout); setLoading(false); inFlightRef.current = false; }
   }
@@ -140,7 +153,7 @@ export default function Chatbot() {
                     {message.role === "user" ? <p>{message.content}</p> : typingReply?.index === index ? (
                       <p className="chat-typing-copy">{typingReply.visibleText}<span className="chat-typing-cursor" aria-hidden="true" /></p>
                     ) : (
-                      <ReactMarkdown components={{ a: ({ children, ...props }) => <a {...props} target="_blank" rel="noreferrer">{children}</a> }}>{message.content.replace(/^[•●◦]\s?/gm, "- ")}</ReactMarkdown>
+                      <p className="chat-plain-copy">{message.content}</p>
                     )}
                   </div>
                 </div>)}
