@@ -686,7 +686,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portfolio-refinement .reveal,
   .portfolio-refinement .music-reactive-hero,
   .portfolio-refinement .music-reactive-hero strong,
   .portfolio-refinement .music-reactive-brand,
@@ -694,6 +693,258 @@ body {
     transition: none !important;
     animation: none !important;
     transform: none !important;
+  }
+}
+
+/* Restore the original rounded interaction layer after the flat surface pass. */
+.portfolio-refinement .feature-card,
+.portfolio-refinement .snap-card {
+  border-radius: 1.1rem !important;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.portfolio-chat .chat-launcher {
+  min-height: 50px;
+  padding: 0.5rem 1rem 0.5rem 0.55rem;
+  border-radius: 999px !important;
+  border-color: #edaa4a85;
+  background: linear-gradient(120deg, #39220fec, #191b22f5);
+  box-shadow: 0 0 24px #ff990026, inset 0 1px 0 #ffd49c20;
+  backdrop-filter: blur(15px);
+}
+
+.portfolio-chat .chat-launcher:hover {
+  border-color: #ffd197;
+  box-shadow: 0 0 32px #ff990050, inset 0 1px 0 #ffd49c35;
+}
+
+.portfolio-chat .chat-window {
+  border-radius: 1.3rem !important;
+  border-color: #db9d535e;
+  background:
+    radial-gradient(ellipse at 90% 0%, #b2661726, transparent 47%),
+    linear-gradient(150deg, #151923f5, #10141cf7);
+  box-shadow:
+    0 25px 80px #0009,
+    0 0 42px #ff990012,
+    inset 0 1px 0 #ffe1b52b;
+  backdrop-filter: blur(24px);
+}
+
+.portfolio-chat .chat-top {
+  background: transparent;
+}
+
+.portfolio-chat .chat-bottom {
+  background: #0d111ac9;
+}
+
+.portfolio-chat .chat-launcher .chat-aura {
+  display: inline-block !important;
+}
+
+.portfolio-chat .chat-heading h2 > span {
+  border-radius: 0.25rem !important;
+  background: #ffb84e0c;
+}
+
+.portfolio-chat .chat-icon-button {
+  border-radius: 0.45rem !important;
+}
+
+.portfolio-chat .chat-suggestions button {
+  border-radius: 0.6rem !important;
+  background: linear-gradient(100deg, #ffbf7008, #ffffff02);
+}
+
+.portfolio-chat .chat-suggestions button:hover {
+  background: #ffad5510;
+}
+
+.portfolio-chat .chat-message-user .chat-message-content {
+  border-radius: 0.8rem 0.8rem 0.2rem 0.8rem !important;
+}
+
+.portfolio-chat .chat-composer {
+  border-radius: 0.8rem !important;
+}
+
+.portfolio-chat .chat-composer button {
+  border-radius: 0.6rem !important;
+  background: linear-gradient(140deg, #ffd293, #ffa331);
+  box-shadow: 0 0 12px #ffad3e1c;
+}
+
+.portfolio-chat .chat-error {
+  border-radius: 0.6rem !important;
+}
+
+.music-edge-controller {
+  border-radius: 999px !important;
+  border-color: rgba(255, 153, 0, 0.5);
+  background:
+    linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
+    rgba(10, 10, 14, 0.78);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow:
+    0 0 22px rgba(255, 153, 0, 0.24),
+    0 0 34px rgba(255, 153, 0, 0.1),
+    inset 0 0 18px rgba(255, 153, 0, 0.16);
+}
+
+.music-edge-controller::before {
+  display: block;
+  opacity: 1;
+  filter: blur(8px);
+}
+
+.music-speaker-pill,
+.music-edge-button {
+  border-radius: 999px !important;
+}
+
+.music-speaker-pill {
+  box-shadow:
+    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
+    inset 0 0 10px rgba(255, 153, 0, 0.12);
+}
+
+.music-edge-button {
+  background: rgba(255, 153, 0, 0.12);
+}
+
+.music-edge-button:hover:not(:disabled) {
+  transform: scale(1.07);
+  filter: drop-shadow(0 0 10px rgba(255, 153, 0, 0.65));
+}
+
+.music-edge-button.is-playing {
+  box-shadow:
+    0 0 calc(8px + (var(--music-vibe) * 8px)) rgba(255, 153, 0, calc(0.28 + (var(--music-vibe) * 0.32))),
+    inset 0 0 8px rgba(255, 153, 0, 0.2);
+}
+
+.music-edge-controller.is-playing {
+  box-shadow:
+    0 0 calc(20px + (var(--music-vibe) * 20px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.35))),
+    0 0 calc(36px + (var(--music-vibe) * 24px)) rgba(255, 153, 0, calc(0.11 + (var(--music-vibe) * 0.22))),
+    inset 0 0 calc(16px + (var(--music-vibe) * 10px)) rgba(255, 153, 0, calc(0.17 + (var(--music-vibe) * 0.2)));
+}
+
+/* Keep the music surface visibly alive even before audio analysis is available. */
+.music-edge-controller::before {
+  animation: musicHaloDrift 3.8s ease-in-out infinite;
+}
+
+.music-edge-controller::after {
+  animation: musicFrameShimmer 2.8s ease-in-out infinite;
+}
+
+.music-speaker-pill {
+  animation: musicPillBreathe 2.4s ease-in-out infinite;
+}
+
+.portfolio-refinement .portfolio-copy {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+@media (max-width: 640px) {
+  .portfolio-refinement .portfolio-copy {
+    text-align: left;
+  }
+}
+
+.portfolio-refinement #featured.feature-card,
+.portfolio-refinement #featured.feature-card:hover {
+  border-color: transparent !important;
+  box-shadow: none;
+}
+
+.portfolio-refinement #featured.feature-card,
+.portfolio-refinement #experience .snap-card {
+  border-color: transparent !important;
+  box-shadow: none;
+  transition:
+    transform 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.portfolio-refinement #featured.feature-card:hover,
+.portfolio-refinement #experience .snap-card:hover {
+  border-color: transparent !important;
+  background:
+    linear-gradient(135deg, rgba(255, 174, 72, 0.08), rgba(255, 255, 255, 0.025) 48%, rgba(89, 123, 167, 0.06)),
+    rgba(255, 255, 255, 0.025);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transform: translateY(-4px);
+}
+
+@keyframes musicHaloDrift {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: translate3d(-2px, 0, 0) scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate3d(2px, -4px, 0) scale(1.06);
+  }
+}
+
+@keyframes musicPillBreathe {
+  0%,
+  100% {
+    filter: brightness(0.96) saturate(0.96);
+  }
+
+  50% {
+    filter: brightness(1.12) saturate(1.12);
+  }
+}
+
+@keyframes musicFrameShimmer {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(0.99);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
+}
+
+@media (min-width: 641px) {
+  .music-edge-controller {
+    animation: musicControllerFloat 4.8s ease-in-out infinite;
+  }
+}
+
+@keyframes musicControllerFloat {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(calc(-50% - 3px)) translateX(2px) rotate(-1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-edge-controller,
+  .music-edge-controller::after,
+  .music-edge-controller::before,
+  .music-speaker-pill {
+    animation: none !important;
   }
 }
 
@@ -1058,8 +1309,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portfolio-refinement .reveal,
-  .portfolio-refinement .reveal.reveal-in,
   .portfolio-chat *,
   .portfolio-chat *::before,
   .portfolio-chat *::after,
@@ -2435,7 +2684,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portfolio-refinement .reveal,
   .portfolio-refinement .music-reactive-hero,
   .portfolio-refinement .music-reactive-hero strong,
   .portfolio-refinement .music-reactive-brand,

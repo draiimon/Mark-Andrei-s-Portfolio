@@ -166,7 +166,7 @@ export default function Home() {
             <p className="mt-2 w-full overflow-hidden text-xl font-semibold text-white sm:text-2xl md:text-3xl">
               <TypewriterTagline lines={taglineLines} />
             </p>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">{aboutText}</p>
+            <p className="portfolio-copy mt-6 max-w-2xl text-base leading-relaxed text-slate-300 md:text-lg">{aboutText}</p>
           </section>
         </ScrollReveal>
 
@@ -175,7 +175,7 @@ export default function Home() {
             <section id="featured" className="feature-card">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-awsOrange">{featuredLabel}</p>
               <h2 className="mt-1 text-2xl font-bold">{featured.name}</h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300 md:text-base">{featured.description}</p>
+              <p className="portfolio-copy mt-3 text-sm leading-relaxed text-slate-300 md:text-base">{featured.description}</p>
               <p className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-400">{featured.techStack}</p>
               <div className="mt-4 flex flex-wrap gap-3 text-sm">
                 {featured.link && (
@@ -215,7 +215,7 @@ export default function Home() {
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-awsOrange">{item.period}</p>
                     <h3 className="mt-1 text-lg font-bold">{item.role}</h3>
                     <p className="text-sm text-slate-300">{item.company}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-300">{item.summary}</p>
+                    <p className="portfolio-copy mt-2 text-sm leading-relaxed text-slate-300">{item.summary}</p>
                   </article>
                 </ScrollReveal>
               ))}
@@ -232,7 +232,7 @@ export default function Home() {
                   <article>
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-awsOrange">{item.period}</p>
                     <h3 className="mt-1 break-words text-base font-bold text-white">{item.org}</h3>
-                    <p className="mt-1 break-words text-sm leading-relaxed text-slate-300">{item.role}</p>
+                    <p className="portfolio-copy mt-1 break-words text-sm leading-relaxed text-slate-300">{item.role}</p>
                   </article>
                 </ScrollReveal>
               ))}
@@ -247,8 +247,7 @@ export default function Home() {
               <div className="space-y-3 border-l border-white/20 pl-4 md:pl-6">
                 {achievements.map((item, idx) => (
                   <ScrollReveal key={item.id} delayMs={140 + idx * 35}>
-                    <p className="flex items-start gap-2 break-words text-sm leading-relaxed text-slate-300">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-awsOrange" />
+                    <p className="break-words text-sm leading-relaxed text-slate-300">
                       <span>{item.text}</span>
                     </p>
                   </ScrollReveal>
