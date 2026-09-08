@@ -1,0 +1,72 @@
+Featured Work
+
+PanicSense PH
+An AI-powered disaster monitoring and sentiment analysis platform designed for the Philippines. It analyzes English, Tagalog, and Taglish content to classify disaster-related emotions such as panic, fear/anxiety, disbelief, resilience, and neutral, with real-time social media monitoring, news analysis, interactive maps, and sentiment dashboards.
+
+React / TypeScript / Node.js / Express / PostgreSQL / Python / Groq AI
+
+Live Demo
+GitHub Repo
+Experience Snapshot
+Mar - May 2025
+
+Cloud DevOps Intern
+Oaktree Innovations
+
+Supported AWS deployments and infrastructure using ECS, S3, and serverless services. Worked with Docker, GitHub Actions, and Terraform to automate delivery, configure environments, and troubleshoot applications.
+
+Apr - May 2025
+
+Freelance Full-Stack / AI Developer
+School Web Portal
+
+Built a school portal with student information, appointments, and admin features. Integrated a RAG chatbot that retrieves relevant student manual content to answer school questions, and handled database features and deployment setup.
+
+Leadership and Community Activities
+Sep 2021 - May 2025
+
+Microsoft Student Community - TIP Manila
+TSMP & Communication Committee
+
+Sep 2023 - May 2025
+
+League of Recognized Student Organizations - TIP Manila
+Assistant Secretary (2024 - 2025); Project Manager, Operations Committee (2023 - 2024)
+
+Jan - May 2024
+
+AWS Cloud Club - TIP Manila
+Vice-Chief Relations Officer
+
+2021 - 2024
+
+ICONS - TIP Manila
+Treasurer (2021 - 2023); Public Relations Officer & Communication Head (2022 - 2024)
+
+Apr 2024 - Apr 2027
+
+UPHSD SHS Alumni Association
+Public Information Officer
+
+Jan 2023 - May 2024
+
+College of Computer Studies - TIP Manila
+Public Relations Officer
+
+Aug 2021 - Jul 2022
+
+CITE Department Student Council - TIP Manila
+Mentee - Sponsorship & Marketing Head
+
+Achievements
+BS Computer Science, Technological Institute of the Philippines - Manila (2021 - 2025) - With Honor Distinction
+
+Service Excellence Award
+
+Service Stewardship Award
+
+Say hi - andreicastillofficial@gmail.com
+
+To the clouds.
+@2026 draiimon
+Thank you!
