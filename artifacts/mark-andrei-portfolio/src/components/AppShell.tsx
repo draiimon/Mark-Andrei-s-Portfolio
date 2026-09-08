@@ -38,11 +38,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
       }, 550);
     };
 
+    const handlePointerMove = (event: PointerEvent) => {
+      // A touch drag is page scrolling, not pointer activity. Let touchmove
+      // keep the floating music control hidden instead of revealing it again.
+      if (event.pointerType === "touch") return;
+      showControls();
+    };
+
     root.dataset.floatingUiState = "visible";
     scheduleIdle();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("pointermove", showControls, { passive: true });
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("touchmove", handleScroll, { passive: true });
     window.addEventListener("pointerdown", showControls, { passive: true });
     window.addEventListener("touchstart", showControls, { passive: true });
     window.addEventListener("keydown", showControls);
@@ -53,7 +61,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
       clearTimer(scrollTimer);
       delete root.dataset.floatingUiState;
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("pointermove", showControls);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("touchmove", handleScroll);
       window.removeEventListener("pointerdown", showControls);
       window.removeEventListener("touchstart", showControls);
       window.removeEventListener("keydown", showControls);
