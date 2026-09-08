@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import AmbientBackgroundVideo from "@/components/AmbientBackgroundVideo";
+import { usePageLoading } from "@/components/PageLoading";
 import SolarAura from "@/components/SolarAura";
 
 type Profile = {
@@ -198,8 +199,15 @@ function BackgroundSparkBurst({
 
     let lastTimestamp = performance.now();
     let lastDrawTimestamp = 0;
+    let pageVisible = !document.hidden;
     const draw = (timestamp: number) => {
-      const frameInterval = mobileViewportRef.current ? 50 : 16;
+      if (!pageVisible) {
+        rendererRunningRef.current = false;
+        animationFrameRef.current = null;
+        return;
+      }
+      const isMobile = mobileViewportRef.current;
+      const frameInterval = isMobile ? 32 : 16;
       if (lastDrawTimestamp && timestamp - lastDrawTimestamp < frameInterval) {
         animationFrameRef.current = window.requestAnimationFrame(draw);
         return;
@@ -209,11 +217,13 @@ function BackgroundSparkBurst({
       lastTimestamp = timestamp;
       const { width, height } = viewportRef.current;
       context.clearRect(0, 0, width, height);
-      context.globalCompositeOperation = "lighter";
+      context.globalCompositeOperation = isMobile ? "source-over" : "lighter";
 
       const activeParticles: AmbientParticle[] = [];
       for (const particle of particlesRef.current) {
         particle.life += deltaSeconds;
+        const lifeLimit = particle.spreadDuration + (isMobile ? 0.8 : 1.35);
+        if (particle.life > lifeLimit) continue;
         activeParticles.push(particle);
 
         const spreadTime = Math.max(0, particle.life);
@@ -246,21 +256,30 @@ function BackgroundSparkBurst({
               Math.max(0, Math.sin(particle.life * (2.2 + particle.driftSpeed) + particle.phase)),
               5
             );
-        const alpha = shimmer * particle.brightness;
+        const fadeOut = Math.min(1, (lifeLimit - particle.life) / 0.8);
+        const alpha = shimmer * particle.brightness * fadeOut;
         const tailX = x - Math.sin(windTime + particle.phase) * particle.trail;
         const tailY = y - Math.cos(windTime * 0.73 + particle.phase * 1.7) * particle.trail;
 
-        context.lineWidth = particle.size;
-        context.strokeStyle = `rgba(255, 153, 32, ${alpha * 0.72})`;
-        context.beginPath();
-        context.moveTo(tailX, tailY);
-        context.lineTo(x, y);
-        context.stroke();
+        if (isMobile) {
+          // Small square glints are substantially cheaper than a stroke plus
+          // arc per particle, while the easing still preserves the burst.
+          const size = Math.max(0.8, particle.size);
+          context.fillStyle = `rgba(255, 226, 157, ${alpha * 0.78})`;
+          context.fillRect(x - size / 2, y - size / 2, size, size);
+        } else {
+          context.lineWidth = particle.size;
+          context.strokeStyle = `rgba(255, 153, 32, ${alpha * 0.72})`;
+          context.beginPath();
+          context.moveTo(tailX, tailY);
+          context.lineTo(x, y);
+          context.stroke();
 
-        context.fillStyle = `rgba(255, 248, 211, ${Math.min(1, alpha * particle.brightness)})`;
-        context.beginPath();
-        context.arc(x, y, particle.size * 0.75, 0, Math.PI * 2);
-        context.fill();
+          context.fillStyle = `rgba(255, 248, 211, ${Math.min(1, alpha * particle.brightness)})`;
+          context.beginPath();
+          context.arc(x, y, particle.size * 0.75, 0, Math.PI * 2);
+          context.fill();
+        }
       }
 
       particlesRef.current = activeParticles;
@@ -274,11 +293,24 @@ function BackgroundSparkBurst({
 
     wakeRendererRef.current = () => {
       if (rendererRunningRef.current) return;
+      if (!pageVisible) return;
       rendererRunningRef.current = true;
       lastTimestamp = performance.now();
       animationFrameRef.current = window.requestAnimationFrame(draw);
     };
 
+    const handleVisibility = () => {
+      pageVisible = !document.hidden;
+      if (!pageVisible && animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+        rendererRunningRef.current = false;
+      } else if (pageVisible && particlesRef.current.length > 0) {
+        wakeRendererRef.current?.();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       if (animationFrameRef.current !== null) {
         window.cancelAnimationFrame(animationFrameRef.current);
@@ -287,6 +319,7 @@ function BackgroundSparkBurst({
       rendererRunningRef.current = false;
       particlesRef.current = [];
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       context.clearRect(0, 0, viewportRef.current.width, viewportRef.current.height);
     };
   }, []);
@@ -302,8 +335,8 @@ function BackgroundSparkBurst({
     const isMobile = mobileViewportRef.current;
     const particleCount = isMobile
       ? isInitialFill
-        ? Math.round(180 + Math.min(1, intensity) * 80)
-        : Math.round(48 + Math.min(1, intensity) * 36)
+        ? Math.round(96 + Math.min(1, intensity) * 36)
+        : Math.round(22 + Math.min(1, intensity) * 18)
       : isInitialFill
         ? Math.round(1100 + Math.min(1, intensity) * 320)
         : Math.round(180 + Math.min(1, intensity) * 280);
@@ -336,7 +369,7 @@ function BackgroundSparkBurst({
       }
     );
 
-    const maxParticles = isMobile ? 520 : 2200;
+    const maxParticles = isMobile ? 240 : 2200;
     particlesRef.current = [
       ...particlesRef.current,
       ...newParticles,
@@ -358,6 +391,7 @@ function BackgroundSparkBurst({
 }
 
 export default function EditPage() {
+  const { currentRoute, markPageReady, markPageError } = usePageLoading();
   const [auth, setAuth] = useState<boolean | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -471,20 +505,6 @@ export default function EditPage() {
   const [socialFile, setSocialFile] = useState<File | null>(null);
 
   useEffect(() => {
-    async function bootstrapAuth() {
-      const res = await fetch("/api/edit/me", { credentials: "include" }).catch(() => null);
-      if (res?.ok) {
-        setAuth(true);
-        await loadData();
-        return;
-      }
-      setAuth(false);
-    }
-
-    void bootstrapAuth();
-  }, []);
-
-  useEffect(() => {
     if (auth !== false) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -496,7 +516,7 @@ export default function EditPage() {
     return () => window.clearTimeout(timer);
   }, [auth]);
 
-  async function loadData() {
+  async function loadData(): Promise<{ ok: boolean; message?: string }> {
     try {
       const [p, proj, exp, lead, ach, tgs] = await Promise.all([
         apiJson<Profile>("/api/edit/profile"),
@@ -554,11 +574,61 @@ export default function EditPage() {
       if (message.toLowerCase().includes("unauthorized")) {
         setAuth(false);
         setError("Session expired. Please sign in again.");
-        return;
+        return { ok: true };
       }
       setError(message);
+      return { ok: false, message };
     }
+    return { ok: true };
   }
+
+  useEffect(() => {
+    if (!currentRoute) return;
+
+    let cancelled = false;
+
+    async function bootstrapAuth() {
+      try {
+        const res = await fetch("/api/edit/me", {
+          credentials: "include",
+          signal: AbortSignal.timeout(8000),
+        });
+
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            setAuth(false);
+            if (!cancelled) markPageReady(currentRoute);
+            return;
+          }
+
+          throw new Error(`Unable to check editor access (${res.status})`);
+        }
+
+        setAuth(true);
+        const result = await loadData();
+        if (cancelled) return;
+
+        if (result.ok) {
+          markPageReady(currentRoute);
+        } else {
+          markPageError(
+            currentRoute,
+            result.message || "The editor could not finish loading.",
+            () => window.location.reload(),
+          );
+        }
+      } catch (cause) {
+        if (cancelled) return;
+        const message = cause instanceof Error ? cause.message : "Unable to prepare the editor.";
+        markPageError(currentRoute, message, () => window.location.reload());
+      }
+    }
+
+    void bootstrapAuth();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentRoute, markPageError, markPageReady]);
 
   async function withSave(task: () => Promise<void>, message: string) {
     setSaving(true);
@@ -824,7 +894,7 @@ export default function EditPage() {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const sparkCount = loginAuraClickTick >= 10
       ? isTouchViewport
-        ? Math.min(56, 8 + loginAuraMomentum * 2 + loginAuraClickTick)
+        ? Math.min(28, 6 + loginAuraMomentum + Math.floor(loginAuraClickTick / 2))
         : Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
       : 0;
     const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
@@ -843,7 +913,7 @@ export default function EditPage() {
                 <span className="edit-solar-halo edit-solar-halo-two" />
                 <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
               </div>
-              <p className="edit-solar-reveal-label">SOLAR / EDIT</p>
+              <p className="edit-solar-reveal-label">MARK ANDREI / EDIT</p>
               <p className="edit-solar-reveal-status">Entering control center</p>
               <button type="button" className="edit-solar-skip" onClick={() => setSolarIntroActive(false)}>
                 Skip intro

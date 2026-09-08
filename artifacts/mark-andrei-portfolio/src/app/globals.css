@@ -6506,9 +6506,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-login-sparks > span {
     width: 0.11rem;
     box-shadow:
-      0 0 0.35rem rgba(255, 255, 235, 0.9),
-      0 0 0.7rem rgba(255, 202, 91, 0.82),
-      0 0 1rem rgba(255, 115, 0, 0.68);
+      0 0 0.28rem rgba(255, 255, 235, 0.82),
+      0 0 0.58rem rgba(255, 202, 91, 0.7);
     filter: none;
   }
 
@@ -7202,5 +7201,167 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-control-center .edit-dashboard-stats {
     gap: 0.9rem;
     margin-top: 1.5rem;
+  }
+}
+
+/* Route readiness layer. The page remains mounted underneath so a slow
+   request never creates a blank preview, while this branded layer owns the
+   initial transition and its recoverable error state. */
+.app-route-content {
+  min-height: 100%;
+  transition: opacity 420ms ease, filter 420ms ease;
+}
+
+.app-route-content[data-route-loading="true"] {
+  opacity: 0.72;
+}
+
+.global-page-loader {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 153, 0, 0.1), transparent 28rem),
+    rgba(5, 8, 13, 0.84);
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.global-page-loader[data-active="false"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.global-page-loader-panel {
+  display: flex;
+  width: min(100%, 23rem);
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(255, 209, 145, 0.2);
+  border-radius: 1.5rem;
+  padding: clamp(2.2rem, 8vw, 3.5rem) clamp(1.4rem, 6vw, 2.8rem);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.025)),
+    rgba(21, 25, 32, 0.42);
+  box-shadow:
+    0 1.5rem 4rem rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(255, 166, 58, 0.08);
+  backdrop-filter: blur(24px) saturate(130%);
+  -webkit-backdrop-filter: blur(24px) saturate(130%);
+  text-align: center;
+}
+
+.global-page-loader-mark {
+  position: relative;
+  width: 3.8rem;
+  height: 3.8rem;
+  margin-bottom: 1.8rem;
+  display: grid;
+  place-items: center;
+}
+
+.global-page-loader-eclipse-shell {
+  display: grid;
+  width: 3.8rem;
+  height: 3.8rem;
+  cursor: default;
+  place-items: center;
+  pointer-events: none;
+}
+
+.global-page-loader-eclipse-shell .edit-login-aura-bounce {
+  width: 100%;
+  height: 100%;
+}
+
+.global-page-loader-kicker {
+  margin: 0;
+  color: #ffb866;
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.global-page-loader-title {
+  margin: 0.7rem 0 1.2rem;
+  color: #f5f0e8;
+  font-size: clamp(2rem, 8vw, 3.3rem);
+  font-weight: 650;
+  letter-spacing: -0.07em;
+  line-height: 0.95;
+}
+
+.global-page-loader-track {
+  width: min(100%, 15rem);
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.global-page-loader-track span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #ff9900, #ffe0ae);
+  animation: global-loader-progress 1.35s ease-in-out infinite;
+}
+
+.global-page-loader-message {
+  max-width: 20rem;
+  margin: 1rem 0 0;
+  color: rgba(226, 232, 240, 0.64);
+  font-size: 0.72rem;
+  line-height: 1.6;
+}
+
+.global-page-loader-retry {
+  margin-top: 1.2rem;
+  border: 1px solid rgba(255, 184, 91, 0.45);
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  color: #ffe2b9;
+  background: rgba(255, 153, 0, 0.1);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.global-page-loader-retry:hover,
+.global-page-loader-retry:focus-visible {
+  border-color: rgba(255, 205, 142, 0.82);
+  background: rgba(255, 153, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+@keyframes global-loader-progress {
+  0% { transform: translateX(-125%); }
+  100% { transform: translateX(360%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-page-loader,
+  .app-route-content {
+    transition: none;
+  }
+
+  .global-page-loader-track span {
+    animation: none;
+  }
+
+  .global-page-loader-track span {
+    width: 100%;
   }
 }

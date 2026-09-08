@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import ClientTabMeta from "@/components/ClientTabMeta";
 import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
 import MoonCursor from "@/components/MoonCursor";
+import { PageLoadingProvider } from "@/components/PageLoading";
 import { resolveMusicEmbed } from "@/lib/music";
 
 export default function AppShell({ children }: { children: ReactNode }) {
@@ -130,7 +131,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <>
+    <PageLoadingProvider>
       <ClientTabMeta />
       <GlobalBackgroundMusic music={music} />
       <MoonCursor />
@@ -140,6 +141,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
           Offline — showing the saved portfolio
         </div>
       )}
-    </>
+    </PageLoadingProvider>
   );
 }

@@ -1,6 +1,7 @@
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import AppShell from "@/components/AppShell";
+import { usePageLoading } from "@/components/PageLoading";
 import { Toaster } from "@/components/ui/toaster";
 import Home from "@/app/home/page";
 import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
@@ -8,6 +9,13 @@ import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
 const EditPage = lazy(() => import("@/app/edit/page"));
 
 function Router() {
+  const [location] = useLocation();
+  const { beginRoute } = usePageLoading();
+
+  useEffect(() => {
+    beginRoute(location);
+  }, [beginRoute, location]);
+
   return (
     <RoutedErrorBoundary>
       <Suspense fallback={null}>

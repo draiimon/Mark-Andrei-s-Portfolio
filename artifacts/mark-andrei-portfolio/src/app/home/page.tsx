@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import AmbientBackgroundVideo from "@/components/AmbientBackgroundVideo";
+import { usePageLoading } from "@/components/PageLoading";
 import PreProfileIntro from "@/components/PreProfileIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
@@ -80,7 +81,23 @@ type AchievementView = {
   text: string;
 };
 
+function waitFor<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    const timer = window.setTimeout(() => resolve(fallback), timeoutMs);
+    promise
+      .then((value) => {
+        window.clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(() => {
+        window.clearTimeout(timer);
+        resolve(fallback);
+      });
+  });
+}
+
 export default function Home() {
+  const { currentRoute, markPageReady } = usePageLoading();
   const [profile, setProfile] = useState<ProfileView>(portfolioSnapshot.profile);
   const [projects, setProjects] = useState<ProjectView[]>(portfolioSnapshot.projects.map((project, idx) => ({
     id: idx + 1,
@@ -104,6 +121,8 @@ export default function Home() {
     new URLSearchParams(window.location.search).get("preview") === "interactions";
 
   useEffect(() => {
+    if (!currentRoute) return;
+
     let cancelled = false;
     const recordView = async () => {
       try {
@@ -120,24 +139,43 @@ export default function Home() {
       }
     };
 
-    fetch("/api/public/portfolio", { cache: "default" })
+    const portfolioData = fetch("/api/public/portfolio", {
+      cache: "default",
+      signal: AbortSignal.timeout(8000),
+    })
       .then((response) => (response.ok ? response.json() : null))
-      .then((data) => {
-        if (cancelled || !data) return;
+      .catch(() => null);
+    const fontsReady = document.fonts?.ready
+      ? waitFor(document.fonts.ready, 2500, undefined)
+      : Promise.resolve();
+    const firstPaint = waitFor(
+      new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
+      }),
+      1200,
+      undefined,
+    );
+
+    Promise.all([portfolioData, fontsReady, firstPaint]).then(([data]) => {
+      if (cancelled) return;
+      if (data) {
         setProfile({ ...portfolioSnapshot.profile, ...data.profile });
         if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
         if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
         if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
         if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
         if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
-      })
-      .catch(() => undefined);
+      }
+      // A bundled snapshot is the deliberate offline/error fallback, so a
+      // failed live request does not trap the public page behind a loader.
+      markPageReady(currentRoute);
+    });
     void recordView();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [currentRoute, markPageReady]);
 
   const featured = projects.find((p) => p.highlight) ?? projects[0] ?? null;
 

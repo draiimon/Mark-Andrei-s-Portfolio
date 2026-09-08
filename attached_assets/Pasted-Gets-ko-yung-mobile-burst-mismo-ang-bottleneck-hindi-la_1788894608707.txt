@@ -1,0 +1,61 @@
+Gets ko—yung mobile burst mismo ang bottleneck, hindi lang yung idle particle field. Iche-check ko yung burst loop at mobile spark DOM count, tapos gagawin kong mas consistent ang frame cadence at mas kaunti ang sabay-sabay na layout/paint work nang hindi nawawala yung explosion effect.
+
+
+
+8 actions
+Nahanap ko ang tunay na dahilan: yung canvas burst particles hindi talaga nade-delete pagkatapos ng animation, kaya naiipon hanggang max pool at patuloy pa ring nire-render kahit tapos na ang sabog. Kasabay nito, mobile was capped at 20 FPS habang may maraming per-particle glow/path operations. Aayusin ko ang lifecycle, gagawing 30 FPS with smaller mobile batches, at babawasan ang DOM spark load.
+
+
+
+4 actions
+Na-fix ko na yung accumulation bug at mobile renderer path. Dinagdagan ko rin ang page-visibility pause para hindi tumakbo ang burst kapag naka-background ang tab. Last polish: mobile compositing/shadow cost, then typecheck at preview check.
+
+
+
+7 actions
+Naayos ko na yung mobile particle burst FPS issue.
+
+Binago ko:
+Tinatanggal na ang particles kapag tapos na ang burst — hindi na naiipon sa background.
+Mobile renderer ngayon ay mas consistent sa 30 FPS imbes na 20 FPS.
+Binawasan ang mobile particle batch at maximum particle pool.
+Gumagamit na ng mas magaan na square glints sa mobile kaysa stroke + arc rendering.
+Binawasan ang mobile DOM spark count at glow shadows.
+Naka-pause ang burst renderer kapag naka-background ang page/tab.
+Verification
+Typecheck passed.
+Mobile Edit preview loads correctly.
+Yung 401 sa browser log ay expected dahil protected ang /edit login endpoint, hindi particle crash.
+Dapat mas smooth na ngayon ang sabog kapag paulit-ulit mong tina-tap yung eclipse sa mobile.
+
+
+
+Worked for 1 minute
+
+Pasted-Fix-the-loading-behavior-across-the-entire-website-espe_1788894132945.txt
+WW
+MaxeneWynter
+MaxeneWynter
+Free
+6 minutes ago
+Reviewing attached files
+
+Reviewing attached files
+Babasa ko muna yung attached loading-behavior brief, tapos imamapa ko ito sa kasalukuyang loading states ng Home at Edit para ma-fix nang consistent sa buong website, hindi lang sa isang screen.
+
+
+
+3 actions
+May brief na ang request: kailangan ng isang tunay na global/route loader, hindi timeout-based, na naghihintay sa critical data/auth/fonts/assets bago ipakita ang page at may safe failure/retry path. Titingnan ko muna ang kasalukuyang AppShell, router, Home, at Edit readiness states para maidugtong ito nang hindi mababago ang existing features.
+
+
+
+11 actions
+May clear implementation path na ako: isang PageLoadingProvider sa AppShell, route transition signal sa router, at page-specific readiness callbacks. Home waits for font readiness + portfolio request/fallback + actual paint; Edit waits for auth and editor data when authenticated. Kapag may critical failure, same branded screen ang magpapakita ng retry—walang permanent blank screen.
+
+
+
+6 actions
+
+Worked for 2 minutes
+You've reached your daily free quota limit. It will reset at 12:00 AM UTC.
