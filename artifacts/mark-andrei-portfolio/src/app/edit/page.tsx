@@ -3,6 +3,7 @@ import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from 
 import SolarAura from "@/components/SolarAura";
 
 const EDIT_SOLAR_INTRO_DURATION_MS = 3000;
+const EDIT_SOLAR_INTRO_FADE_MS = 1100;
 
 type Profile = {
   id: number;
@@ -376,6 +377,7 @@ export default function EditPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [solarIntroActive, setSolarIntroActive] = useState(true);
+  const [solarIntroFading, setSolarIntroFading] = useState(false);
   const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
   const [dragItem, setDragItem] = useState<DragItem>(null);
@@ -492,8 +494,15 @@ export default function EditPage() {
       return;
     }
 
-    const timer = window.setTimeout(() => setSolarIntroActive(false), EDIT_SOLAR_INTRO_DURATION_MS);
-    return () => window.clearTimeout(timer);
+    const fadeTimer = window.setTimeout(() => setSolarIntroFading(true), EDIT_SOLAR_INTRO_DURATION_MS);
+    const hideTimer = window.setTimeout(
+      () => setSolarIntroActive(false),
+      EDIT_SOLAR_INTRO_DURATION_MS + EDIT_SOLAR_INTRO_FADE_MS,
+    );
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(hideTimer);
+    };
   }, [auth]);
 
   useEffect(() => {
@@ -858,7 +867,7 @@ export default function EditPage() {
           backgroundSparkIntensity={starIntensity}
         >
           {solarIntroActive && (
-            <div className="edit-solar-reveal" role="status" aria-live="polite">
+             <div className={`edit-solar-reveal ${solarIntroFading ? "edit-solar-reveal-fading" : ""}`} role="status" aria-live="polite">
               <div className="edit-solar-reveal-visual" aria-hidden="true">
                 <span className="edit-solar-halo edit-solar-halo-one" />
                 <span className="edit-solar-halo edit-solar-halo-two" />
