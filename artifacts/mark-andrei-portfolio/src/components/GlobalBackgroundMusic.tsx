@@ -282,17 +282,32 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setVibe(0);
       setBeat(0);
     };
+    const isEditorRoute = /^\/(?:edit|admin)(?:\/|$)/.test(window.location.pathname);
+    const handleEditorInteraction = () => {
+      void tryPlay(true);
+    };
     const onVisibilityChange = () => {
       if (!document.hidden && !audio.paused) startVibeLoop();
     };
 
     window.addEventListener("portfolio:enter-profile", handleEnterProfile);
+    if (isEditorRoute) {
+      // Attempt autoplay for the editor. Browsers that block unprompted audio
+      // will resume it on the first real interaction and unlock analysis.
+      void tryPlay();
+      window.addEventListener("pointerdown", handleEditorInteraction, { once: true, passive: true });
+      window.addEventListener("keydown", handleEditorInteraction, { once: true });
+    }
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
     document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       window.removeEventListener("portfolio:enter-profile", handleEnterProfile);
+      if (isEditorRoute) {
+        window.removeEventListener("pointerdown", handleEditorInteraction);
+        window.removeEventListener("keydown", handleEditorInteraction);
+      }
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
       document.removeEventListener("visibilitychange", onVisibilityChange);

@@ -5003,12 +5003,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 29rem);
   gap: clamp(3rem, 8vw, 9rem);
   align-items: center;
-  /*
-   * Keep the login foreground calm while the Edit page's video, clouds, and
-   * surrounding atmosphere continue to respond to the background music.
-   */
-  --music-vibe: 0 !important;
-  --music-beat: 0 !important;
 }
 
 .edit-login-copy {
@@ -6359,4 +6353,32 @@ html:has(.pre-intro) .ask-ai-wrap {
 /* Lift the editor intro copy slightly without shifting the login panel. */
 .edit-login-copy {
   transform: translateY(-10px);
+}
+
+/* Match the Home header's music response on the editor login foreground,
+   while keeping the motion restrained enough that click momentum never
+   becomes a size jump. */
+.edit-login-display {
+  transform: translateY(calc((var(--music-vibe) * -1.2px) + (var(--music-beat) * -2px)))
+    scale(calc(1 + (var(--music-vibe) * 0.012) + (var(--music-beat) * 0.016)));
+  text-shadow:
+    0 0 calc(5px + (var(--music-vibe) * 8px) + (var(--music-beat) * 9px))
+    rgba(255, 153, 0, calc(0.08 + (var(--music-vibe) * 0.16) + (var(--music-beat) * 0.18)));
+  transition: transform 180ms ease-out, text-shadow 180ms ease-out;
+}
+
+.edit-login-title {
+  display: inline-block;
+  transform: translateY(calc((var(--music-vibe) * -0.5px) + (var(--music-beat) * -1px)))
+    scale(calc(1 + (var(--music-vibe) * 0.008) + (var(--music-beat) * 0.01)));
+  text-shadow:
+    0 0 calc(3px + (var(--music-vibe) * 5px) + (var(--music-beat) * 6px))
+    rgba(255, 153, 0, calc(0.06 + (var(--music-vibe) * 0.1) + (var(--music-beat) * 0.12)));
+  transition: transform 180ms ease-out, text-shadow 180ms ease-out;
+}
+
+.edit-login-mark .edit-login-aura {
+  transform: translateY(calc((var(--music-vibe) * -0.8px) + (var(--music-beat) * -1.4px)))
+    scale(calc(1 + (var(--music-vibe) * 0.018) + (var(--music-beat) * 0.035)));
+  transition: transform 180ms ease-out, filter 180ms ease-out;
 }
