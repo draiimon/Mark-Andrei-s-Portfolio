@@ -1,3 +1,4 @@
+import { effectBudget, getPerformanceProfile } from "@/lib/adaptive-performance";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 import AmbientBackgroundVideo from "@/components/AmbientBackgroundVideo";
@@ -178,14 +179,12 @@ function BackgroundSparkBurst({
     const resize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const isMobile = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+      const isMobile = getPerformanceProfile().tier !== "full";
       mobileViewportRef.current = isMobile;
       // A full-DPR canvas is disproportionately expensive on phones. The
       // particles still read as sharp at 1x, while the page keeps scrolling
       // without competing with a multi-megapixel repaint.
-      const pixelRatio = isMobile
-        ? 1
-        : Math.min(window.devicePixelRatio || 1, 1.5);
+      const pixelRatio = effectBudget().canvasDpr;
       viewportRef.current = { width, height, pixelRatio };
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
@@ -206,8 +205,8 @@ function BackgroundSparkBurst({
         animationFrameRef.current = null;
         return;
       }
-      const isMobile = mobileViewportRef.current;
-      const frameInterval = isMobile ? 32 : 16;
+      const isMobile = getPerformanceProfile().tier !== "full";
+      const frameInterval = effectBudget().frameMs;
       if (lastDrawTimestamp && timestamp - lastDrawTimestamp < frameInterval) {
         animationFrameRef.current = window.requestAnimationFrame(draw);
         return;
@@ -369,7 +368,7 @@ function BackgroundSparkBurst({
       }
     );
 
-    const maxParticles = isMobile ? 240 : 2200;
+    const maxParticles = effectBudget().particles;
     particlesRef.current = [
       ...particlesRef.current,
       ...newParticles,

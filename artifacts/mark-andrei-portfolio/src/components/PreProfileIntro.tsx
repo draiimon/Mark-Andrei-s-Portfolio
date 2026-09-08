@@ -1,5 +1,7 @@
 import { Cloud } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { prepareVisualFrame } from "@/lib/visual-ready";
 
 type PreProfileIntroProps = {
   brand: string;
@@ -47,13 +49,14 @@ export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps)
 
   useEffect(() => {
     if (phase !== "loading") return;
-    const fadeTimer = window.setTimeout(() => setPhase("fade"), 900);
-    return () => window.clearTimeout(fadeTimer);
+    const controller = new AbortController();
+    void prepareVisualFrame(document.body, controller.signal).then(ready => { if (ready) setPhase("fade"); });
+    return () => controller.abort();
   }, [phase]);
 
   useEffect(() => {
     if (phase !== "fade") return;
-    const hideTimer = window.setTimeout(() => setPhase("hidden"), 300);
+    const hideTimer = window.setTimeout(() => setPhase("hidden"), 420);
     return () => window.clearTimeout(hideTimer);
   }, [phase]);
 
@@ -76,7 +79,8 @@ export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps)
 
   if (phase === "hidden") return null;
 
-  return (
+  // Keep the glass above the entire page, outside animated/filtered page layers.
+  return createPortal(
     <div
       className={`pre-intro ${phase === "fade" ? "pre-intro-fade" : ""} ${phase === "idle" ? "pre-intro-clickable" : ""}`}
       onWheelCapture={(e) => {
@@ -107,6 +111,7 @@ export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps)
           <span className={`pre-intro-line ${phase !== "idle" ? "pre-intro-progress" : "pre-intro-line-idle"}`} />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

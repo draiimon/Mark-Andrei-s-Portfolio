@@ -1,40 +1,24 @@
-# Build stage: install deps and build Next
-FROM node:20-alpine AS builder
-
+FROM node:24-bookworm-slim AS builder
 WORKDIR /app
-
-COPY package.json package-lock.json* ./
-RUN npm install
-
-COPY prisma ./prisma/
-RUN npx prisma generate
+RUN npm install --global pnpm@11.6.0
 
 COPY . .
-RUN mkdir -p public
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN pnpm install --frozen-lockfile
 
-# Run stage: serve with Node
-FROM node:20-alpine AS runner
+# Only the public site URL is needed while compiling browser assets.
+ARG NEXT_PUBLIC_SITE_URL=""
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+ENV PORT=3000 BASE_PATH=/
+RUN pnpm run build
 
+FROM node:24-bookworm-slim AS runner
 WORKDIR /app
+ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+# The API build bundles its dependencies, including its logging workers.
+COPY --from=builder --chown=node:node /app/artifacts/api-server/dist ./artifacts/api-server/dist
+COPY --from=builder --chown=node:node /app/artifacts/mark-andrei-portfolio/dist/public ./artifacts/mark-andrei-portfolio/dist/public
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/prisma ./prisma
-
-USER nextjs
+USER node
 EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
-CMD ["node", "server.js"]
+CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]

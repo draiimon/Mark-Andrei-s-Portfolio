@@ -1,29 +1,23 @@
-import type { ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { useEffect, useState } from "react";
 import ClientTabMeta from "@/components/ClientTabMeta";
 import GlobalBackgroundMusic from "@/components/GlobalBackgroundMusic";
-import MoonCursor from "@/components/MoonCursor";
+const MoonCursor = lazy(() => import("@/components/MoonCursor"));
 import { PageLoadingProvider } from "@/components/PageLoading";
 import { resolveMusicEmbed } from "@/lib/music";
-import { getPerformanceProfile } from "@/lib/performance-profile";
+import { getPerformanceProfile, observePerformance } from "@/lib/adaptive-performance";
+const music = resolveMusicEmbed("/uploads/music/1772698457967-vuu52gsd.mp3");
 
 export default function AppShell({ children }: { children: ReactNode }) {
-  const music = resolveMusicEmbed("/uploads/music/1772698457967-vuu52gsd.mp3");
+  useEffect(observePerformance, []);
   const [offline, setOffline] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
 
   useEffect(() => {
     const root = document.documentElement;
     let idleTimer: number | null = null;
     let scrollTimer: number | null = null;
-    const { coarsePointer, constrainedNetwork, lowPower } = getPerformanceProfile();
+    const { coarsePointer } = getPerformanceProfile();
     let lastPointerMove = 0;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (lowPower) root.dataset.mobileLite = "true";
-    else delete root.dataset.mobileLite;
-    root.dataset.performanceTier = lowPower ? "lite" : "full";
-    if (constrainedNetwork) root.dataset.networkConstrained = "true";
-    if (reducedMotion) root.dataset.reducedMotion = "true";
 
     const clearTimer = (timer: number | null) => {
       if (timer !== null) window.clearTimeout(timer);
@@ -80,10 +74,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
       clearTimer(scrollTimer);
       delete root.dataset.floatingUiState;
       delete root.dataset.pageVisibility;
-      delete root.dataset.performanceTier;
-      delete root.dataset.networkConstrained;
-      delete root.dataset.reducedMotion;
-      delete root.dataset.mobileLite;
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerdown", showControls);
@@ -123,7 +113,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
     <PageLoadingProvider>
       <ClientTabMeta />
       <GlobalBackgroundMusic music={music} />
-      <MoonCursor />
+      {!getPerformanceProfile().coarsePointer.matches && <Suspense fallback={null}><MoonCursor /></Suspense>}
       {children}
       {offline && (
         <div className="offline-status" role="status" aria-live="polite">

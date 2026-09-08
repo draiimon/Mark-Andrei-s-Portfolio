@@ -1,5 +1,6 @@
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { getPerformanceProfile, effectBudget, subscribePerformance } from "@/lib/adaptive-performance";
 import type { ResolvedMusic } from "@/lib/music";
 
 type GlobalBackgroundMusicProps = {
@@ -141,7 +142,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const startVibeLoop = () => {
     if (rafRef.current) return;
     const loop = (ts: number) => {
-      const frameInterval = lowPowerRef.current ? 66 : isMobileRef.current ? 40 : 16;
+      const frameInterval = effectBudget().frameMs;
       if (lastRenderTsRef.current && ts - lastRenderTsRef.current < frameInterval) {
         rafRef.current = window.requestAnimationFrame(loop);
         return;
@@ -204,25 +205,12 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   };
 
   useEffect(() => {
-    const updateMobileFlag = () => {
-      isMobileRef.current = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
-      const mem = typeof navigator !== "undefined" && "deviceMemory" in navigator ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8 : 8;
-      const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency || 8 : 8;
-      const ua = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
-      const isAndroid = ua.includes("android");
-      lowPowerRef.current = isAndroid && (mem <= 6 || cores <= 6);
-      if (lowPowerRef.current) {
-        document.documentElement.setAttribute("data-mobile-lite", "true");
-      } else {
-        document.documentElement.removeAttribute("data-mobile-lite");
-      }
+    const update = () => {
+      isMobileRef.current = getPerformanceProfile().coarsePointer.matches;
+      lowPowerRef.current = getPerformanceProfile().tier === "lightweight";
     };
-    updateMobileFlag();
-    window.addEventListener("resize", updateMobileFlag);
-    return () => {
-      window.removeEventListener("resize", updateMobileFlag);
-      document.documentElement.removeAttribute("data-mobile-lite");
-    };
+    update();
+    return subscribePerformance(update);
   }, []);
 
   useEffect(() => {
@@ -309,7 +297,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     if (isEditorRoute) {
       // Attempt autoplay for the editor. Browsers that block unprompted audio
       // will resume it on the first real interaction and unlock analysis.
-      void tryPlay();
+      if (!getPerformanceProfile().constrainedNetwork) void tryPlay();
       window.addEventListener("pointerdown", handleEditorInteraction, { once: true, passive: true });
       window.addEventListener("keydown", handleEditorInteraction, { once: true });
     }

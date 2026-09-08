@@ -1,3 +1,4 @@
+import { effectBudget, getPerformanceProfile } from "@/lib/adaptive-performance";
 import { useEffect, useRef, type CSSProperties } from "react";
 
 export type SolarAuraState = "idle" | "thinking" | "typing";
@@ -41,19 +42,19 @@ export default function SolarAura({
     let velocity = 30;
     let visible = true;
     let lastPaint = 0;
-    const frameInterval = document.documentElement.dataset.mobileLite === "true" ? 50 : 16;
+
 
     const animate = (time: number) => {
-      if (!visible || document.hidden) {
+      if (!visible || document.hidden || getPerformanceProfile().reducedMotion) {
         frame = 0;
         return;
       }
-      if (lastPaint && time - lastPaint < frameInterval) {
+      if (lastPaint && time - lastPaint < effectBudget().frameMs) {
         frame = requestAnimationFrame(animate);
         return;
       }
       lastPaint = time;
-      const delta = Math.min(40, Math.max(0, time - lastTime));
+      const delta = Math.min(100, Math.max(0, time - lastTime));
       lastTime = time;
 
       // One rotating body with a soft velocity spring: clicks change the
@@ -75,17 +76,17 @@ export default function SolarAura({
         frame = 0;
       }
     };
-    const observer = new IntersectionObserver(([entry]) => {
+    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       updateRunning();
     }, { rootMargin: "96px" });
 
-    observer.observe(aura);
+    observer?.observe(aura);
     document.addEventListener("visibilitychange", updateRunning);
     updateRunning();
     return () => {
       if (frame) cancelAnimationFrame(frame);
-      observer.disconnect();
+      observer?.disconnect();
       document.removeEventListener("visibilitychange", updateRunning);
     };
   }, []);

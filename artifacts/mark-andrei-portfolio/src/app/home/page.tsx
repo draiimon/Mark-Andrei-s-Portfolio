@@ -6,6 +6,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
 import portfolioSnapshot from "@/data/portfolio-snapshot.json";
+import { publicJson } from "@/lib/public-data";
 import { ExternalLink, Github } from "lucide-react";
 
 const LazyChatbot = lazy(() => import("@/components/Chatbot"));
@@ -81,21 +82,6 @@ type AchievementView = {
   text: string;
 };
 
-function waitFor<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
-  return new Promise((resolve) => {
-    const timer = window.setTimeout(() => resolve(fallback), timeoutMs);
-    promise
-      .then((value) => {
-        window.clearTimeout(timer);
-        resolve(value);
-      })
-      .catch(() => {
-        window.clearTimeout(timer);
-        resolve(fallback);
-      });
-  });
-}
-
 export default function Home() {
   const { currentRoute, markPageReady } = usePageLoading();
   const [profile, setProfile] = useState<ProfileView>(portfolioSnapshot.profile);
@@ -124,11 +110,13 @@ export default function Home() {
     if (!currentRoute) return;
 
     let cancelled = false;
+    const controller = new AbortController();
     const recordView = async () => {
       try {
         const response = await fetch("/api/public/views", {
           method: "POST",
           credentials: "same-origin",
+          signal: controller.signal,
         });
         const data = (await response.json().catch(() => null)) as { viewCount?: unknown } | null;
         if (!cancelled && typeof data?.viewCount === "number") {
@@ -139,39 +127,23 @@ export default function Home() {
       }
     };
 
-    const portfolioData = fetch("/api/public/portfolio", {
-      cache: "default",
-      signal: AbortSignal.timeout(8000),
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .catch(() => null);
-    const fontsReady = document.fonts?.ready
-      ? waitFor(document.fonts.ready, 2500, undefined)
-      : Promise.resolve();
-    const firstPaint = waitFor(
-      new Promise<void>((resolve) => {
-        window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
-      }),
-      1200,
-      undefined,
-    );
-
-    Promise.all([fontsReady, firstPaint]).then(() => {
-      if (!cancelled) markPageReady(currentRoute);
-    });
+    const portfolioData = publicJson<{ profile: ProfileView; projects: ProjectView[]; experience: ExperienceView[]; leadership: LeadershipView[]; achievements: AchievementView[]; taglines: typeof portfolioSnapshot.taglines }>("/api/public/portfolio", controller.signal).catch(() => null);
     portfolioData.then((data) => {
-      if (cancelled || !data) return;
+      if (cancelled) return;
+      if (!data) { markPageReady(currentRoute); return; }
       setProfile({ ...portfolioSnapshot.profile, ...data.profile });
       if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
       if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
       if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
       if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
       if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
+      markPageReady(currentRoute);
     });
     void recordView();
 
     return () => {
       cancelled = true;
+      controller.abort();
     };
   }, [currentRoute, markPageReady]);
 

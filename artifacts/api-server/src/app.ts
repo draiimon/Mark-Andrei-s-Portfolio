@@ -3,6 +3,7 @@ import cors from "cors";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import path from "node:path";
 
 const app: Express = express();
 
@@ -31,5 +32,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+// Keep unknown API routes out of the single-page application's fallback.
+app.use("/api", (_req, res) => {
+  res.status(404).json({ error: "Not found" });
+});
+
+if (process.env.NODE_ENV === "production") {
+  const publicDir = path.resolve(import.meta.dirname, "../../mark-andrei-portfolio/dist/public");
+  app.use(express.static(publicDir));
+  app.get(["/", "/home", "/edit", "/admin", "/admin/dashboard"], (_req, res) => {
+    res.sendFile(path.join(publicDir, "index.html"));
+  });
+}
 
 export default app;

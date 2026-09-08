@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <style>
+      html{background:#080a0f;color:#fff}#boot-gate{position:fixed;inset:0;z-index:9999;display:grid;place-content:center;text-align:center;background:radial-gradient(ellipse at 30% 35%,#33240f55,transparent 60%),#080a0f;font:600 20px system-ui,sans-serif}#boot-gate p{margin:6px}#boot-gate small{font:11px system-ui,sans-serif;letter-spacing:.18em;color:#c8c8c8}#boot-gate a{color:#ffb43b;font-size:14px}html:not([data-visual-ready="true"]) #root{visibility:hidden}
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>Mark Andrei — To the clouds.</title>
     <meta name="description" content="Mark Andrei Castillo is a software developer and Cloud DevOps builder creating practical applications, reliable systems, and useful AI integrations." />
@@ -53,6 +56,13 @@
     </script>
   </head>
   <body>
+    <div id="boot-gate" role="status" aria-live="polite"><p>☁ To the clouds.</p><small id="boot-status">PREPARING YOUR EXPERIENCE</small><a id="boot-retry" href="" hidden>Try again</a></div>
+    <script>
+      window.__bootFailure = function () { if(document.documentElement.dataset.visualReady==='true')return;document.getElementById('boot-status').textContent='Connection interrupted. Please try again.';document.getElementById('boot-retry').hidden=false; };
+      window.addEventListener('error',function(e){if(e.target&&e.target.tagName==='SCRIPT')window.__bootFailure();},true);
+      window.setTimeout(function(){if(document.getElementById('boot-gate'))window.__bootFailure();},20000);
+    </script>
+    <noscript><style>#boot-gate{display:none}</style><main><h1>Mark Andrei Castillo</h1><p>Software Development &amp; Cloud DevOps</p><p>Enable JavaScript for the interactive portfolio and editor.</p><a href="mailto:andreicastillofficial@gmail.com">Contact Andrei</a></main></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
