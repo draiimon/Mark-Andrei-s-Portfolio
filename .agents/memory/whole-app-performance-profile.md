@@ -20,3 +20,9 @@ The public home route intentionally keeps its “To the clouds.” enter-profile
 **Why:** The home intro is part of the portfolio identity and is not interchangeable with the editor control-center transition.
 
 **How to apply:** Preserve the home intro when changing global loading behavior, and keep its Android glass treatment tied to the active intro state so it cannot survive into the page content.
+
+Capability-tier attributes that affect loading visuals must be set before the React root renders, not only in a post-mount effect.
+
+**Why:** Android can paint the intro once before the device tier is detected, creating a visible unblurred-to-blurred flash.
+
+**How to apply:** Seed the initial tier synchronously during app bootstrap, then let the mounted shell continue updating it for resize or route changes.

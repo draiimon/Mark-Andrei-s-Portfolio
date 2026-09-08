@@ -1,11 +1,17 @@
 import { createRoot } from 'react-dom/client';
 
 import App from './App';
+import { getPerformanceProfile } from "@/lib/performance-profile";
 
 import "./index.css";
 import "@/app/globals.css";
 
 document.body.className = "font-body antialiased";
+
+const initialPerformanceProfile = getPerformanceProfile();
+if (initialPerformanceProfile.lowPower) {
+  document.documentElement.dataset.mobileLite = "true";
+}
 
 createRoot(document.getElementById('root')!, {
   onCaughtError: (error, errorInfo) => {
