@@ -7229,9 +7229,14 @@ html:has(.pre-intro) .ask-ai-wrap {
    section while it is entering the viewport. Keep the award list fully
    paintable on narrow phones; the section is small, so this costs very little. */
 @media (max-width: 640px) {
+  .portfolio-page-content {
+    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
+
   .portfolio-page-content #achievements {
     content-visibility: visible;
     contain-intrinsic-size: none;
+    padding-bottom: 0.75rem;
   }
 
   .portfolio-page-content #achievements,
