@@ -3,7 +3,8 @@ import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from 
 import SolarAura from "@/components/SolarAura";
 
 const EDIT_SOLAR_INTRO_DURATION_MS = 3000;
-const EDIT_SOLAR_INTRO_FADE_MS = 1100;
+const EDIT_SOLAR_INTRO_MOBILE_FADE_MS = 1100;
+const EDIT_SOLAR_INTRO_DESKTOP_FADE_MS = 420;
 
 type Profile = {
   id: number;
@@ -494,10 +495,13 @@ export default function EditPage() {
       return;
     }
 
+    const fadeDuration = window.matchMedia("(max-width: 760px)").matches
+      ? EDIT_SOLAR_INTRO_MOBILE_FADE_MS
+      : EDIT_SOLAR_INTRO_DESKTOP_FADE_MS;
     const fadeTimer = window.setTimeout(() => setSolarIntroFading(true), EDIT_SOLAR_INTRO_DURATION_MS);
     const hideTimer = window.setTimeout(
       () => setSolarIntroActive(false),
-      EDIT_SOLAR_INTRO_DURATION_MS + EDIT_SOLAR_INTRO_FADE_MS,
+      EDIT_SOLAR_INTRO_DURATION_MS + fadeDuration,
     );
     return () => {
       window.clearTimeout(fadeTimer);

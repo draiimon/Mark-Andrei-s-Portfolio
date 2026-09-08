@@ -5212,7 +5212,7 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 .edit-solar-reveal-fading {
-  animation: edit-solar-reveal-out 1100ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: edit-solar-reveal-out 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .edit-solar-reveal-visual {
@@ -5438,6 +5438,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 @media (max-width: 760px) {
+  .edit-solar-reveal-fading {
+    animation-duration: 1100ms;
+  }
+
   .edit-solar-reveal-visual {
     width: min(82vw, 21rem);
   }
