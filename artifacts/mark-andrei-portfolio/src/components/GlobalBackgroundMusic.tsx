@@ -147,7 +147,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       }
       lastRenderTsRef.current = ts;
       if (document.hidden) {
-        rafRef.current = window.requestAnimationFrame(loop);
+        rafRef.current = null;
         return;
       }
 
@@ -223,7 +223,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       const audio = new Audio();
       audio.crossOrigin = "anonymous";
       audio.loop = true;
-      audio.preload = "auto";
+      audio.preload = "none";
       audioRef.current = audio;
     }
 
@@ -231,11 +231,13 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     if (!audio) return;
     audio.volume = volume;
 
-    if (srcRef.current !== music.src) {
+    const ensureAudioSource = () => {
+      if (srcRef.current === music.src) return;
+      audio.preload = "auto";
       audio.src = music.src;
       srcRef.current = music.src;
       audio.load();
-    }
+    };
 
     const tryPlay = async (fromGesture = false) => {
       try {
@@ -243,6 +245,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
           userGestureRef.current = true;
           await ensureAudioContext();
         }
+        ensureAudioSource();
         await audio.play();
         setIsPlaying(true);
         if (userGestureRef.current && audioCtxRef.current?.state === "suspended") {
@@ -262,7 +265,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       void tryPlay(true);
     };
 
-    void tryPlay();
     const onPlay = () => {
       setIsPlaying(true);
       if (userGestureRef.current) {
@@ -280,15 +282,20 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setVibe(0);
       setBeat(0);
     };
+    const onVisibilityChange = () => {
+      if (!document.hidden && !audio.paused) startVibeLoop();
+    };
 
     window.addEventListener("portfolio:enter-profile", handleEnterProfile);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       window.removeEventListener("portfolio:enter-profile", handleEnterProfile);
       audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       stopVibeLoop();
       vibeRef.current = 0;
       beatRef.current = 0;
@@ -341,11 +348,17 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
 
   const togglePlay = async () => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !music || music.kind !== "audio") return;
     try {
       if (audio.paused) {
         userGestureRef.current = true;
         await ensureAudioContext();
+        if (srcRef.current !== music.src) {
+          audio.preload = "auto";
+          audio.src = music.src;
+          srcRef.current = music.src;
+          audio.load();
+        }
         await audio.play();
       } else {
         audio.pause();

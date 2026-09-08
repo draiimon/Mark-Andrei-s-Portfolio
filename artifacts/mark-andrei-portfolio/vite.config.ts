@@ -27,12 +27,21 @@ if (!basePath) {
   );
 }
 
+const socialUrlPlugin = () => ({
+  name: "portfolio-social-url",
+  transformIndexHtml(html: string) {
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.VITE_SITE_URL || "").trim().replace(/\/+$/, "");
+    return html.replaceAll("__SITE_URL__", siteUrl);
+  },
+});
+
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
+    socialUrlPlugin(),
     ...(process.env.NODE_ENV !== 'production' &&
     process.env.REPL_ID !== undefined
       ? [

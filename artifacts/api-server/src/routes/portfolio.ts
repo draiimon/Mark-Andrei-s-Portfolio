@@ -42,7 +42,7 @@ const profile: Profile = {
   brandName: "To the clouds.",
   heroTagline: "builds in the cloud.",
   tabTitle: "Mark Andrei - To the clouds.....",
-  faviconUrl: "/favicon.svg",
+  faviconUrl: "/solar-eclipse-logo.svg",
   socialImageUrl: null,
   featuredLabel: "Featured Work",
   experienceTitle: "Experience Snapshot",
@@ -181,43 +181,51 @@ async function hydrateFromDatabase() {
     });
   }
 
-  const projectResult = await pool.query<Project>(
-    `SELECT "id", "name", "tagline", "description", "techStack", "link", "githubUrl", "highlight"
-     FROM "Project"
-     ORDER BY "highlight" DESC, "createdAt" DESC, "id" ASC`,
-  );
+  const [
+    projectResult,
+    experienceResult,
+    leadershipResult,
+    achievementResult,
+    taglineResult,
+  ] = await Promise.all([
+    pool.query<Project>(
+      `SELECT "id", "name", "tagline", "description", "techStack", "link", "githubUrl", "highlight"
+       FROM "Project"
+       ORDER BY "highlight" DESC, "createdAt" DESC, "id" ASC`,
+    ),
+    pool.query<Experience>(
+      `SELECT "id", "role", "company", "period", "summary", "sortOrder"
+       FROM "Experience"
+       ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+    ),
+    pool.query<Leadership>(
+      `SELECT "id", "org", "role", "period", "sortOrder"
+       FROM "Leadership"
+       ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+    ),
+    pool.query<Achievement>(
+      `SELECT "id", "text", "sortOrder"
+       FROM "Achievement"
+       ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+    ),
+    pool.query<Tagline>(
+      `SELECT "id", "text", "sortOrder"
+       FROM "Tagline"
+       ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
+    ),
+  ]);
   projects.splice(0, projects.length, ...projectResult.rows.map((row) => ({
     ...row,
     id: Number(row.id),
     highlight: Boolean(row.highlight),
   })));
 
-  const experienceResult = await pool.query<Experience>(
-    `SELECT "id", "role", "company", "period", "summary", "sortOrder"
-     FROM "Experience"
-     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
-  );
   experience.splice(0, experience.length, ...experienceResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
 
-  const leadershipResult = await pool.query<Leadership>(
-    `SELECT "id", "org", "role", "period", "sortOrder"
-     FROM "Leadership"
-     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
-  );
   leadership.splice(0, leadership.length, ...leadershipResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
 
-  const achievementResult = await pool.query<Achievement>(
-    `SELECT "id", "text", "sortOrder"
-     FROM "Achievement"
-     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
-  );
   achievements.splice(0, achievements.length, ...achievementResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
 
-  const taglineResult = await pool.query<Tagline>(
-    `SELECT "id", "text", "sortOrder"
-     FROM "Tagline"
-     ORDER BY "sortOrder" ASC, "createdAt" ASC, "id" ASC`,
-  );
   taglines.splice(0, taglines.length, ...taglineResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
 }
 
@@ -464,14 +472,14 @@ router.get("/public/portfolio", async (_req, res) => {
   return res.json({ profile, projects, experience, leadership, achievements, taglines });
 });
 
-router.get("/public/site-meta", (_req, res) => res.json({ tabTitle: profile.tabTitle, faviconUrl: profile.faviconUrl }));
+router.get("/public/site-meta", (_req, res) => res.json({ tabTitle: profile.tabTitle, faviconUrl: "/solar-eclipse-logo.svg" }));
 router.get("/public/site-media/:key", (req, res) => {
+  if (req.params.key === "favicon") return res.redirect("/solar-eclipse-logo.svg");
   const key = req.params.key === "favicon" ? "faviconUrl" : "socialImageUrl";
   const value = profile[key];
   const ownMediaPath = `/api/public/site-media/${req.params.key}`;
   if (typeof value === "string" && value) {
     if (value === ownMediaPath || value.startsWith(`${ownMediaPath}?`)) {
-      if (key === "faviconUrl") return res.redirect("/favicon.svg");
       return res.status(404).json({ error: "Media not found" });
     }
     return res.redirect(value);
@@ -655,7 +663,7 @@ router.post("/chat", async (req, res) => {
       ownership: "This is one of Andrei's own projects. He built and maintains the portfolio site, its API, admin editor, AI assistant, music interaction, and database-backed content.",
     },
   };
-  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 short sentences. Use plain text only: never use Markdown, bold, headings, bullets, or numbered lists. The portfolio website itself is one of Andrei's projects: he built and maintains this site and its portfolio systems. If someone asks whether Andrei made or built this portfolio/site, answer yes and briefly explain that it is his own project. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
+  const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 short sentences unless the user asks for a list or a more detailed explanation. Use Markdown selectively and cleanly: keep normal conversational answers as paragraphs, use short bullet lists when the user asks for bullets or when listing several distinct works, and use bold only for useful emphasis such as names, project titles, or labels. Do not add decorative headings or formatting to every reply. The portfolio website itself is one of Andrei's projects: he built and maintains this site and its portfolio systems. If someone asks whether Andrei made or built this portfolio/site, answer yes and briefly explain that it is his own project. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
 
 Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
   try {

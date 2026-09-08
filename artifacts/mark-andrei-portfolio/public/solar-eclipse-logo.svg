@@ -16,8 +16,6 @@
       <feGaussianBlur stdDeviation="22"/>
     </filter>
   </defs>
-  <!-- Transparent canvas: this is the same dark moon / warm corona treatment
-       used by the original chatbot tab icon. -->
   <circle cx="256" cy="256" r="190" fill="#FFB64D" opacity="0.18" filter="url(#softGlow)"/>
   <circle cx="256" cy="256" r="171" stroke="#A75A17" stroke-width="17" opacity="0.9" filter="url(#coronaGlow)"/>
   <circle cx="256" cy="256" r="165" stroke="#FFCA78" stroke-width="10" filter="url(#coronaGlow)"/>

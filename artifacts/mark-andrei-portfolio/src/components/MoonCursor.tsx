@@ -31,10 +31,16 @@ export default function MoonCursor() {
       target.x = event.clientX;
       target.y = event.clientY;
       active = true;
+      if (!frame) frame = window.requestAnimationFrame(animate);
     };
 
     const onLeave = () => {
       active = false;
+      cursor.style.opacity = "0";
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+      }
     };
 
     const animate = () => {
@@ -52,15 +58,18 @@ export default function MoonCursor() {
       cursor.style.transform = `translate3d(${current.x}px, ${current.y}px, 0) translate(-50%, -50%) rotate(${tilt}deg) scale(${scale})`;
       cursor.style.opacity = active ? `${0.72 + speed * 0.28}` : "0";
       cursor.style.setProperty("--cursor-speed", speed.toFixed(3));
-      frame = window.requestAnimationFrame(animate);
+      if (Math.abs(deltaX) >= 0.2 || Math.abs(deltaY) >= 0.2) {
+        frame = window.requestAnimationFrame(animate);
+      } else {
+        frame = 0;
+      }
     };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     document.documentElement.addEventListener("mouseleave", onLeave);
-    frame = window.requestAnimationFrame(animate);
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("mouseleave", onLeave);
       document.documentElement.classList.remove("has-moon-cursor");

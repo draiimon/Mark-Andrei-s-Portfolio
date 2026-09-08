@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowUp, ArrowUpRight, BriefcaseBusiness, Code2, Mail, RotateCcw, X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 type Message = { role: "user" | "assistant"; content: string };
 type TypingReply = { index: number; fullText: string; visibleText: string };
@@ -13,16 +14,56 @@ const questions = [
 ];
 const thinkingSteps = ["Reading the portfolio", "Connecting the details", "Thinking it through", "Crafting a reply"];
 
-function plainAssistantReply(value: string) {
+function normalizeAssistantReply(value: string) {
   return value
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1")
-    .replace(/^(\s{0,3}#{1,6}\s+)/gm, "")
-    .replace(/^\s*(?:[-*+]|[•●◦])\s+/gm, "")
-    .replace(/^\s*\d+\.\s+/gm, "")
-    .replace(/(\*\*|__|\*|_|`)/g, "")
-    .replace(/^>\s?/gm, "")
+    .replace(/\r\n?/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+function removeUnclosedEmphasis(value: string) {
+  return ["**", "__"].reduce((result, marker) => {
+    let count = 0;
+    let lastIndex = -1;
+    for (let index = result.indexOf(marker); index >= 0; index = result.indexOf(marker, index + marker.length)) {
+      count += 1;
+      lastIndex = index;
+    }
+    return count % 2 === 1
+      ? `${result.slice(0, lastIndex)}${result.slice(lastIndex + marker.length)}`
+      : result;
+  }, value);
+}
+
+function AssistantReply({ content, typing = false }: { content: string; typing?: boolean }) {
+  const markdown = typing ? removeUnclosedEmphasis(content) : content;
+  const markdownComponents = {
+    a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+      const isExternalLink = typeof href === "string" && /^https?:\/\//i.test(href);
+      return (
+        <a
+          {...props}
+          href={href}
+          target={isExternalLink ? "_blank" : undefined}
+          rel={isExternalLink ? "noopener noreferrer" : undefined}
+        >
+          {children}
+        </a>
+      );
+    },
+  };
+  return (
+    <div className={`chat-rich-copy ${typing ? "chat-rich-copy-typing" : ""}`}>
+      <ReactMarkdown
+        components={{
+          ...markdownComponents,
+          ...(typing ? { p: ({ children }) => <span>{children}</span> } : {}),
+        }}
+      >
+        {markdown}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
 function Aura({ small = false, state = "idle" }: { small?: boolean; state?: AuraState }) {
@@ -113,7 +154,7 @@ export default function Chatbot() {
       });
       const data = await response.json();
       if (!response.ok || typeof data.reply !== "string" || !data.reply.trim()) throw new Error("Chat unavailable");
-      const reply = plainAssistantReply(data.reply);
+       const reply = normalizeAssistantReply(data.reply);
       if (!reply) throw new Error("Chat unavailable");
       const assistantIndex = nextMessages.length;
       setMessages((previous) => [...previous, { role: "assistant", content: "" }]);
@@ -150,10 +191,10 @@ export default function Chatbot() {
                 {messages.map((message, index) => <div className={`chat-message chat-message-${message.role}`} key={index}>
                   <p className="chat-speaker">{message.role === "assistant" ? "ANDREI’S AI" : "YOU"}</p>
                   <div className="chat-message-content">
-                    {message.role === "user" ? <p>{message.content}</p> : typingReply?.index === index ? (
-                      <p className="chat-typing-copy">{typingReply.visibleText}<span className="chat-typing-cursor" aria-hidden="true" /></p>
+                     {message.role === "user" ? <p>{message.content}</p> : typingReply?.index === index ? (
+                       <div className="chat-typing-copy"><AssistantReply content={typingReply.visibleText} typing /><span className="chat-typing-cursor" aria-hidden="true" /></div>
                     ) : (
-                      <p className="chat-plain-copy">{message.content}</p>
+                       <AssistantReply content={message.content} />
                     )}
                   </div>
                 </div>)}

@@ -71,10 +71,13 @@ export default function ClientTabMeta() {
         clearTick();
         runTypingLoop(data.tabTitle?.trim() || document.title || "Portfolio");
 
-        const href = data.faviconUrl?.trim() || "/favicon.svg";
+        // The Solar/Eclipse mark is the permanent site identity. Keep old
+        // database-uploaded favicon values from replacing it at runtime.
+        const href = "/solar-eclipse-logo.svg";
         upsertIcon("icon", href);
         upsertIcon("shortcut icon", href);
         upsertIcon("apple-touch-icon", href);
+        upsertIcon("mask-icon", href);
       } catch {
         clearTick();
         runTypingLoop(document.title || "Portfolio");

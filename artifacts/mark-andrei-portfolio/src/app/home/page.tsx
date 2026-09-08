@@ -1,11 +1,30 @@
-import { useEffect, useState } from "react";
-import Chatbot from "@/components/Chatbot";
+import { lazy, Suspense, useEffect, useState } from "react";
 import PreProfileIntro from "@/components/PreProfileIntro";
 import ScrollReveal from "@/components/ScrollReveal";
 import TopBar from "@/components/TopBar";
 import TypewriterTagline from "@/components/TypewriterTagline";
 import portfolioSnapshot from "@/data/portfolio-snapshot.json";
 import { ExternalLink, Github } from "lucide-react";
+
+const LazyChatbot = lazy(() => import("@/components/Chatbot"));
+
+function DeferredChatbot({ interactionPreview }: { interactionPreview: boolean }) {
+  const [ready, setReady] = useState(interactionPreview);
+
+  useEffect(() => {
+    if (ready) return;
+    const onEnterProfile = () => setReady(true);
+    window.addEventListener("portfolio:enter-profile", onEnterProfile, { once: true });
+    return () => window.removeEventListener("portfolio:enter-profile", onEnterProfile);
+  }, [ready]);
+
+  if (!ready) return null;
+  return (
+    <Suspense fallback={null}>
+      <LazyChatbot />
+    </Suspense>
+  );
+}
 
 type ProfileView = {
   fullName: string;
@@ -300,7 +319,7 @@ export default function Home() {
         </footer>
         </div>
 
-        <Chatbot />
+        <DeferredChatbot interactionPreview={interactionPreview} />
         {!interactionPreview && <PreProfileIntro brand={brandName} />}
       </div>
     </main>

@@ -4510,6 +4510,47 @@ html:has(.pre-intro) .ask-ai-wrap {
   margin-bottom: 0;
 }
 
+.portfolio-chat .chat-rich-copy {
+  color: inherit;
+}
+
+.portfolio-chat .chat-rich-copy p {
+  margin: 0;
+}
+
+.portfolio-chat .chat-rich-copy ul,
+.portfolio-chat .chat-rich-copy ol {
+  margin: 0.45rem 0 0.15rem;
+  padding-left: 1.15rem;
+}
+
+.portfolio-chat .chat-rich-copy li {
+  padding-left: 0.15rem;
+  margin: 0.22rem 0;
+}
+
+.portfolio-chat .chat-rich-copy li::marker {
+  color: #ffc477;
+}
+
+.portfolio-chat .chat-rich-copy strong {
+  color: #ffe2ad;
+  font-weight: 750;
+}
+
+.portfolio-chat .chat-rich-copy h1,
+.portfolio-chat .chat-rich-copy h2,
+.portfolio-chat .chat-rich-copy h3 {
+  margin: 0 0 0.4rem;
+  color: #ffe2ad;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.portfolio-chat .chat-rich-copy-typing p {
+  display: inline;
+}
+
 @media (max-width: 640px) {
   .portfolio-chat .chat-message {
     max-width: 94%;
@@ -4638,3 +4679,25 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
+/* The assistant controls stay grounded. Do not bounce, float, or animate the
+   chatbot surface itself; hover colors remain available as interaction cues. */
+.portfolio-chat .chat-launcher,
+.portfolio-chat .chat-window,
+.portfolio-chat .chat-suggestions button,
+.portfolio-chat .chat-icon-button,
+.portfolio-chat .chat-composer,
+.portfolio-chat .chat-composer button,
+.portfolio-chat .chat-error,
+.portfolio-chat .chat-aura,
+.portfolio-chat .chat-aura::before,
+.portfolio-chat .chat-aura::after,
+.portfolio-chat .chat-aura > span {
+  animation: none !important;
+  transform: none !important;
+}
+
+:root[data-floating-ui-state="idle"] .portfolio-chat .chat-launcher,
+:root[data-floating-ui-state="scrolling"] .portfolio-chat .chat-launcher {
+  animation: none !important;
+  transform: none !important;
+}
