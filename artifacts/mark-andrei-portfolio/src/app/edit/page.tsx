@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
 
 type Profile = {
@@ -101,6 +101,31 @@ async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
     throw new Error(message);
   }
   return (await res.json()) as T;
+}
+
+function PortfolioSurface({ children }: { children: ReactNode }) {
+  return (
+    <>
+      <video
+        className="site-video-background"
+        src="/assets/solar-eclipse-background-pingpong.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        tabIndex={-1}
+        aria-hidden="true"
+      />
+      <div className="site-video-shade" aria-hidden="true" />
+      <div className="site-content-layer">
+        <div className="cloud-light one" />
+        <div className="cloud-light two" />
+        <div className="cloud-light three" />
+        {children}
+      </div>
+    </>
+  );
 }
 
 export default function EditPage() {
@@ -521,80 +546,83 @@ export default function EditPage() {
 
   if (auth === null) {
     return (
-      <main className="min-h-screen bg-black text-white flex items-center justify-center">
-        <span className="text-neutral-500">Loading...</span>
+      <main className="edit-page site-shell min-h-screen text-white">
+        <PortfolioSurface>
+          <div className="flex min-h-screen items-center justify-center">
+            <span className="text-neutral-500">Loading...</span>
+          </div>
+        </PortfolioSurface>
       </main>
     );
   }
 
   if (auth === false) {
     return (
-      <main className="site-shell min-h-screen text-white">
-        <div className="cloud-light one" />
-        <div className="cloud-light two" />
-        <div className="cloud-light three" />
-        <div className="mx-auto flex min-h-screen max-w-md items-center p-6">
-          <div className="login-shell w-full rounded-3xl p-7 md:p-8 fade-rise">
-            <div className="edit-orb one" />
-            <div className="edit-orb two" />
-            <div className="relative z-10">
-              <div className="mb-6 flex items-center gap-2">
-                <span className="rounded-full border border-awsOrange/45 bg-awsOrange/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-awsOrange">
-                  Internal
-                </span>
-              </div>
-              <div className="mb-5 flex items-center gap-3">
-                <div>
-                  <p className="text-xl font-semibold leading-tight text-white">Sign in to edit portfolio</p>
-                  <p className="text-xs text-neutral-400">Use your admin credentials to continue.</p>
+      <main className="edit-page site-shell min-h-screen text-white">
+        <PortfolioSurface>
+          <div className="mx-auto flex min-h-screen max-w-md items-center p-6">
+            <div className="login-shell w-full rounded-3xl p-7 md:p-8 fade-rise">
+              <div className="edit-orb one" />
+              <div className="edit-orb two" />
+              <div className="relative z-10">
+                <div className="mb-6 flex items-center gap-2">
+                  <span className="rounded-full border border-awsOrange/45 bg-awsOrange/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-awsOrange">
+                    Internal
+                  </span>
                 </div>
+                <div className="mb-5 flex items-center gap-3">
+                  <div>
+                    <p className="text-xl font-semibold leading-tight text-white">Sign in to edit portfolio</p>
+                    <p className="text-xs text-neutral-400">Use your admin credentials to continue.</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleLogin} className="space-y-3.5">
+                  <label className="block space-y-1">
+                    <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Username</span>
+                    <div className="field-shell rounded-xl px-3 py-2.5">
+                      <input
+                        type="text"
+                        placeholder="draiimon"
+                        autoComplete="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                      />
+                    </div>
+                  </label>
+
+                  <label className="block space-y-1">
+                    <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Password</span>
+                    <div className="field-shell flex items-center rounded-xl px-3 py-2.5">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="ml-2 rounded p-1 text-neutral-400 hover:text-awsOrange"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </label>
+
+                  {loginError && <p className="text-xs text-red-400">{loginError}</p>}
+                  <button type="submit" className="w-full rounded-xl bg-awsOrange px-4 py-2.5 font-semibold text-black shadow-[0_10px_28px_rgba(255,153,0,0.35)] transition hover:brightness-110">
+                    Enter Edit Mode
+                  </button>
+                </form>
               </div>
-
-              <form onSubmit={handleLogin} className="space-y-3.5">
-                <label className="block space-y-1">
-                  <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Username</span>
-                  <div className="field-shell rounded-xl px-3 py-2.5">
-                    <input
-                      type="text"
-                      placeholder="draiimon"
-                      autoComplete="username"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
-                    />
-                  </div>
-                </label>
-
-                <label className="block space-y-1">
-                  <span className="text-[11px] uppercase tracking-[0.12em] text-neutral-400">Password</span>
-                  <div className="field-shell flex items-center rounded-xl px-3 py-2.5">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter password"
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-transparent text-white placeholder:text-neutral-500 focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      className="ml-2 rounded p-1 text-neutral-400 hover:text-awsOrange"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </label>
-
-                {loginError && <p className="text-xs text-red-400">{loginError}</p>}
-                <button type="submit" className="w-full rounded-xl bg-awsOrange px-4 py-2.5 font-semibold text-black shadow-[0_10px_28px_rgba(255,153,0,0.35)] transition hover:brightness-110">
-                  Enter Edit Mode
-                </button>
-              </form>
             </div>
           </div>
-        </div>
+        </PortfolioSurface>
       </main>
     );
   }
@@ -604,12 +632,9 @@ export default function EditPage() {
 
   return (
     <main className={`edit-page site-shell min-h-screen text-white ${deckScrolling ? "deck-scrolling" : ""}`}>
-      <div className="cloud-light one" />
-      <div className="cloud-light two" />
-      <div className="cloud-light three" />
-
-      <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6 md:space-y-10 md:py-14">
-        <header className="topbar edit-topbar rounded-2xl px-4 py-3 md:px-5">
+      <PortfolioSurface>
+        <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6 md:space-y-10 md:py-14">
+          <header className="topbar edit-topbar rounded-2xl px-4 py-3 md:px-5">
           <div className="edit-orb one" />
           <div className="edit-orb two" />
           <div className="relative z-10 flex w-full items-center justify-between gap-3">
@@ -636,7 +661,7 @@ export default function EditPage() {
               Logout
             </button>
           </div>
-        </header>
+          </header>
 
         {(error || success) && (
           <div className={`space-y-2 ${dragItem?.section === "experience" ? "drag-lane-active" : ""}`}>
@@ -1595,7 +1620,8 @@ export default function EditPage() {
             Back to site
           </a>
         </p>
-      </div>
+        </div>
+      </PortfolioSurface>
     </main>
   );
 }

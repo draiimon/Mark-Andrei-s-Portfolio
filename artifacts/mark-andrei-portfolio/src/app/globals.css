@@ -4768,3 +4768,77 @@ html:has(.pre-intro) .ask-ai-wrap {
     filter: blur(0.2px) !important;
   }
 }
+
+/* Keep the editor on the same eclipse surface as the public portfolio. */
+.edit-page::before {
+  background: transparent;
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .edit-page .edit-topbar,
+  .edit-page .login-shell,
+  .edit-page .feature-card.edit-section,
+  .edit-page .control-deck {
+    backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+  }
+
+  .edit-page .edit-orb,
+  .edit-page .deck-glow {
+    animation: none;
+    will-change: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .edit-page .site-content-layer > div:not(.cloud-light) {
+    width: 100%;
+  }
+
+  .edit-page .edit-topbar {
+    border-radius: 1rem;
+    padding: 0.75rem;
+  }
+
+  .edit-page .edit-topbar > .relative {
+    flex-wrap: wrap;
+  }
+
+  .edit-page .edit-topbar > .relative > a:first-child {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  .edit-page .edit-topbar > .relative > a,
+  .edit-page .edit-topbar > .relative > button {
+    min-height: 2.5rem;
+  }
+
+  .edit-page .control-deck,
+  .edit-page .feature-card.edit-section {
+    border-radius: 1rem;
+  }
+}
+
+:root[data-mobile-lite="true"] .edit-page .edit-orb,
+:root[data-mobile-lite="true"] .edit-page .deck-glow {
+  opacity: 0.24;
+  filter: blur(24px);
+  transform: none !important;
+}
+
+:root[data-mobile-lite="true"] .edit-page .edit-topbar,
+:root[data-mobile-lite="true"] .edit-page .login-shell,
+:root[data-mobile-lite="true"] .edit-page .feature-card.edit-section,
+:root[data-mobile-lite="true"] .edit-page .control-deck {
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+:root[data-mobile-lite="true"] .edit-page .feature-card.edit-section,
+:root[data-mobile-lite="true"] .edit-page .control-deck {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 420px;
+}
