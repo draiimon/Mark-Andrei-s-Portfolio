@@ -975,7 +975,27 @@ export default function EditPage() {
     <main className="edit-page edit-control-center site-shell min-h-screen text-white">
       <PortfolioSurface>
         <div className="edit-admin-shell mx-auto px-4 sm:px-6">
-          <header className="edit-topbar">
+          <header
+            className="edit-topbar"
+            onPointerMove={(event) => {
+              const rect = event.currentTarget.getBoundingClientRect();
+              const pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+              const pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
+              event.currentTarget.style.setProperty("--orb-drift-x", `${pointerX * 8}px`);
+              event.currentTarget.style.setProperty("--orb-drift-y", `${pointerY * 5}px`);
+              event.currentTarget.style.setProperty("--orb-tilt", `${pointerX * 9}deg`);
+            }}
+            onPointerLeave={(event) => {
+              event.currentTarget.style.setProperty("--orb-drift-x", "0px");
+              event.currentTarget.style.setProperty("--orb-drift-y", "0px");
+              event.currentTarget.style.setProperty("--orb-tilt", "0deg");
+            }}
+          >
+            <span className="edit-topbar-orb" aria-hidden="true">
+              <span className="edit-topbar-orb-core" />
+              <span className="edit-topbar-spark is-one" />
+              <span className="edit-topbar-spark is-two" />
+            </span>
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
               <span className="edit-admin-mark" aria-hidden="true" />
               <span>
