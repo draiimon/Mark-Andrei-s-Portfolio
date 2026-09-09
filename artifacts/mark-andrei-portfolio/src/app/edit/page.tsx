@@ -414,6 +414,31 @@ function EditorBeatSparkles() {
   );
 }
 
+function EditorBeatRails() {
+  const [burst, setBurst] = useState(0);
+
+  useEffect(() => {
+    const handleBeat = () => setBurst((current) => current + 1);
+    window.addEventListener("portfolio:music-beat", handleBeat);
+    return () => window.removeEventListener("portfolio:music-beat", handleBeat);
+  }, []);
+
+  return (
+    <>
+      <span
+        key={`editor-beat-rail-left-${burst}`}
+        className={`edit-header-rail edit-header-rail-left ${burst > 0 ? "is-beat-burst" : ""}`}
+        aria-hidden="true"
+      />
+      <span
+        key={`editor-beat-rail-right-${burst}`}
+        className={`edit-header-rail edit-header-rail-right ${burst > 0 ? "is-beat-burst" : ""}`}
+        aria-hidden="true"
+      />
+    </>
+  );
+}
+
 export default function EditPage() {
   const [auth, setAuth] = useState<boolean | null>(null);
   const [username, setUsername] = useState("");
@@ -1081,8 +1106,7 @@ export default function EditPage() {
                 })}
               </span>
             </button>
-            <span className="edit-header-rail edit-header-rail-left" aria-hidden="true" />
-            <span className="edit-header-rail edit-header-rail-right" aria-hidden="true" />
+            <EditorBeatRails />
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
               <span className="edit-admin-identity-brand">
                 <Cloud className="h-5 w-5 text-awsOrange" aria-hidden="true" />
