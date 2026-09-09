@@ -1,0 +1,1457 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --edit-void: #0b090d;
+  --edit-night: #121016;
+  --edit-panel: rgba(27, 21, 29, 0.72);
+  --edit-panel-solid: #1d1720;
+  --edit-panel-soft: rgba(38, 29, 38, 0.58);
+  --edit-line: rgba(247, 231, 206, 0.13);
+  --edit-line-strong: rgba(247, 231, 206, 0.23);
+  --edit-ink: #f7ebd8;
+  --edit-muted: #b2a6a3;
+  --edit-dim: #776d71;
+  --edit-amber: #f2a65a;
+  --edit-amber-soft: #ffd09b;
+  --edit-rust: #9d5844;
+  --edit-plum: #40283e;
+  --edit-green: #a3c19b;
+  --edit-red: #dc8c7d;
+  --edit-serif: "Instrument Serif", Georgia, serif;
+  --edit-sans: "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+  --edit-mono: "DM Mono", ui-monospace, monospace;
+}
+
+.edit-mockup,
+.edit-mockup * {
+  box-sizing: border-box;
+}
+
+.edit-mockup {
+  min-height: 100dvh;
+  color: var(--edit-ink);
+  background:
+    radial-gradient(circle at 78% 2%, rgba(156, 81, 42, 0.18), transparent 29rem),
+    radial-gradient(circle at 4% 64%, rgba(71, 38, 68, 0.24), transparent 25rem),
+    var(--edit-void);
+  font-family: var(--edit-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow: hidden;
+  position: relative;
+}
+
+.edit-mockup button,
+.edit-mockup input,
+.edit-mockup textarea {
+  font: inherit;
+}
+
+.edit-mockup button {
+  cursor: pointer;
+}
+
+.edit-mockup button:focus-visible,
+.edit-mockup a:focus-visible,
+.edit-mockup input:focus-visible,
+.edit-mockup textarea:focus-visible {
+  outline: 2px solid var(--edit-amber);
+  outline-offset: 3px;
+}
+
+.edit-mockup input::placeholder,
+.edit-mockup textarea::placeholder {
+  color: var(--edit-dim);
+}
+
+.edit-mockup .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.edit-mockup .state-switch {
+  align-items: center;
+  background: rgba(11, 9, 13, 0.72);
+  border: 1px solid var(--edit-line);
+  border-radius: 999px;
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.25rem;
+}
+
+.edit-mockup .state-switch button {
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--edit-muted);
+  min-height: 2.25rem;
+  padding: 0 0.8rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.edit-mockup .state-switch button.is-active {
+  background: rgba(242, 166, 90, 0.16);
+  color: var(--edit-amber-soft);
+}
+
+.edit-mockup .eclipse-mark {
+  align-items: center;
+  background:
+    radial-gradient(circle, #100c0e 0 42%, #2c1715 44% 51%, var(--edit-amber) 55% 58%, rgba(242, 166, 90, 0.13) 69%, transparent 71%),
+    radial-gradient(circle, rgba(242, 166, 90, 0.25), transparent 70%);
+  border: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 2.75rem;
+  justify-content: center;
+  position: relative;
+  width: 2.75rem;
+}
+
+.edit-mockup .eclipse-mark::after {
+  border: 1px solid rgba(255, 210, 155, 0.3);
+  border-radius: 50%;
+  content: "";
+  inset: -5px;
+  position: absolute;
+}
+
+.edit-mockup .micro-label {
+  color: var(--edit-amber);
+  font-family: var(--edit-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.edit-mockup .icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+/* Current baseline ------------------------------------------------------- */
+.edit-current {
+  background:
+    linear-gradient(180deg, rgba(6, 5, 8, 0.22), rgba(11, 9, 13, 0.92)),
+    radial-gradient(circle at 40% 0%, rgba(242, 166, 90, 0.1), transparent 33rem),
+    var(--edit-void);
+}
+
+.edit-current .current-state-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.8rem 1rem 0;
+}
+
+.edit-current .current-login {
+  display: grid;
+  min-height: 100dvh;
+  padding: 1.25rem;
+  place-items: center;
+  position: relative;
+}
+
+.edit-current .current-login::before {
+  background: radial-gradient(circle, rgba(242, 166, 90, 0.22), transparent 65%);
+  content: "";
+  height: 28rem;
+  left: 50%;
+  position: absolute;
+  top: 16%;
+  transform: translateX(-50%);
+  width: 28rem;
+}
+
+.edit-current .current-login-shell {
+  align-items: center;
+  display: grid;
+  gap: clamp(2.5rem, 8vw, 6.5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 25rem);
+  max-width: 72rem;
+  position: relative;
+  width: 100%;
+}
+
+.edit-current .current-login-copy a {
+  color: var(--edit-muted);
+  font-size: 0.72rem;
+  text-decoration: none;
+}
+
+.edit-current .current-login-copy a:hover {
+  color: var(--edit-amber-soft);
+}
+
+.edit-current .current-identity {
+  color: var(--edit-amber);
+  font-family: var(--edit-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.16em;
+  margin: 2rem 0 1.1rem;
+  text-transform: uppercase;
+}
+
+.edit-current .current-login-copy h1 {
+  font-size: clamp(3rem, 7vw, 6rem);
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+  margin: 0;
+  max-width: 7ch;
+}
+
+.edit-current .current-login-copy h1 span {
+  color: var(--edit-amber-soft);
+  display: block;
+  font-family: var(--edit-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+
+.edit-current .current-login-panel {
+  background: rgba(21, 16, 23, 0.78);
+  border: 1px solid var(--edit-line);
+  border-radius: 1.2rem;
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.25);
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+
+.edit-current .current-login-panel header {
+  align-items: center;
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+}
+
+.edit-current .current-login-panel h2 {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.edit-current .current-login-panel header p {
+  color: var(--edit-dim);
+  font-size: 0.68rem;
+  margin: 0.18rem 0 0;
+}
+
+.edit-current .current-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.edit-current .current-form label,
+.edit-current .current-field {
+  color: var(--edit-muted);
+  display: grid;
+  font-size: 0.7rem;
+  gap: 0.42rem;
+}
+
+.edit-current .current-form input,
+.edit-current .current-form textarea,
+.edit-current .current-field input,
+.edit-current .current-field textarea {
+  background: rgba(3, 2, 5, 0.38);
+  border: 1px solid var(--edit-line);
+  border-radius: 0.6rem;
+  color: var(--edit-ink);
+  min-height: 2.9rem;
+  padding: 0.75rem 0.8rem;
+  width: 100%;
+}
+
+.edit-current .current-form textarea,
+.edit-current .current-field textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.edit-current .current-password {
+  position: relative;
+}
+
+.edit-current .current-password input {
+  padding-right: 2.7rem;
+}
+
+.edit-current .current-password button {
+  background: transparent;
+  border: 0;
+  color: var(--edit-dim);
+  height: 2.8rem;
+  position: absolute;
+  right: 0;
+  top: 1.1rem;
+  width: 2.5rem;
+}
+
+.edit-current .current-login-button,
+.edit-current .current-save {
+  align-items: center;
+  background: var(--edit-amber);
+  border: 0;
+  border-radius: 0.6rem;
+  color: #24150c;
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1rem;
+}
+
+.edit-current .current-login-button {
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.edit-current .current-login-button:hover,
+.edit-current .current-save:hover {
+  background: #ffd09b;
+}
+
+.edit-current .current-error {
+  color: var(--edit-red);
+  font-size: 0.72rem;
+  margin: 0;
+}
+
+.edit-current .current-admin {
+  margin: 0 auto;
+  max-width: 86rem;
+  padding: 1rem 1rem 5rem;
+}
+
+.edit-current .current-topbar {
+  align-items: center;
+  background: rgba(19, 15, 22, 0.7);
+  border: 1px solid var(--edit-line);
+  border-radius: 0.85rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.7rem 0.9rem;
+  position: sticky;
+  top: 0.7rem;
+  z-index: 5;
+}
+
+.edit-current .current-brand {
+  align-items: center;
+  display: flex;
+  gap: 0.7rem;
+}
+
+.edit-current .current-brand strong {
+  display: block;
+  font-size: 0.78rem;
+}
+
+.edit-current .current-brand small {
+  color: var(--edit-dim);
+  display: block;
+  font-family: var(--edit-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  margin-top: 0.15rem;
+  text-transform: uppercase;
+}
+
+.edit-current .current-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.45rem;
+}
+
+.edit-current .current-actions button,
+.edit-current .current-actions a {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--edit-line);
+  border-radius: 0.55rem;
+  color: var(--edit-muted);
+  display: inline-flex;
+  gap: 0.4rem;
+  min-height: 2.4rem;
+  padding: 0 0.7rem;
+  text-decoration: none;
+}
+
+.edit-current .current-actions button:hover,
+.edit-current .current-actions a:hover {
+  border-color: var(--edit-line-strong);
+  color: var(--edit-ink);
+}
+
+.edit-current .current-intro {
+  border-bottom: 1px solid var(--edit-line);
+  padding: 5rem 0 2.6rem;
+}
+
+.edit-current .current-intro p {
+  color: var(--edit-amber);
+  font-family: var(--edit-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  margin: 0 0 0.9rem;
+  text-transform: uppercase;
+}
+
+.edit-current .current-intro h1 {
+  font-size: clamp(2.6rem, 6vw, 4.7rem);
+  letter-spacing: -0.07em;
+  line-height: 0.92;
+  margin: 0;
+  max-width: 11ch;
+}
+
+.edit-current .current-intro > span {
+  color: var(--edit-dim);
+  display: block;
+  font-size: 0.72rem;
+  margin-top: 1.5rem;
+  max-width: 34ch;
+}
+
+.edit-current .current-layout {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 13rem minmax(0, 1fr);
+  padding-top: 2.5rem;
+}
+
+.edit-current .current-nav {
+  align-self: start;
+  background: rgba(25, 19, 28, 0.64);
+  border: 1px solid var(--edit-line);
+  border-radius: 0.8rem;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.35rem;
+  position: sticky;
+  top: 6rem;
+}
+
+.edit-current .current-nav > span {
+  color: var(--edit-dim);
+  font-family: var(--edit-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.13em;
+  padding: 0.75rem;
+  text-transform: uppercase;
+}
+
+.edit-current .current-nav button {
+  background: transparent;
+  border: 0;
+  border-radius: 0.5rem;
+  color: var(--edit-muted);
+  min-height: 3rem;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.edit-current .current-nav button.is-active,
+.edit-current .current-nav button:hover {
+  background: rgba(242, 166, 90, 0.09);
+  color: var(--edit-ink);
+}
+
+.edit-current .current-nav button.is-active {
+  box-shadow: inset 2px 0 0 var(--edit-amber);
+}
+
+.edit-current .current-nav button small {
+  color: var(--edit-dim);
+  display: block;
+  font-size: 0.6rem;
+  margin-top: 0.1rem;
+}
+
+.edit-current .current-section {
+  animation: edit-rise 260ms ease both;
+}
+
+.edit-current .current-section-head {
+  border-bottom: 1px solid var(--edit-line);
+  margin-bottom: 1rem;
+  padding-bottom: 1.1rem;
+}
+
+.edit-current .current-section-head h2 {
+  font-size: 1.45rem;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.edit-current .current-section-head p {
+  color: var(--edit-dim);
+  font-size: 0.75rem;
+  margin: 0.35rem 0 0;
+}
+
+.edit-current .current-fields {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.edit-current .current-fields .wide {
+  grid-column: 1 / -1;
+}
+
+.edit-current .current-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.3rem;
+}
+
+.edit-current .current-list-row {
+  align-items: center;
+  border-bottom: 1px solid var(--edit-line);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 0.85rem 0;
+}
+
+.edit-current .current-list-row strong {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.edit-current .current-list-row small {
+  color: var(--edit-dim);
+  display: block;
+  font-size: 0.68rem;
+  margin-top: 0.2rem;
+}
+
+.edit-current .current-row-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.edit-current .current-row-actions button {
+  background: transparent;
+  border: 0;
+  color: var(--edit-muted);
+  min-height: 2.4rem;
+  min-width: 2.4rem;
+}
+
+.edit-current .current-row-actions button:hover {
+  color: var(--edit-amber-soft);
+}
+
+.edit-current .current-pill {
+  background: rgba(163, 193, 155, 0.12);
+  border: 1px solid rgba(163, 193, 155, 0.23);
+  border-radius: 999px;
+  color: var(--edit-green);
+  font-family: var(--edit-mono);
+  font-size: 0.6rem;
+  padding: 0.3rem 0.5rem;
+  white-space: nowrap;
+}
+
+.edit-current .current-save {
+  margin-top: 1.4rem;
+}
+
+/* Refined control room --------------------------------------------------- */
+.edit-refined {
+  background:
+    linear-gradient(135deg, rgba(11, 9, 13, 0.94), rgba(20, 14, 20, 0.84)),
+    radial-gradient(circle at 82% 0%, rgba(242, 166, 90, 0.2), transparent 30rem);
+}
+
+.edit-refined::before {
+  background-image: linear-gradient(rgba(247, 231, 206, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(247, 231, 206, 0.025) 1px, transparent 1px);
+  background-size: 42px 42px;
+  content: "";
+  inset: 0;
+  opacity: 0.32;
+  pointer-events: none;
+  position: absolute;
+}
+
+.edit-refined .refined-state-bar {
+  left: 50%;
+  position: absolute;
+  top: 0.7rem;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+.edit-refined .refined-login {
+  display: grid;
+  min-height: 100dvh;
+  padding: 4.6rem 1.1rem 2rem;
+  place-items: center;
+  position: relative;
+}
+
+.edit-refined .refined-login-grid {
+  align-items: center;
+  display: grid;
+  gap: 2.4rem;
+  max-width: 75rem;
+  position: relative;
+  width: 100%;
+}
+
+.edit-refined .refined-login-story {
+  max-width: 32rem;
+}
+
+.edit-refined .refined-login-story .micro-label {
+  display: block;
+  margin-bottom: 1.2rem;
+}
+
+.edit-refined .refined-login-story h1 {
+  font-size: clamp(3.1rem, 11vw, 7.8rem);
+  letter-spacing: -0.085em;
+  line-height: 0.86;
+  margin: 0;
+}
+
+.edit-refined .refined-login-story h1 em {
+  color: var(--edit-amber-soft);
+  display: block;
+  font-family: var(--edit-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.05em;
+}
+
+.edit-refined .refined-login-story p {
+  color: var(--edit-muted);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  margin: 1.5rem 0 0;
+  max-width: 30ch;
+}
+
+.edit-refined .refined-login-story a {
+  color: var(--edit-amber-soft);
+  display: inline-flex;
+  font-size: 0.7rem;
+  margin-top: 2rem;
+  text-decoration: none;
+}
+
+.edit-refined .refined-login-story a:hover {
+  text-decoration: underline;
+}
+
+.edit-refined .refined-orbit {
+  align-items: center;
+  display: flex;
+  height: clamp(16rem, 47vw, 29rem);
+  justify-content: center;
+  margin: -1.2rem auto -0.6rem;
+  position: relative;
+  width: clamp(16rem, 47vw, 29rem);
+}
+
+.edit-refined .refined-orbit::before,
+.edit-refined .refined-orbit::after {
+  border: 1px solid rgba(242, 166, 90, 0.24);
+  border-radius: 50%;
+  content: "";
+  inset: 7%;
+  position: absolute;
+  transform: rotate(-19deg) scaleY(0.38);
+}
+
+.edit-refined .refined-orbit::after {
+  inset: 0;
+  border-color: rgba(242, 166, 90, 0.11);
+  transform: rotate(23deg) scaleY(0.48);
+}
+
+.edit-refined .refined-orbit-core {
+  background: radial-gradient(circle at 44% 40%, #201212 0 44%, #100c10 48% 60%, #da813b 63%, rgba(242, 166, 90, 0.2) 69%, transparent 73%);
+  border-radius: 50%;
+  box-shadow: 0 0 2rem rgba(242, 166, 90, 0.24), 0 0 6rem rgba(157, 88, 68, 0.2);
+  height: 44%;
+  position: relative;
+  width: 44%;
+  z-index: 1;
+}
+
+.edit-refined .refined-orbit-core::before {
+  border: 1px dashed rgba(255, 210, 155, 0.48);
+  border-radius: 50%;
+  content: "";
+  inset: -19%;
+  position: absolute;
+}
+
+.edit-refined .refined-login-card {
+  background: linear-gradient(145deg, rgba(46, 33, 39, 0.78), rgba(22, 16, 24, 0.78));
+  border: 1px solid var(--edit-line-strong);
+  border-radius: 1.35rem;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.34), inset 0 1px rgba(255, 239, 213, 0.08);
+  padding: 1.25rem;
+  position: relative;
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+}
+
+.edit-refined .refined-login-card header {
+  align-items: center;
+  display: flex;
+  gap: 0.8rem;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.edit-refined .refined-login-card header > div {
+  align-items: center;
+  display: flex;
+  gap: 0.7rem;
+}
+
+.edit-refined .refined-login-card h2 {
+  font-size: 0.83rem;
+  margin: 0;
+}
+
+.edit-refined .refined-login-card header p {
+  color: var(--edit-dim);
+  font-size: 0.65rem;
+  margin: 0.15rem 0 0;
+}
+
+.edit-refined .refined-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.edit-refined .refined-form label {
+  color: var(--edit-muted);
+  display: grid;
+  font-size: 0.68rem;
+  gap: 0.35rem;
+}
+
+.edit-refined .refined-form input,
+.edit-refined .refined-field input,
+.edit-refined .refined-field textarea {
+  background: rgba(9, 7, 11, 0.48);
+  border: 1px solid var(--edit-line);
+  border-radius: 0.7rem;
+  color: var(--edit-ink);
+  min-height: 3rem;
+  padding: 0.72rem 0.8rem;
+  width: 100%;
+}
+
+.edit-refined .refined-form input:focus,
+.edit-refined .refined-field input:focus,
+.edit-refined .refined-field textarea:focus {
+  border-color: rgba(242, 166, 90, 0.68);
+  box-shadow: 0 0 0 3px rgba(242, 166, 90, 0.08);
+  outline: none;
+}
+
+.edit-refined .refined-password {
+  position: relative;
+}
+
+.edit-refined .refined-password input {
+  padding-right: 3rem;
+}
+
+.edit-refined .refined-password button {
+  background: transparent;
+  border: 0;
+  color: var(--edit-muted);
+  height: 3rem;
+  position: absolute;
+  right: 0;
+  top: 1.05rem;
+  width: 2.7rem;
+}
+
+.edit-refined .refined-submit,
+.edit-refined .refined-primary {
+  align-items: center;
+  background: var(--edit-amber);
+  border: 0;
+  border-radius: 0.7rem;
+  color: #27160c;
+  display: inline-flex;
+  font-size: 0.74rem;
+  font-weight: 800;
+  gap: 0.45rem;
+  justify-content: center;
+  min-height: 3.1rem;
+  padding: 0 1rem;
+}
+
+.edit-refined .refined-submit {
+  margin-top: 0.35rem;
+  width: 100%;
+}
+
+.edit-refined .refined-submit:hover,
+.edit-refined .refined-primary:hover {
+  background: #ffd09b;
+}
+
+.edit-refined .refined-form-note {
+  color: var(--edit-dim);
+  font-size: 0.65rem;
+  margin: 0.35rem 0 0;
+  text-align: center;
+}
+
+.edit-refined .refined-error {
+  color: var(--edit-red);
+  font-size: 0.7rem;
+  margin: 0;
+}
+
+.edit-refined .refined-editor {
+  margin: 0 auto;
+  max-width: 96rem;
+  padding: 1rem 1rem 5rem;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.edit-refined .refined-topbar {
+  align-items: center;
+  background: rgba(24, 17, 24, 0.68);
+  border: 1px solid var(--edit-line);
+  border-radius: 1rem;
+  box-shadow: 0 1.1rem 2.5rem rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 239, 213, 0.06);
+  display: flex;
+  gap: 0.8rem;
+  justify-content: space-between;
+  padding: 0.62rem 0.7rem 0.62rem 0.8rem;
+  position: sticky;
+  top: 0.65rem;
+  z-index: 10;
+  backdrop-filter: blur(20px) saturate(120%);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+}
+
+.edit-refined .refined-identity {
+  align-items: center;
+  display: flex;
+  gap: 0.7rem;
+}
+
+.edit-refined .refined-identity strong {
+  display: block;
+  font-size: 0.77rem;
+}
+
+.edit-refined .refined-identity small {
+  color: var(--edit-dim);
+  display: block;
+  font-family: var(--edit-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  margin-top: 0.12rem;
+  text-transform: uppercase;
+}
+
+.edit-refined .refined-top-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.edit-refined .refined-save-state {
+  align-items: center;
+  color: var(--edit-green);
+  display: inline-flex;
+  font-family: var(--edit-mono);
+  font-size: 0.61rem;
+  gap: 0.35rem;
+  margin-right: 0.35rem;
+}
+
+.edit-refined .refined-save-state .saving-dot {
+  background: var(--edit-amber);
+  border-radius: 50%;
+  height: 0.42rem;
+  width: 0.42rem;
+}
+
+.edit-refined .refined-top-actions button,
+.edit-refined .refined-top-actions a {
+  align-items: center;
+  background: rgba(247, 231, 206, 0.04);
+  border: 1px solid var(--edit-line);
+  border-radius: 0.6rem;
+  color: var(--edit-muted);
+  display: inline-flex;
+  gap: 0.4rem;
+  min-height: 2.5rem;
+  padding: 0 0.7rem;
+  text-decoration: none;
+}
+
+.edit-refined .refined-top-actions button:hover,
+.edit-refined .refined-top-actions a:hover {
+  border-color: rgba(242, 166, 90, 0.45);
+  color: var(--edit-ink);
+}
+
+.edit-refined .refined-intro {
+  align-items: end;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  padding: 5.1rem 0 2.5rem;
+}
+
+.edit-refined .refined-intro .micro-label {
+  display: block;
+  margin-bottom: 0.7rem;
+}
+
+.edit-refined .refined-intro h1 {
+  font-size: clamp(3rem, 7vw, 6.8rem);
+  letter-spacing: -0.09em;
+  line-height: 0.84;
+  margin: 0;
+  max-width: 7ch;
+}
+
+.edit-refined .refined-intro h1 em {
+  color: var(--edit-amber-soft);
+  font-family: var(--edit-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.edit-refined .refined-intro-copy {
+  color: var(--edit-muted);
+  font-size: 0.75rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 27ch;
+}
+
+.edit-refined .refined-layout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 14rem minmax(0, 1fr);
+}
+
+.edit-refined .refined-nav {
+  align-self: start;
+  background: rgba(28, 20, 29, 0.62);
+  border: 1px solid var(--edit-line);
+  border-radius: 1rem;
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.45rem;
+  position: sticky;
+  top: 5.8rem;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.edit-refined .refined-nav .nav-kicker {
+  color: var(--edit-dim);
+  font-family: var(--edit-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  padding: 0.7rem 0.7rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.edit-refined .refined-nav button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0.65rem;
+  color: var(--edit-muted);
+  display: flex;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+}
+
+.edit-refined .refined-nav button .nav-icon {
+  color: var(--edit-dim);
+  height: 0.93rem;
+  width: 0.93rem;
+}
+
+.edit-refined .refined-nav button span {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.edit-refined .refined-nav button small {
+  color: var(--edit-dim);
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 400;
+  margin-top: 0.05rem;
+}
+
+.edit-refined .refined-nav button:hover,
+.edit-refined .refined-nav button.is-active {
+  background: rgba(242, 166, 90, 0.1);
+  color: var(--edit-ink);
+}
+
+.edit-refined .refined-nav button.is-active .nav-icon {
+  color: var(--edit-amber);
+}
+
+.edit-refined .refined-nav button.is-active {
+  box-shadow: inset 2px 0 var(--edit-amber);
+}
+
+.edit-refined .refined-content {
+  min-width: 0;
+}
+
+.edit-refined .refined-section {
+  animation: edit-rise 300ms ease both;
+  background: linear-gradient(145deg, rgba(38, 28, 38, 0.73), rgba(20, 15, 22, 0.62));
+  border: 1px solid var(--edit-line);
+  border-radius: 1.25rem;
+  box-shadow: inset 0 1px rgba(255, 239, 213, 0.055), 0 1.8rem 4rem rgba(0, 0, 0, 0.16);
+  padding: clamp(1rem, 2.6vw, 2rem);
+  backdrop-filter: blur(17px) saturate(112%);
+  -webkit-backdrop-filter: blur(17px) saturate(112%);
+}
+
+.edit-refined .refined-section-head {
+  align-items: start;
+  border-bottom: 1px solid var(--edit-line);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 1.35rem;
+  padding-bottom: 1.1rem;
+}
+
+.edit-refined .refined-section-head .section-index {
+  color: var(--edit-amber);
+  font-family: var(--edit-mono);
+  font-size: 0.63rem;
+}
+
+.edit-refined .refined-section-head h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: -0.055em;
+  margin: 0.25rem 0 0;
+}
+
+.edit-refined .refined-section-head p {
+  color: var(--edit-muted);
+  font-size: 0.72rem;
+  margin: 0.4rem 0 0;
+}
+
+.edit-refined .refined-updated {
+  color: var(--edit-dim);
+  font-family: var(--edit-mono);
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+.edit-refined .refined-fields {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.edit-refined .refined-field {
+  display: grid;
+  gap: 0.38rem;
+}
+
+.edit-refined .refined-field.wide {
+  grid-column: 1 / -1;
+}
+
+.edit-refined .refined-field label {
+  color: var(--edit-muted);
+  font-size: 0.67rem;
+  font-weight: 600;
+}
+
+.edit-refined .refined-field textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.edit-refined .refined-field input[type="checkbox"] {
+  accent-color: var(--edit-amber);
+  height: 1rem;
+  width: 1rem;
+}
+
+.edit-refined .refined-actions {
+  align-items: center;
+  border-top: 1px solid var(--edit-line);
+  display: flex;
+  gap: 0.7rem;
+  justify-content: space-between;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+}
+
+.edit-refined .refined-actions small {
+  color: var(--edit-dim);
+  font-size: 0.65rem;
+}
+
+.edit-refined .refined-primary {
+  min-height: 2.8rem;
+}
+
+.edit-refined .refined-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.edit-refined .refined-list-row {
+  align-items: center;
+  background: rgba(9, 7, 11, 0.25);
+  border: 1px solid rgba(247, 231, 206, 0.09);
+  border-radius: 0.8rem;
+  display: flex;
+  gap: 0.7rem;
+  justify-content: space-between;
+  min-height: 4.1rem;
+  padding: 0.7rem 0.8rem;
+}
+
+.edit-refined .refined-list-row:hover {
+  border-color: rgba(242, 166, 90, 0.3);
+}
+
+.edit-refined .refined-list-main {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.edit-refined .list-handle {
+  color: var(--edit-dim);
+  flex: 0 0 auto;
+}
+
+.edit-refined .refined-list-main strong {
+  display: block;
+  font-size: 0.77rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-refined .refined-list-main small {
+  color: var(--edit-dim);
+  display: block;
+  font-size: 0.63rem;
+  margin-top: 0.14rem;
+}
+
+.edit-refined .refined-row-actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.25rem;
+}
+
+.edit-refined .refined-row-actions button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0.45rem;
+  color: var(--edit-muted);
+  display: inline-flex;
+  justify-content: center;
+  min-height: 2.4rem;
+  min-width: 2.4rem;
+}
+
+.edit-refined .refined-row-actions button:hover {
+  background: rgba(242, 166, 90, 0.1);
+  color: var(--edit-amber-soft);
+}
+
+.edit-refined .refined-badge {
+  background: rgba(163, 193, 155, 0.12);
+  border: 1px solid rgba(163, 193, 155, 0.22);
+  border-radius: 999px;
+  color: var(--edit-green);
+  font-family: var(--edit-mono);
+  font-size: 0.56rem;
+  padding: 0.28rem 0.45rem;
+}
+
+.edit-refined .refined-upload {
+  align-items: center;
+  border: 1px dashed rgba(242, 166, 90, 0.38);
+  border-radius: 0.9rem;
+  display: flex;
+  gap: 0.85rem;
+  padding: 1.1rem;
+}
+
+.edit-refined .refined-upload .upload-icon {
+  align-items: center;
+  background: rgba(242, 166, 90, 0.12);
+  border-radius: 0.65rem;
+  color: var(--edit-amber);
+  display: flex;
+  flex: 0 0 auto;
+  height: 2.6rem;
+  justify-content: center;
+  width: 2.6rem;
+}
+
+.edit-refined .refined-upload strong {
+  display: block;
+  font-size: 0.75rem;
+}
+
+.edit-refined .refined-upload p {
+  color: var(--edit-dim);
+  font-size: 0.64rem;
+  margin: 0.2rem 0 0;
+}
+
+.edit-refined .refined-upload button {
+  background: transparent;
+  border: 1px solid var(--edit-line-strong);
+  border-radius: 0.55rem;
+  color: var(--edit-muted);
+  margin-left: auto;
+  min-height: 2.5rem;
+  padding: 0 0.7rem;
+  white-space: nowrap;
+}
+
+.edit-refined .refined-upload button:hover {
+  border-color: var(--edit-amber);
+  color: var(--edit-amber-soft);
+}
+
+.edit-refined .refined-toast {
+  align-items: center;
+  background: rgba(39, 48, 35, 0.9);
+  border: 1px solid rgba(163, 193, 155, 0.24);
+  border-radius: 999px;
+  bottom: 1rem;
+  color: var(--edit-green);
+  display: flex;
+  font-family: var(--edit-mono);
+  font-size: 0.62rem;
+  gap: 0.4rem;
+  left: 50%;
+  padding: 0.55rem 0.8rem;
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 40;
+}
+
+@keyframes edit-rise {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 760px) {
+  .edit-refined .refined-login {
+    padding: 2rem;
+  }
+
+  .edit-refined .refined-login-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 25rem);
+  }
+
+  .edit-refined .refined-orbit {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0 0 0 auto;
+  }
+
+  .edit-refined .refined-login-story {
+    grid-column: 1;
+    grid-row: 1;
+    margin-top: -17rem;
+  }
+
+  .edit-refined .refined-login-card {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 759px) {
+  .edit-current .current-login-shell {
+    display: block;
+    max-width: 26rem;
+  }
+
+  .edit-current .current-login-copy {
+    margin-bottom: 2rem;
+  }
+
+  .edit-current .current-login-copy h1 {
+    font-size: clamp(3.1rem, 15vw, 5rem);
+  }
+
+  .edit-current .current-login-copy .current-identity {
+    margin-top: 1.4rem;
+  }
+
+  .edit-current .current-layout,
+  .edit-refined .refined-layout {
+    display: block;
+  }
+
+  .edit-current .current-nav,
+  .edit-refined .refined-nav {
+    display: flex;
+    gap: 0.25rem;
+    margin: 0 -1rem 1.2rem;
+    overflow-x: auto;
+    padding: 0.4rem 1rem;
+    position: sticky;
+    scrollbar-width: none;
+    top: 4.6rem;
+    z-index: 4;
+  }
+
+  .edit-current .current-nav::-webkit-scrollbar,
+  .edit-refined .refined-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .edit-current .current-nav > span,
+  .edit-refined .refined-nav .nav-kicker {
+    display: none;
+  }
+
+  .edit-current .current-nav button,
+  .edit-refined .refined-nav button {
+    flex: 0 0 auto;
+    min-height: 2.65rem;
+    padding: 0 0.75rem;
+    white-space: nowrap;
+  }
+
+  .edit-current .current-nav button small,
+  .edit-refined .refined-nav button small,
+  .edit-refined .refined-nav button .nav-icon {
+    display: none;
+  }
+
+  .edit-current .current-nav button.is-active,
+  .edit-refined .refined-nav button.is-active {
+    box-shadow: inset 0 -2px var(--edit-amber);
+  }
+
+  .edit-refined .refined-intro {
+    display: block;
+    padding: 4.5rem 0 2rem;
+  }
+
+  .edit-refined .refined-intro-copy {
+    margin-top: 1.2rem;
+  }
+
+  .edit-refined .refined-fields,
+  .edit-current .current-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .edit-refined .refined-field.wide,
+  .edit-current .current-fields .wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .edit-current .current-admin,
+  .edit-refined .refined-editor {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+
+  .edit-current .current-actions a span,
+  .edit-current .current-actions button span,
+  .edit-refined .refined-top-actions a span,
+  .edit-refined .refined-top-actions button span {
+    display: none;
+  }
+
+  .edit-current .current-actions a,
+  .edit-current .current-actions button,
+  .edit-refined .refined-top-actions a,
+  .edit-refined .refined-top-actions button {
+    min-width: 2.5rem;
+    padding: 0;
+  }
+
+  .edit-current .current-brand small,
+  .edit-refined .refined-identity small {
+    display: none;
+  }
+
+  .edit-current .current-brand strong,
+  .edit-refined .refined-identity strong {
+    font-size: 0.7rem;
+  }
+
+  .edit-refined .refined-save-state {
+    display: none;
+  }
+
+  .edit-refined .refined-section {
+    border-radius: 1rem;
+  }
+
+  .edit-refined .refined-upload {
+    align-items: start;
+    flex-wrap: wrap;
+  }
+
+  .edit-refined .refined-upload button {
+    margin-left: 3.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edit-mockup *,
+  .edit-mockup *::before,
+  .edit-mockup *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
