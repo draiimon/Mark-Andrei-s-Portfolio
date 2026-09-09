@@ -27,6 +27,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const renderedVibeRef = useRef(0);
   const renderedBeatRef = useRef(0);
   const lastRenderTsRef = useRef(0);
+  const lastBeatEventTsRef = useRef(-Infinity);
   const isMobileRef = useRef(false);
   const lowPowerRef = useRef(false);
   const sampleTickRef = useRef(0);
@@ -42,6 +43,16 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
     const clamped = Math.max(0, Math.min(1, value));
     renderedBeatRef.current = clamped;
     document.documentElement.style.setProperty("--music-beat", clamped.toFixed(3));
+  };
+
+  const emitMusicBeat = (strength: number, timestamp: number) => {
+    if (timestamp - lastBeatEventTsRef.current < 150) return;
+    lastBeatEventTsRef.current = timestamp;
+    window.dispatchEvent(
+      new CustomEvent("portfolio:music-beat", {
+        detail: { strength: Math.max(0, Math.min(1, strength)) },
+      }),
+    );
   };
 
   const stopVibeLoop = () => {
@@ -177,6 +188,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         const threshold = lowPowerRef.current ? 0.2 + (0.2 * (1 - volume)) : 0.13 + (0.24 * (1 - volume));
         const hasPeak = bass > threshold && rise > (lowPowerRef.current ? 0.026 : 0.016);
         beatRef.current = hasPeak ? 1 : beatRef.current * (lowPowerRef.current ? 0.95 : 0.92);
+        if (hasPeak) emitMusicBeat(Math.max(0.46, bass), ts);
         prevBassRef.current = prevBassRef.current * 0.58 + bass * 0.42;
       } else if (active && EDITOR_ROUTE_RE.test(window.location.pathname)) {
         // Autoplay can start the audio element before the browser permits a
@@ -186,6 +198,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
         const pulse = (Math.sin(phase * Math.PI * 3.2 - 0.8) + 1) / 2;
         target = 0.06 + pulse * 0.28;
         beatRef.current = pulse > 0.86 ? 0.72 : beatRef.current * 0.9;
+        if (pulse > 0.86) emitMusicBeat(0.5 + pulse * 0.22, ts);
       }
 
       const vibeSmooth = isMobileRef.current ? 0.9 : 0.82;
@@ -287,6 +300,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       beatRef.current = 0;
       prevBassRef.current = 0;
       lastRenderTsRef.current = 0;
+      lastBeatEventTsRef.current = -Infinity;
       setVibe(0);
       setBeat(0);
     };
@@ -327,6 +341,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       beatRef.current = 0;
       prevBassRef.current = 0;
       lastRenderTsRef.current = 0;
+      lastBeatEventTsRef.current = -Infinity;
       setVibe(0);
       setBeat(0);
     };
@@ -361,6 +376,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       beatRef.current = 0;
       prevBassRef.current = 0;
       lastRenderTsRef.current = 0;
+      lastBeatEventTsRef.current = -Infinity;
       setVibe(0);
       setBeat(0);
       if (!audioRef.current) return;

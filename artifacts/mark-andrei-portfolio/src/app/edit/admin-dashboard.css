@@ -79,28 +79,6 @@
   isolation: isolate;
 }
 
-.edit-control-center .edit-topbar::after {
-  position: absolute;
-  right: 0;
-  bottom: 0.42rem;
-  left: 0;
-  z-index: 0;
-  height: 1px;
-  content: "";
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(240, 173, 88, 0.18) 12%,
-    rgba(240, 173, 88, 0.72) 34%,
-    var(--editor-sun) 50%,
-    rgba(240, 173, 88, 0.72) 66%,
-    rgba(240, 173, 88, 0.18) 88%,
-    transparent
-  );
-  box-shadow: 0 0 0.9rem rgba(240, 145, 44, 0.64);
-}
-
 .edit-topbar-orb {
   position: relative;
   top: 0.35rem;
@@ -147,11 +125,56 @@
 
 .edit-admin-identity {
   position: relative;
+  display: grid;
+  gap: 0.28rem;
   grid-column: 1;
   grid-row: 1;
   z-index: 1;
   padding-left: 0;
   justify-self: start;
+}
+
+.edit-admin-identity-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.34rem;
+  min-width: 0;
+  color: #f6f0e7;
+  transform: translateY(calc((var(--music-vibe) * -0.7px) + (var(--music-beat) * -1.8px)))
+    scale(calc(1 + (var(--music-vibe) * 0.012) + (var(--music-beat) * 0.025)));
+  filter: drop-shadow(0 0 calc(2px + (var(--music-vibe) * 5px) + (var(--music-beat) * 7px)) rgba(255, 153, 0, calc(0.16 + (var(--music-beat) * 0.24))));
+  transition: transform 160ms ease-out, filter 160ms ease-out;
+}
+
+.edit-admin-identity-brand > svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: #ffb347;
+  filter: drop-shadow(0 0 calc(2px + (var(--music-beat) * 4px)) rgba(88, 210, 255, 0.55));
+  transform: translateY(calc(var(--music-beat) * -1px)) rotate(calc(var(--music-beat) * -3deg));
+  transition: transform 140ms ease-out, color 140ms ease-out;
+}
+
+.edit-admin-identity-brand .music-reactive-brand {
+  color: transparent;
+  background: linear-gradient(
+    105deg,
+    #ffd28d 0%,
+    #ff9f43 34%,
+    #73d9ed 72%,
+    #d9b8ff 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.edit-admin-identity-brand .brand-letter {
+  text-shadow:
+    0 0 calc(3px + (var(--music-vibe) * 5px))
+      rgba(255, 159, 67, calc(0.16 + (var(--music-beat) * 0.22))),
+    0 0 calc(4px + (var(--music-beat) * 7px))
+      rgba(115, 217, 237, calc(0.08 + (var(--music-beat) * 0.16)));
 }
 
 .edit-admin-actions {
@@ -169,32 +192,45 @@
   border-left: 1px solid var(--editor-line);
 }
 
-.edit-admin-identity > span:last-child {
-  display: grid;
-  min-width: 0;
-  max-width: 100%;
-  line-height: 1.1;
-}
-
-.edit-admin-identity > span:last-child > span {
-  max-width: 100%;
-  overflow: hidden;
-  color: #e9e5de;
-  font-size: 0.78rem;
-  font-weight: 680;
-  letter-spacing: 0.015em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.edit-admin-actions::after {
+  position: absolute;
+  bottom: -0.62rem;
+  left: 50%;
+  width: calc(78% + (var(--music-beat) * 22%));
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  opacity: calc(0.64 + (var(--music-beat) * 0.28));
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 159, 67, 0.18) 10%,
+    rgba(255, 198, 117, 0.82) 28%,
+    rgba(115, 217, 237, 0.68) 42%,
+    transparent calc(47% + (var(--music-beat) * 2.2%)),
+    transparent calc(53% - (var(--music-beat) * 2.2%)),
+    rgba(115, 217, 237, 0.68) 58%,
+    rgba(255, 198, 117, 0.82) 72%,
+    rgba(255, 159, 67, 0.18) 90%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 calc(0.42rem + (var(--music-beat) * 0.58rem))
+      rgba(255, 159, 67, calc(0.22 + (var(--music-beat) * 0.3))),
+    0 0 calc(0.9rem + (var(--music-beat) * 0.75rem))
+      rgba(115, 217, 237, calc(0.08 + (var(--music-beat) * 0.18)));
+  transform: translateX(-50%) scaleY(calc(1 + (var(--music-beat) * 0.55)));
+  transform-origin: center;
+  transition: width 160ms ease-out, opacity 160ms ease-out, box-shadow 160ms ease-out;
 }
 
 .edit-admin-identity small {
   max-width: 100%;
-  margin-top: 0.28rem;
   overflow: hidden;
-  color: var(--editor-faint);
-  font-size: 0.56rem;
-  font-weight: 650;
-  letter-spacing: 0.18em;
+  color: #8ed8e7;
+  font-size: 0.54rem;
+  font-weight: 680;
+  letter-spacing: 0.2em;
   line-height: 1;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -832,16 +868,12 @@
     padding: 0.7rem 0 1rem;
   }
 
-  .edit-control-center .edit-topbar::after {
-    bottom: 0.34rem;
-  }
-
   .edit-admin-identity {
     width: 100%;
   }
 
-  .edit-admin-identity > span:last-child {
-    width: 100%;
+  .edit-admin-identity-brand {
+    max-width: 100%;
   }
 
   .edit-admin-actions {
@@ -986,11 +1018,7 @@
   }
 
   .edit-admin-identity {
-    gap: 0.56rem;
-  }
-
-  .edit-admin-identity small {
-    display: none;
+    gap: 0.2rem;
   }
 
   .edit-admin-mark {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRight, Eye, EyeOff, ExternalLink, GripVertical, LogOut } from "lucide-react";
+import { ArrowUpRight, Cloud, Eye, EyeOff, ExternalLink, GripVertical, LogOut } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 import "./admin-dashboard.css";
 
@@ -368,6 +368,48 @@ function BackgroundSparkBurst({
       className="edit-background-spark-canvas"
       aria-hidden="true"
     />
+  );
+}
+
+function EditorBeatDust() {
+  const [burst, setBurst] = useState(0);
+  const [strength, setStrength] = useState(0.5);
+
+  useEffect(() => {
+    const handleBeat = (event: Event) => {
+      const detail = (event as CustomEvent<{ strength?: number }>).detail;
+      setStrength(Math.max(0.32, Math.min(1, detail?.strength ?? 0.5)));
+      setBurst((current) => current + 1);
+    };
+
+    window.addEventListener("portfolio:music-beat", handleBeat);
+    return () => window.removeEventListener("portfolio:music-beat", handleBeat);
+  }, []);
+
+  if (burst === 0) return null;
+
+  return (
+    <span className="edit-beat-dust" aria-hidden="true">
+      <span
+        key={`beat-dust-burst-${burst}`}
+        className="edit-beat-dust-burst"
+        style={{ "--dust-strength": strength } as React.CSSProperties}
+      >
+        {Array.from({ length: 14 }, (_, index) => (
+          <span
+            key={`beat-dust-${burst}-${index}`}
+            style={
+              {
+                "--dust-angle": `${index * (360 / 14) + ((burst * 17 + index * 7) % 16) - 8}deg`,
+                "--dust-delay": `${(index * 17) % 90}ms`,
+                "--dust-distance": `${1.8 + ((index * 11) % 9) * 0.11 + strength * 0.55}rem`,
+                "--dust-length": `${0.3 + ((index * 5) % 5) * 0.08 + strength * 0.12}rem`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </span>
+    </span>
   );
 }
 
@@ -878,6 +920,7 @@ export default function EditPage() {
                         momentum={loginAuraMomentum}
                         />
                       </span>
+                      <EditorBeatDust />
                       <span
                         className={`edit-login-sparks ${
                           sparkCount > 0
@@ -1006,6 +1049,7 @@ export default function EditPage() {
                   />
                 </span>
               </span>
+              <EditorBeatDust />
               <span
                 className={`edit-login-sparks ${
                   loginAuraClickTick > 0
@@ -1036,10 +1080,21 @@ export default function EditPage() {
               </span>
             </button>
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
-              <span>
-                <span>Mark Andrei</span>
-                <small>Portfolio editor</small>
+              <span className="edit-admin-identity-brand">
+                <Cloud aria-hidden="true" />
+                <span className="brand-wave music-reactive-brand" aria-label="clouds">
+                  {"clouds".split("").map((ch, index) => (
+                    <span
+                      key={`${ch}-${index}`}
+                      className="brand-letter"
+                      style={{ animationDelay: `${index * 0.04}s`, ["--i" as any]: index }}
+                    >
+                      {ch}
+                    </span>
+                  ))}
+                </span>
               </span>
+              <small>Portfolio editor</small>
             </a>
             <div className="edit-admin-actions">
               <a href="/home" className="edit-action-secondary">
