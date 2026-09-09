@@ -1104,12 +1104,11 @@ export default function EditPage() {
           <div>
             <p>Hi Mark Andrei!</p>
             <h1 id="edit-dashboard-title">Shape what people see.</h1>
+            <p className="edit-dashboard-meta">
+              {totalContentItems} content records · {projects.length} projects live · {profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}
+            </p>
           </div>
-          <p>{totalContentItems} content records · {projects.length} projects live · {profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}</p>
-        </section>
-
-        <div className="edit-admin-layout">
-          <nav className="edit-admin-nav" aria-label="Portfolio sections">
+          <nav className="edit-admin-nav edit-hero-nav" aria-label="Portfolio sections">
             <p>Content</p>
             <label className="edit-mobile-section-picker">
               <span className="sr-only">Choose editor section</span>
@@ -1161,7 +1160,9 @@ export default function EditPage() {
               </button>
             ))}
           </nav>
+        </section>
 
+        <div className="edit-admin-layout">
           <div className="edit-workspace" data-active-section={activeEditorSection}>
 
         <section id="resume" className="feature-card edit-section space-y-4">
