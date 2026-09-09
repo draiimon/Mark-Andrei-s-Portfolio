@@ -1767,6 +1767,35 @@
     font-size: clamp(3.4rem, 10vw, 6.2rem);
   }
 
+  .edit-control-center .edit-hero-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(4.7rem, 1fr));
+    gap: 0.5rem;
+  }
+
+  .edit-control-center .edit-hero-nav button,
+  .edit-control-center .edit-hero-nav button:nth-of-type(4n),
+  .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
+    display: grid;
+    min-height: 4.7rem;
+    padding: 0.8rem 0.75rem 0.65rem;
+  }
+
+  .edit-control-center .edit-hero-nav button span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 0.78rem;
+    letter-spacing: 0.045em;
+    line-height: 1.05;
+  }
+
+  .edit-control-center .edit-hero-nav button small {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 0.58rem;
+    letter-spacing: 0.02em;
+  }
+
   .edit-control-center .edit-mobile-section-picker select {
     font-size: 0.7rem;
     letter-spacing: 0.045em;
@@ -1822,7 +1851,7 @@
   .edit-control-center .edit-hero-nav button,
   .edit-control-center .edit-hero-nav button:nth-of-type(4n),
   .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
-    min-height: 4.15rem;
+    min-height: 4.6rem;
     padding: 0.72rem 0.68rem 0.62rem;
   }
 
