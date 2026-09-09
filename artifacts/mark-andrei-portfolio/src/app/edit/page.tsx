@@ -1040,10 +1040,19 @@ export default function EditPage() {
   const totalContentItems =
     projects.length + experience.length + leadership.length + achievements.length + taglines.length;
   const editorBrand = profile?.brandName || "To the clouds.";
+  const editorCompact =
+    typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
+  const editorBackgroundBurstCycle = editorCompact
+    ? loginAuraClickTick
+    : Math.floor(loginAuraClickTick / 10);
+  const editorBackgroundSparkIntensity = Math.min(1, loginAuraClickTick / 40);
 
   return (
     <main className="edit-page edit-control-center site-shell min-h-screen text-white">
-      <PortfolioSurface>
+      <PortfolioSurface
+        backgroundBurstCycle={editorBackgroundBurstCycle}
+        backgroundSparkIntensity={editorBackgroundSparkIntensity}
+      >
         <div className="edit-admin-shell mx-auto px-4 sm:px-6">
           <header className="edit-topbar">
             <button
@@ -1110,7 +1119,7 @@ export default function EditPage() {
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
               <span className="edit-admin-identity-brand">
                 <Cloud className="h-5 w-5 text-awsOrange" aria-hidden="true" />
-                <span className="brand-wave music-reactive-brand whitespace-normal" aria-label={editorBrand}>
+                <span className="brand-wave edit-identity-wave whitespace-normal" aria-label={editorBrand}>
                   {editorBrand.split("").map((ch, index) => (
                     <span
                       key={`${ch}-${index}`}

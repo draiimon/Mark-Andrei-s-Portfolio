@@ -108,8 +108,6 @@
   min-height: 7.3rem;
   min-width: 0;
   max-width: 100%;
-  --edit-rail-reach: clamp(0rem, calc(1.2vw - 0.05rem), 1.2rem);
-  --edit-rail-inset: clamp(9rem, 12vw, 11.5rem);
   padding: 1.05rem 0 1.55rem;
   border: 0;
   border-radius: 0;
@@ -171,7 +169,7 @@
   align-self: center;
   grid-row: 1;
   z-index: 0;
-  width: calc(100% - var(--edit-rail-inset) + (var(--music-beat) * 1rem) + var(--edit-rail-reach, 0rem));
+  width: calc(clamp(4.75rem, 34%, 8.5rem) + (var(--music-beat) * 1.25rem));
   height: 1px;
   margin-top: 0.35rem;
   border-radius: 0;
@@ -208,14 +206,15 @@
 
 .edit-header-rail-left {
   grid-column: 1;
-  justify-self: start;
-  margin-left: var(--edit-rail-inset);
+  justify-self: end;
+  margin: 0;
+  transform-origin: right center;
   background: linear-gradient(
     90deg,
-    rgba(255, 153, 0, 0.46) 0%,
-    rgba(255, 215, 156, 0.3) 56%,
-    rgba(255, 244, 225, 0.18) 84%,
-    transparent 100%
+    transparent 0%,
+    rgba(255, 244, 225, 0.18) 22%,
+    rgba(255, 215, 156, 0.3) 64%,
+    rgba(255, 153, 0, 0.46) 100%
   );
 }
 
@@ -226,13 +225,14 @@
 
 .edit-header-rail-right {
   grid-column: 3;
-  justify-self: end;
-  margin-right: var(--edit-rail-inset);
+  justify-self: start;
+  margin: 0;
+  transform-origin: left center;
   background: linear-gradient(
-    270deg,
+    90deg,
     rgba(255, 153, 0, 0.46) 0%,
-    rgba(255, 215, 156, 0.3) 56%,
-    rgba(255, 244, 225, 0.18) 84%,
+    rgba(255, 215, 156, 0.3) 36%,
+    rgba(255, 244, 225, 0.18) 78%,
     transparent 100%
   );
 }
@@ -273,10 +273,7 @@
   font-size: 1rem;
   font-weight: 800;
   line-height: 1.15;
-  transform: translateY(calc((var(--music-vibe) * -0.7px) + (var(--music-beat) * -1.8px)))
-    scale(calc(1 + (var(--music-vibe) * 0.012) + (var(--music-beat) * 0.025)));
-  filter: drop-shadow(0 0 calc(2px + (var(--music-vibe) * 5px) + (var(--music-beat) * 7px)) rgba(255, 153, 0, calc(0.16 + (var(--music-beat) * 0.24))));
-  transition: transform 160ms ease-out, filter 160ms ease-out;
+  filter: drop-shadow(0 0 2px rgba(255, 153, 0, 0.16));
 }
 
 .edit-admin-identity-brand > svg {
@@ -284,9 +281,8 @@
   height: 1.25rem;
   flex: 0 0 auto;
   color: #ff9900;
-  filter: drop-shadow(0 0 calc(6px + (var(--music-beat) * 5px)) rgba(255, 153, 0, calc(0.45 + (var(--music-beat) * 0.25))));
-  transform: translateY(calc(var(--music-beat) * -1px)) rotate(calc(var(--music-beat) * -3deg));
-  transition: transform 140ms ease-out, color 140ms ease-out;
+  filter: drop-shadow(0 0 6px rgba(255, 153, 0, 0.45));
+  transition: color 140ms ease-out;
 }
 
 .edit-admin-identity-brand .brand-wave {
@@ -298,6 +294,7 @@
 
 .edit-admin-identity-brand .brand-letter {
   flex: initial;
+  animation: letterWave 2.2s ease-in-out infinite;
 }
 
 .edit-admin-actions {
@@ -1008,8 +1005,6 @@
   .edit-control-center .edit-topbar {
     top: calc(0.65rem + env(safe-area-inset-top));
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    --edit-rail-reach: 0.4rem;
-    --edit-rail-inset: clamp(4.8rem, 16vw, 6.5rem);
     gap: 0.5rem;
     min-height: 5.4rem;
     padding: 0.7rem 0 1rem;
@@ -1166,8 +1161,6 @@
 
   .edit-control-center .edit-topbar {
     top: calc(0.55rem + env(safe-area-inset-top));
-    --edit-rail-reach: 0.22rem;
-    --edit-rail-inset: clamp(4.1rem, 15vw, 5.4rem);
     gap: 0.32rem;
     min-height: 4.75rem;
     padding-block: 0.55rem 0.72rem;
