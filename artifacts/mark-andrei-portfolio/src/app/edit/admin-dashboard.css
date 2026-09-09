@@ -54,11 +54,14 @@
 }
 
 .edit-control-center .site-content-layer > .edit-admin-shell {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: none;
   min-width: 0;
+  min-height: calc(100svh - 0.85rem);
   margin-inline: auto;
-  padding: 0.85rem var(--editor-gutter) 5.5rem;
+  padding: 0.85rem var(--editor-gutter) 2.25rem;
 }
 
 /* Bring the public home atmosphere into the authenticated dashboard without
@@ -688,7 +691,7 @@
   min-width: 0;
   max-width: 100%;
   min-height: 0;
-  padding: 0 0 2rem !important;
+  padding: 0 0 1rem !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
@@ -725,7 +728,7 @@
 
 .edit-control-center .feature-card.edit-section > form,
 .edit-control-center .feature-card.edit-section > div:not(:first-child) {
-  margin-top: 1.45rem;
+  margin-top: 1rem;
 }
 
 .edit-control-center .feature-card.edit-section p,
@@ -758,12 +761,12 @@
 
 .edit-control-center .feature-card.edit-section > form > .space-y-4 > div,
 .edit-control-center .feature-card.edit-section form > div.rounded-xl {
-  padding: clamp(1.1rem, 2.2vw, 1.55rem) 0 !important;
+  padding: clamp(0.85rem, 1.6vw, 1.15rem) 0 !important;
 }
 
 .edit-control-center .feature-card.edit-section > div > .rounded-xl,
 .edit-control-center .feature-card.edit-section .drag-card {
-  padding: 1.05rem 0 !important;
+  padding: 0.85rem 0 !important;
 }
 
 .edit-control-center .feature-card.edit-section .drag-card:hover,
@@ -876,53 +879,80 @@
 /* Actions, links, drag states */
 
 .edit-control-center .feature-card.edit-section button {
-  min-height: 2.72rem;
-  border: 1px solid rgba(255, 206, 133, 0.24) !important;
-  border-radius: 0.12rem;
-  background: rgba(1, 4, 8, 0.24) !important;
-  box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.045),
-    0 0.45rem 1.1rem rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  min-height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  padding: 0 0.28rem;
+  border: 0 !important;
+  border-bottom: 1px solid transparent !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--editor-copy);
-  font-size: 0.66rem;
-  font-weight: 680;
-  letter-spacing: 0.075em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 720;
+  letter-spacing: 0.035em;
+  text-transform: none;
   transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease, transform 160ms ease, opacity 160ms ease;
 }
 
 .edit-control-center .feature-card.edit-section button.bg-awsOrange {
-  min-height: 2.8rem;
-  border-color: rgba(255, 218, 166, 0.42) !important;
-  background: rgba(240, 173, 88, 0.1) !important;
-  box-shadow:
-    inset 0 1px rgba(255, 248, 225, 0.12),
-    0 0.55rem 1.4rem rgba(220, 122, 16, 0.1);
   color: var(--editor-sun-soft) !important;
-  font-weight: 730;
 }
 
 .edit-control-center .feature-card.edit-section button.bg-awsOrange:hover:not(:disabled) {
-  border-color: rgba(255, 239, 198, 0.72) !important;
-  background: rgba(240, 173, 88, 0.2) !important;
-  box-shadow:
-    inset 0 1px rgba(255, 248, 225, 0.18),
-    0 0.7rem 1.6rem rgba(220, 122, 16, 0.16);
+  border-bottom-color: rgba(240, 173, 88, 0.7) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--editor-sun-soft) !important;
   transform: translateY(-1px);
 }
 
 .edit-control-center .feature-card.edit-section button.border-white\/20,
 .edit-control-center .feature-card.edit-section button.border-white\/15 {
-  border-color: rgba(227, 232, 238, 0.18) !important;
-  background: rgba(255, 255, 255, 0.025) !important;
+  border-bottom-color: transparent !important;
+  background: transparent !important;
   color: var(--editor-copy);
 }
 
 .edit-control-center .feature-card.edit-section button.border-white\/20:hover:not(:disabled),
 .edit-control-center .feature-card.edit-section button.border-white\/15:hover:not(:disabled) {
-  border-color: rgba(240, 173, 88, 0.48) !important;
-  background: rgba(240, 173, 88, 0.08) !important;
+  border-bottom-color: rgba(240, 173, 88, 0.52) !important;
+  background: transparent !important;
   color: var(--editor-sun-soft);
+}
+
+.edit-site-footer {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-size: clamp(0.75rem, 1vw, 1rem);
+}
+
+.edit-site-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .edit-site-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .edit-site-footer-grid span:first-child {
+    text-align: left;
+  }
+
+  .edit-site-footer-grid span:last-child {
+    text-align: right;
+  }
 }
 
 .edit-control-center .text-awsOrange {
@@ -1337,7 +1367,7 @@
 
   .edit-control-center .feature-card.edit-section > form,
   .edit-control-center .feature-card.edit-section > div:not(:first-child) {
-    margin-top: 1.08rem;
+    margin-top: 0.82rem;
   }
 
   .edit-control-center .feature-card.edit-section > form > .space-y-4 > div,
@@ -1494,7 +1524,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
   gap: clamp(2rem, 5vw, 5.5rem);
-  padding: clamp(2.7rem, 4.6vw, 4.25rem) 0 clamp(2.45rem, 4.5vw, 3.75rem);
+  padding: clamp(2.7rem, 4.6vw, 4.25rem) 0 clamp(1.35rem, 2.5vw, 2.15rem);
   border-bottom-color: var(--editor-line-strong);
 }
 
@@ -1566,7 +1596,7 @@
 }
 
 .edit-control-center .edit-admin-layout[data-has-selected-section="true"] {
-  padding-top: clamp(0.7rem, 1.6vw, 1.35rem);
+  padding-top: clamp(0.25rem, 0.7vw, 0.6rem);
 }
 
 .edit-control-center .edit-hero-nav {
@@ -1576,6 +1606,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(6.35rem, 1fr));
+  grid-auto-rows: minmax(6.35rem, 1fr);
   align-self: center;
   justify-self: stretch;
   gap: clamp(0.48rem, 1vw, 0.72rem);
@@ -1595,6 +1626,7 @@
 .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
   counter-increment: editor-tile;
   position: relative;
+  container-type: inline-size;
   display: grid;
   grid-template-rows: auto 1fr;
   align-content: stretch;
@@ -1656,15 +1688,22 @@
 
 .edit-control-center .edit-hero-nav button span {
   position: relative;
-  align-self: start;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 2.55rem;
+  align-items: flex-start;
+  align-self: start;
   padding-top: 1.05rem;
   color: currentColor;
-  font-size: clamp(0.78rem, 1.05vw, 1.08rem);
+  font-size: clamp(0.62rem, 9.5cqi, 0.9rem);
   font-weight: 760;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.055em;
   line-height: 1.08;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .edit-control-center .edit-hero-nav button span::before {
@@ -1685,7 +1724,7 @@
   align-self: end;
   min-height: 1.2rem;
   color: #777c83;
-  font-size: clamp(0.58rem, 0.72vw, 0.72rem);
+  font-size: clamp(0.5rem, 5.6cqi, 0.72rem);
   letter-spacing: 0.04em;
   line-height: 1.2;
 }
@@ -1815,7 +1854,6 @@
   .edit-control-center .edit-hero-nav button span {
     max-width: 100%;
     overflow-wrap: anywhere;
-    font-size: 0.78rem;
     letter-spacing: 0.045em;
     line-height: 1.05;
   }
@@ -1823,7 +1861,6 @@
   .edit-control-center .edit-hero-nav button small {
     max-width: 100%;
     overflow-wrap: anywhere;
-    font-size: 0.58rem;
     letter-spacing: 0.02em;
   }
 
@@ -1887,11 +1924,11 @@
   }
 
   .edit-control-center .edit-hero-nav button span {
-    font-size: 0.72rem;
+    font-size: clamp(0.6rem, 9.5cqi, 0.9rem);
   }
 
   .edit-control-center .edit-hero-nav button small {
-    font-size: 0.52rem;
+    font-size: clamp(0.48rem, 5.6cqi, 0.72rem);
   }
 }
 

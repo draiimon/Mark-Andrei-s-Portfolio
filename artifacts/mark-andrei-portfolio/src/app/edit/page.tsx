@@ -2190,13 +2190,15 @@ export default function EditPage() {
           </form>
         </section>
 
-        <p className="pt-3 text-xs text-neutral-600">
-          <a href="/home" className="hover:text-awsOrange">
-            Back to site
-          </a>
-        </p>
           </div>
         </div>
+        <footer className="edit-site-footer" aria-label="Portfolio footer">
+          <div className="edit-site-footer-grid">
+            <span>{editorBrand}</span>
+            <span>{profile?.footerCenterText || "@2026 draiimon"}</span>
+            <span>{profile?.footerRightText || "Thank you!"}</span>
+          </div>
+        </footer>
         </div>
       </PortfolioSurface>
     </main>
