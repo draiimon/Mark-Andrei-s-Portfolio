@@ -2,7 +2,7 @@
   "name": "workspace",
   "version": "0.0.0",
   "license": "MIT",
-  "packageManager": "pnpm@11.6.0",
+  "packageManager": "pnpm@10.26.1",
   "scripts": {
     "preinstall": "node scripts/check-package-manager.cjs",
     "dev": "node scripts/dev-local.mjs",
