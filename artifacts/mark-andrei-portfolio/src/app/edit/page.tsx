@@ -975,38 +975,72 @@ export default function EditPage() {
     <main className="edit-page edit-control-center site-shell min-h-screen text-white">
       <PortfolioSurface>
         <div className="edit-admin-shell mx-auto px-4 sm:px-6">
-          <header
-            className="edit-topbar"
-            onPointerMove={(event) => {
-              const rect = event.currentTarget.getBoundingClientRect();
-              const pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
-              const pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
-              event.currentTarget.style.setProperty("--orb-drift-x", `${pointerX * 8}px`);
-              event.currentTarget.style.setProperty("--orb-drift-y", `${pointerY * 5}px`);
-              event.currentTarget.style.setProperty("--orb-tilt", `${pointerX * 9}deg`);
-            }}
-            onPointerLeave={(event) => {
-              event.currentTarget.style.setProperty("--orb-drift-x", "0px");
-              event.currentTarget.style.setProperty("--orb-drift-y", "0px");
-              event.currentTarget.style.setProperty("--orb-tilt", "0deg");
-            }}
-          >
-            <span className="edit-topbar-orb" aria-hidden="true">
-              <span className="edit-topbar-orb-core" />
-              <span className="edit-topbar-spark is-one" />
-              <span className="edit-topbar-spark is-two" />
-            </span>
+          <header className="edit-topbar">
+            <button
+              type="button"
+              className={`edit-topbar-orb edit-login-mark ${loginAuraMomentum > 0 ? "has-momentum" : ""}`}
+              onClick={() => {
+                setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
+                setLoginAuraClickTick((tick) => tick + 1);
+              }}
+              aria-label="Speed up eclipse"
+              title="Click repeatedly to speed up the eclipse; it gradually slows down"
+            >
+              <span className="edit-topbar-music-bob">
+                <span
+                  className={`edit-login-aura-bounce ${
+                    loginAuraClickTick > 0
+                      ? loginAuraClickTick % 2 === 0
+                        ? "edit-login-click-pulse-a"
+                        : "edit-login-click-pulse-b"
+                      : ""
+                  }`}
+                  aria-hidden="true"
+                >
+                  <SolarAura
+                    small
+                    state="idle"
+                    className="edit-login-aura"
+                    showOrbits={false}
+                    momentum={loginAuraMomentum}
+                  />
+                </span>
+              </span>
+              <span
+                className={`edit-login-sparks ${
+                  loginAuraClickTick > 0
+                    ? loginAuraClickTick % 2 === 0
+                      ? "edit-login-spark-burst-a"
+                      : "edit-login-spark-burst-b"
+                    : ""
+                }`}
+                aria-hidden="true"
+              >
+                {Array.from({ length: loginAuraClickTick > 0 ? Math.min(18, 5 + loginAuraMomentum + loginAuraClickTick) : 0 }, (_, index) => {
+                  const angle = index * (360 / Math.max(1, loginAuraClickTick));
+                  return (
+                    <span
+                      key={`editor-eclipse-spark-${index}`}
+                      style={
+                        {
+                          "--spark-angle": `${angle}deg`,
+                          "--spark-delay": `${(index * 13) % 120}ms`,
+                          "--spark-distance": `${2.55 + loginAuraMomentum * 0.06}rem`,
+                          "--spark-duration": `${520 - loginAuraMomentum * 6}ms`,
+                          "--spark-length": `${0.58 + (index % 4) * 0.1}rem`,
+                        } as React.CSSProperties
+                      }
+                    />
+                  );
+                })}
+              </span>
+            </button>
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
-              <span className="edit-admin-mark" aria-hidden="true" />
               <span>
                 <span>Mark Andrei</span>
                 <small>Portfolio editor</small>
               </span>
             </a>
-            <div className="edit-admin-status" aria-live="polite">
-              <span className={saving ? "is-saving" : ""} aria-hidden="true" />
-              {saving ? "Saving changes" : success ? "Changes saved" : "All changes synced"}
-            </div>
             <div className="edit-admin-actions">
               <a href="/home" className="edit-action-secondary">
                 <span>View portfolio</span>
