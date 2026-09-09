@@ -1541,6 +1541,19 @@
   text-wrap: balance;
 }
 
+.edit-control-center .edit-headline-wave {
+  display: inline-flex;
+  max-width: 100%;
+  flex-wrap: wrap;
+  vertical-align: top;
+}
+
+.edit-control-center .edit-headline-letter {
+  display: inline-block;
+  animation: letterWave 2.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
 .edit-control-center .edit-dashboard-meta {
   max-width: 30ch;
   margin-top: 1.25rem;
@@ -1549,6 +1562,14 @@
 
 .edit-control-center .edit-admin-layout {
   padding-top: clamp(2.35rem, 4vw, 3.5rem);
+}
+
+.edit-control-center .edit-admin-layout[data-has-selected-section="false"] {
+  display: none;
+}
+
+.edit-control-center .edit-admin-layout[data-has-selected-section="true"] {
+  padding-top: clamp(0.7rem, 1.6vw, 1.35rem);
 }
 
 .edit-control-center .edit-hero-nav {

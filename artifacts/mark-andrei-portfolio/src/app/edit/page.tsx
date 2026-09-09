@@ -461,6 +461,9 @@ export default function EditPage() {
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [activeEditorSection, setActiveEditorSection] = useState<EditorSection>("profile");
+  const [editorHeadline, setEditorHeadline] = useState("Shape what people see.");
+  const [editorHeadlineTyping, setEditorHeadlineTyping] = useState(false);
+  const [editorHasSelectedSection, setEditorHasSelectedSection] = useState(false);
 
   useEffect(() => {
     if (loginAuraMomentum <= 0) return;
@@ -493,6 +496,13 @@ export default function EditPage() {
     setLoginAuraBurstStrength(strength);
     setLoginAuraDustBurstCycle((cycle) => cycle + 1);
     emitEclipseBurst(strength, "click");
+  };
+
+  const selectEditorSection = (section: EditorSection) => {
+    setActiveEditorSection(section);
+    setEditorHasSelectedSection(true);
+    setEditorHeadline("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const [profile, setProfile] = useState<Profile>(null);
@@ -890,6 +900,61 @@ export default function EditPage() {
     setLoginError("");
   }
 
+  const totalContentItems =
+    projects.length + experience.length + leadership.length + achievements.length + taglines.length;
+  const editorBrand = profile?.brandName || "To the clouds.";
+  const editorBackgroundBurstCycle = loginAuraDustBurstCycle;
+  const editorBackgroundSparkIntensity = Math.min(1, loginAuraClickTick / 40);
+  const editorSectionHeadlines: Record<EditorSection, string> = {
+    profile: "Identity and Links",
+    projects: "Projects",
+    experience: "Experience",
+    leadership: "Leadership",
+    taglines: "Taglines",
+    achievements: "Achievements",
+    resume: "Resume",
+    "site-media": "Site Media",
+  };
+  const editorSectionMeta: Record<EditorSection, string> = {
+    profile: "Homepage-visible fields only.",
+    projects: `${projects.length} ${projects.length === 1 ? "project" : "projects"} live`,
+    experience: `${experience.length} ${experience.length === 1 ? "entry" : "entries"} in the timeline`,
+    leadership: `${leadership.length} ${leadership.length === 1 ? "entry" : "entries"} in the timeline`,
+    taglines: `${taglines.length} rotating ${taglines.length === 1 ? "line" : "lines"}`,
+    achievements: `${achievements.length} ${achievements.length === 1 ? "achievement" : "achievements"} saved`,
+    resume: "Upload and replace the PDF document.",
+    "site-media": "Manage favicon and social preview assets.",
+  };
+
+  useEffect(() => {
+    if (!editorHasSelectedSection) return;
+
+    const nextHeadline = editorSectionHeadlines[activeEditorSection];
+    let characterIndex = 0;
+    setEditorHeadline("");
+    setEditorHeadlineTyping(true);
+
+    const timer = window.setInterval(() => {
+      characterIndex += 1;
+      setEditorHeadline(nextHeadline.slice(0, characterIndex));
+
+      if (characterIndex >= nextHeadline.length) {
+        window.clearInterval(timer);
+        setEditorHeadlineTyping(false);
+      }
+    }, 34);
+
+    return () => window.clearInterval(timer);
+  }, [
+    activeEditorSection,
+    editorHasSelectedSection,
+    projects.length,
+    experience.length,
+    leadership.length,
+    taglines.length,
+    achievements.length,
+  ]);
+
   if (auth !== true) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const compactLogin =
@@ -1019,12 +1084,6 @@ export default function EditPage() {
     );
   }
 
-  const totalContentItems =
-    projects.length + experience.length + leadership.length + achievements.length + taglines.length;
-  const editorBrand = profile?.brandName || "To the clouds.";
-  const editorBackgroundBurstCycle = loginAuraDustBurstCycle;
-  const editorBackgroundSparkIntensity = Math.min(1, loginAuraClickTick / 40);
-
   return (
     <main className="edit-page edit-control-center site-shell min-h-screen text-white">
       <PortfolioSurface
@@ -1103,9 +1162,24 @@ export default function EditPage() {
         <section className="edit-dashboard-intro" aria-labelledby="edit-dashboard-title">
           <div>
             <p>Hi Mark Andrei!</p>
-            <h1 id="edit-dashboard-title">Shape what people see.</h1>
+            <h1 id="edit-dashboard-title" aria-live="polite" aria-label={editorHeadline}>
+              <span className="brand-wave edit-headline-wave" aria-hidden="true">
+                {editorHeadline.split("").map((ch, index) => (
+                  <span
+                    key={`${index}-${ch}`}
+                    className="brand-letter edit-headline-letter"
+                    style={{ animationDelay: `${index * 0.04}s`, ["--i" as any]: index }}
+                  >
+                    {ch === " " ? "\u00A0" : ch}
+                  </span>
+                ))}
+              </span>
+              {editorHeadlineTyping && <span className="edit-headline-cursor" aria-hidden="true" />}
+            </h1>
             <p className="edit-dashboard-meta">
-              {totalContentItems} content records · {projects.length} projects live · {profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}
+              {editorHasSelectedSection
+                ? editorSectionMeta[activeEditorSection]
+                : `${totalContentItems} content records · ${projects.length} projects live · ${profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}`}
             </p>
           </div>
           <nav className="edit-admin-nav edit-hero-nav" aria-label="Portfolio sections">
@@ -1117,8 +1191,7 @@ export default function EditPage() {
                 aria-label="Choose editor section"
                 onChange={(event) => {
                   const nextSection = event.target.value as EditorSection;
-                  setActiveEditorSection(nextSection);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  selectEditorSection(nextSection);
                 }}
               >
                 {([
@@ -1150,10 +1223,7 @@ export default function EditPage() {
                 type="button"
                 className={activeEditorSection === id ? "is-active" : ""}
                 aria-current={activeEditorSection === id ? "page" : undefined}
-                onClick={() => {
-                  setActiveEditorSection(id);
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
+                onClick={() => selectEditorSection(id)}
               >
                 <span>{label}</span>
                 <small>{meta}</small>
@@ -1162,11 +1232,13 @@ export default function EditPage() {
           </nav>
         </section>
 
-        <div className="edit-admin-layout">
+        <div className="edit-admin-layout" data-has-selected-section={editorHasSelectedSection ? "true" : "false"}>
           <div className="edit-workspace" data-active-section={activeEditorSection}>
 
         <section id="resume" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Resume (PDF)</h2>
+          {activeEditorSection !== "resume" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Resume (PDF)</h2>
+          )}
           <form
             className="flex flex-wrap items-end gap-3 text-sm"
             onSubmit={(e) => {
@@ -1201,7 +1273,9 @@ export default function EditPage() {
         </section>
 
         <section id="site-media" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Site Media Uploads</h2>
+          {activeEditorSection !== "site-media" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Site Media Uploads</h2>
+          )}
           <p className="text-xs text-neutral-500">Uploads are saved in database and applied to tab icon + social preview.</p>
           <div className="grid gap-3 md:grid-cols-2">
             <form
@@ -1260,7 +1334,9 @@ export default function EditPage() {
         <section id="profile" className="feature-card edit-section space-y-5">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-200">Profile and Links</h2>
+              {activeEditorSection !== "profile" && (
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-200">Profile and Links</h2>
+              )}
               <p className="mt-1 text-xs text-neutral-400">Homepage-visible fields only.</p>
             </div>
             {profile?.updatedAt && (
@@ -1571,7 +1647,9 @@ export default function EditPage() {
         </section>
 
         <section id="projects" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Projects</h2>
+          {activeEditorSection !== "projects" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Projects</h2>
+          )}
           <div className="space-y-4">
             {projects.map((p) => (
               <div key={p.id} className="rounded-xl border border-white/10 bg-black/30 p-4">
@@ -1673,7 +1751,9 @@ export default function EditPage() {
         </section>
 
         <section id="experience" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Experience</h2>
+          {activeEditorSection !== "experience" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Experience</h2>
+          )}
           <p className="text-xs text-neutral-500">Drag cards to reorder.</p>
           <div className={`space-y-2 ${dragItem?.section === "leadership" ? "drag-lane-active" : ""}`}>
             {experience.map((item) => (
@@ -1777,7 +1857,9 @@ export default function EditPage() {
         </section>
 
         <section id="leadership" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Leadership</h2>
+          {activeEditorSection !== "leadership" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Leadership</h2>
+          )}
           <p className="text-xs text-neutral-500">Drag cards to reorder.</p>
           <div className={`space-y-2 ${dragItem?.section === "taglines" ? "drag-lane-active" : ""}`}>
             {leadership.map((item) => (
@@ -1879,7 +1961,9 @@ export default function EditPage() {
         </section>
 
         <section id="taglines" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Taglines</h2>
+          {activeEditorSection !== "taglines" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Taglines</h2>
+          )}
           <p className="text-xs text-neutral-500">Drag cards to reorder.</p>
           <div className={`space-y-2 ${dragItem?.section === "achievements" ? "drag-lane-active" : ""}`}>
             {taglines.map((item) => (
@@ -1977,7 +2061,9 @@ export default function EditPage() {
         </section>
 
         <section id="achievements" className="feature-card edit-section space-y-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Achievements</h2>
+          {activeEditorSection !== "achievements" && (
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Achievements</h2>
+          )}
           <p className="text-xs text-neutral-500">Drag cards to reorder.</p>
           <div className="space-y-2">
             {achievements.map((item) => (
