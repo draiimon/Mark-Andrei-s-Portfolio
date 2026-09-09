@@ -371,7 +371,7 @@ function BackgroundSparkBurst({
   );
 }
 
-function EditorBeatDust() {
+function EditorBeatSparkles() {
   const [burst, setBurst] = useState(0);
   const [strength, setStrength] = useState(0.5);
 
@@ -389,26 +389,27 @@ function EditorBeatDust() {
   if (burst === 0) return null;
 
   return (
-    <span className="edit-beat-dust" aria-hidden="true">
-      <span
-        key={`beat-dust-burst-${burst}`}
-        className="edit-beat-dust-burst"
-        style={{ "--dust-strength": strength } as React.CSSProperties}
-      >
-        {Array.from({ length: 14 }, (_, index) => (
-          <span
-            key={`beat-dust-${burst}-${index}`}
-            style={
-              {
-                "--dust-angle": `${index * (360 / 14) + ((burst * 17 + index * 7) % 16) - 8}deg`,
-                "--dust-delay": `${(index * 17) % 90}ms`,
-                "--dust-distance": `${1.8 + ((index * 11) % 9) * 0.11 + strength * 0.55}rem`,
-                "--dust-length": `${0.3 + ((index * 5) % 5) * 0.08 + strength * 0.12}rem`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
-      </span>
+    <span
+      key={`beat-spark-burst-${burst}`}
+      className={`edit-login-sparks ${
+        burst % 2 === 0 ? "edit-login-spark-burst-a" : "edit-login-spark-burst-b"
+      }`}
+      aria-hidden="true"
+    >
+      {Array.from({ length: 18 }, (_, index) => (
+        <span
+          key={`beat-spark-${burst}-${index}`}
+          style={
+            {
+              "--spark-angle": `${index * (360 / 18) + ((burst * 17 + index * 7) % 16) - 8}deg`,
+              "--spark-delay": `${(index * 11) % 80}ms`,
+              "--spark-distance": `${2.45 + strength * 0.85 + ((index * 7) % 7) * 0.1}rem`,
+              "--spark-duration": `${560 + ((index * 13) % 6) * 34}ms`,
+              "--spark-length": `${0.62 + strength * 0.18 + (index % 4) * 0.1}rem`,
+            } as React.CSSProperties
+          }
+        />
+      ))}
     </span>
   );
 }
@@ -920,7 +921,7 @@ export default function EditPage() {
                         momentum={loginAuraMomentum}
                         />
                       </span>
-                      <EditorBeatDust />
+                      <EditorBeatSparkles />
                       <span
                         className={`edit-login-sparks ${
                           sparkCount > 0
@@ -1013,6 +1014,7 @@ export default function EditPage() {
 
   const totalContentItems =
     projects.length + experience.length + leadership.length + achievements.length + taglines.length;
+  const editorBrand = profile?.brandName || "To the clouds.";
 
   return (
     <main className="edit-page edit-control-center site-shell min-h-screen text-white">
@@ -1049,7 +1051,7 @@ export default function EditPage() {
                   />
                 </span>
               </span>
-              <EditorBeatDust />
+              <EditorBeatSparkles />
               <span
                 className={`edit-login-sparks ${
                   loginAuraClickTick > 0
@@ -1083,15 +1085,15 @@ export default function EditPage() {
             <span className="edit-header-rail edit-header-rail-right" aria-hidden="true" />
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
               <span className="edit-admin-identity-brand">
-                <Cloud aria-hidden="true" />
-                <span className="brand-wave music-reactive-brand" aria-label="clouds">
-                  {"clouds".split("").map((ch, index) => (
+                <Cloud className="h-5 w-5 text-awsOrange" aria-hidden="true" />
+                <span className="brand-wave music-reactive-brand whitespace-normal" aria-label={editorBrand}>
+                  {editorBrand.split("").map((ch, index) => (
                     <span
                       key={`${ch}-${index}`}
                       className="brand-letter"
                       style={{ animationDelay: `${index * 0.04}s`, ["--i" as any]: index }}
                     >
-                      {ch}
+                      {ch === " " ? "\u00A0" : ch}
                     </span>
                   ))}
                 </span>
