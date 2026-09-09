@@ -38,6 +38,13 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+// Render's default health probe uses HEAD /. Keep the root probe successful
+// while the static frontend below continues to serve the actual page on GET /.
+app.head("/", (_req, res) => {
+  res.sendStatus(200);
+});
+
 app.use("/api", router);
 
 const staticRoot = process.env.STATIC_ROOT?.trim();

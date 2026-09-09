@@ -6815,50 +6815,82 @@ html[data-mobile-lite] .cloud-light {
   will-change: auto;
 }
 
-/* Final glass corrections:
-   keep the editor auth surface fully open over the eclipse, while the home
-   entry screen uses a real backdrop blur instead of a faint tint. */
-.edit-page .edit-login-panel,
-.edit-page .edit-login-shell,
-.edit-page .edit-login-shell > .relative {
+/* Final surface corrections:
+   keep the editor auth surface genuinely open over the eclipse, and keep the
+   home entry copy crisp while only the page behind it receives the blur. */
+.edit-page:not(.edit-control-center) .edit-login-panel,
+.edit-page:not(.edit-control-center) .edit-login-shell,
+.edit-page:not(.edit-control-center) .edit-login-shell > .relative {
   background: transparent !important;
+  background-color: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
 }
 
-.edit-page .edit-login-shell {
+.edit-page:not(.edit-control-center) .edit-login-shell {
   overflow: visible !important;
+  filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-.edit-page .edit-login-shell::before,
-.edit-page .edit-login-shell::after {
+.edit-page:not(.edit-control-center) .edit-login-shell::before,
+.edit-page:not(.edit-control-center) .edit-login-shell::after {
   display: none !important;
 }
 
 .site-shell:not(.edit-page) .pre-intro {
-  background: rgba(8, 10, 14, 0.24) !important;
-  backdrop-filter: blur(22px) saturate(118%) !important;
-  -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
+  isolation: isolate;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .site-shell:not(.edit-page) .pre-intro::before {
-  opacity: 0.42;
+  z-index: 0;
+  background:
+    linear-gradient(rgba(8, 10, 14, 0.16), rgba(8, 10, 14, 0.16)),
+    radial-gradient(ellipse at 12% 28%, rgba(255, 153, 0, 0.16), transparent 38%),
+    radial-gradient(ellipse at 86% 24%, rgba(86, 125, 174, 0.14), transparent 42%),
+    radial-gradient(ellipse at 52% 92%, rgba(255, 153, 0, 0.08), transparent 42%);
+  opacity: 0.92;
+  mix-blend-mode: normal;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.site-shell:not(.edit-page) .pre-intro-core {
+  z-index: 1;
+  filter: none !important;
+  opacity: 1;
+}
+
+/* Keep the intro text and progress line sharp. Blur the layers underneath it
+   directly so the effect survives browsers that do not backdrop-filter a
+   pseudo-element reliably. */
+html:has(.pre-intro) .site-shell:not(.edit-page) .site-video-background {
+  filter: blur(14px) saturate(92%);
+  transform: scale(1.035);
+  transition: filter 280ms ease, transform 280ms ease;
+}
+
+html:has(.pre-intro) .site-shell:not(.edit-page) .site-content-layer > :not(.pre-intro) {
+  filter: blur(14px) saturate(92%);
+  transform: scale(1.012);
+  opacity: 0.9;
+  transition: filter 280ms ease, transform 280ms ease, opacity 280ms ease;
 }
 
 @media (max-width: 768px) {
-  .site-shell:not(.edit-page) .pre-intro {
-    background: rgba(8, 10, 14, 0.28) !important;
-    backdrop-filter: blur(24px) saturate(116%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(116%) !important;
+  .site-shell:not(.edit-page) .pre-intro::before {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
-}
 
-/* Keep the entry screen unmistakably separated from the page beneath it. */
-.site-shell:not(.edit-page) .pre-intro {
-  backdrop-filter: blur(30px) saturate(118%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(118%) !important;
+  html:has(.pre-intro) .site-shell:not(.edit-page) .site-video-background,
+  html:has(.pre-intro) .site-shell:not(.edit-page) .site-content-layer > :not(.pre-intro) {
+    filter: blur(10px) saturate(92%);
+  }
 }
 
 /* The editor dashboard uses the same quiet glass language as the login view,
