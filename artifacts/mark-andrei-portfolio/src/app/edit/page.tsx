@@ -1079,6 +1079,8 @@ export default function EditPage() {
                 })}
               </span>
             </button>
+            <span className="edit-header-rail edit-header-rail-left" aria-hidden="true" />
+            <span className="edit-header-rail edit-header-rail-right" aria-hidden="true" />
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
               <span className="edit-admin-identity-brand">
                 <Cloud aria-hidden="true" />
