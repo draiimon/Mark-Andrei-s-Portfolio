@@ -30,6 +30,12 @@
   scroll-padding-top: 7rem;
 }
 
+/* The intro copy is intentionally lifted as a free overlay. Do not let the
+   shared site-shell crop the upper edge of a glyph while it is raised. */
+.edit-control-center.site-shell {
+  overflow: visible;
+}
+
 @supports (min-height: 100dvh) {
   .edit-control-center {
     min-height: 100dvh;
@@ -457,6 +463,7 @@
   position: relative;
   top: -72px;
   left: clamp(0rem, 1.2vw, 1.25rem);
+  z-index: 3;
   min-width: 0;
   transform: translateY(-clamp(2rem, 4vw, 3.35rem));
 }
