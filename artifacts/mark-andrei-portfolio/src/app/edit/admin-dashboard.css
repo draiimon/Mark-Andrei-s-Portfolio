@@ -279,7 +279,7 @@
   align-items: center;
   gap: 0.25rem;
   min-width: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   color: #fff;
   font-size: 1rem;
   font-weight: 800;
@@ -298,13 +298,15 @@
 
 .edit-admin-identity-brand .brand-wave {
   display: inline-flex;
-  max-width: 100%;
-  flex-wrap: wrap;
-  white-space: normal;
+  min-width: max-content;
+  max-width: none;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .edit-admin-identity-brand .brand-letter {
-  flex: initial;
+  flex: 0 0 auto;
   animation: letterWave 2.2s ease-in-out infinite;
 }
 
@@ -452,6 +454,9 @@
 }
 
 .edit-dashboard-intro > div {
+  position: relative;
+  top: -72px;
+  left: clamp(0rem, 1.2vw, 1.25rem);
   min-width: 0;
   transform: translateY(-clamp(2rem, 4vw, 3.35rem));
 }
@@ -467,8 +472,11 @@
 }
 
 .edit-dashboard-intro h1 {
-  max-width: 11ch;
+  width: min(100%, 13ch);
+  max-width: 13ch;
   margin: 0;
+  overflow: visible;
+  padding-inline-start: 0.06em;
   color: #f3f0ea;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(
@@ -494,6 +502,9 @@
 }
 
 .edit-dashboard-intro > p {
+  position: relative;
+  top: -72px;
+  right: clamp(0rem, 1.2vw, 1.25rem);
   max-width: 24ch;
   margin: 0 0 0.3rem;
   color: var(--editor-muted);
@@ -1117,17 +1128,22 @@
   }
 
   .edit-dashboard-intro > div {
+    left: 0;
+    top: -52px;
     transform: translateY(-1rem);
   }
 
   .edit-dashboard-intro h1 {
-    max-width: 10.5ch;
+    width: min(100%, 11ch);
+    max-width: 11ch;
   }
 
   .edit-dashboard-intro > p {
     max-width: 34ch;
     margin-top: 1.25rem;
     text-align: left;
+    right: 0;
+    top: -52px;
     transform: translateY(-0.35rem);
   }
 
@@ -1293,17 +1309,22 @@
   }
 
   .edit-dashboard-intro > div {
+    left: 0;
+    top: -46px;
     transform: translateY(-0.7rem);
   }
 
   .edit-dashboard-intro h1 {
-    max-width: 10ch;
+    width: min(100%, 10.5ch);
+    max-width: 10.5ch;
     font-size: clamp(2.5rem, 13vw, 3.65rem);
   }
 
   .edit-dashboard-intro > p {
     max-width: 30ch;
     line-height: 1.5;
+    right: 0;
+    top: -46px;
     transform: translateY(-0.15rem);
   }
 
