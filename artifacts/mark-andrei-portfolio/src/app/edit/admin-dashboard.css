@@ -67,6 +67,7 @@
   min-height: 7.3rem;
   min-width: 0;
   max-width: 100%;
+  --edit-rail-reach: clamp(0rem, calc(3vw - 0.05rem), 3rem);
   padding: 1.05rem 0 1.55rem;
   border: 0;
   border-radius: 0;
@@ -128,7 +129,7 @@
   align-self: end;
   grid-row: 1;
   z-index: 0;
-  width: calc(68% + (var(--music-beat) * 32%) + var(--edit-rail-reach, 0rem));
+  width: calc(82% + (var(--music-beat) * 18%) + var(--edit-rail-reach, 0rem));
   height: 4px;
   margin-bottom: 1.52rem;
   border-radius: 999px;
@@ -148,6 +149,7 @@
 .edit-header-rail-left {
   grid-column: 1;
   justify-self: start;
+  clip-path: polygon(0 0, 100% 38%, 100% 62%, 0 100%);
   background: linear-gradient(
     90deg,
     rgba(255, 153, 0, 0.98) 0%,
@@ -161,6 +163,7 @@
 .edit-header-rail-right {
   grid-column: 3;
   justify-self: end;
+  clip-path: polygon(0 38%, 0 62%, 100% 100%, 100% 0);
   background: linear-gradient(
     270deg,
     rgba(255, 153, 0, 0.98) 0%,
@@ -230,14 +233,13 @@
   gap: 0.24rem;
   min-width: 0;
   max-width: 100%;
-  padding-left: 0.9rem;
-  border-left: 1px solid var(--editor-line);
+  padding-left: 0;
 }
 
 .edit-admin-identity small {
   max-width: 100%;
   overflow: hidden;
-  color: #8ed8e7;
+  color: #fff;
   font-size: 0.54rem;
   font-weight: 680;
   letter-spacing: 0.2em;
@@ -890,7 +892,7 @@
   .edit-admin-actions {
     flex-wrap: nowrap;
     gap: 0.08rem;
-    padding-left: 0.48rem;
+    padding-left: 0;
   }
 
   .edit-header-rail {
