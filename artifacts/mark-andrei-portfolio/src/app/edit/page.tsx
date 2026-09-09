@@ -1017,6 +1017,31 @@ export default function EditPage() {
         <div className="edit-admin-layout">
           <nav className="edit-admin-nav" aria-label="Portfolio sections">
             <p>Content</p>
+            <label className="edit-mobile-section-picker">
+              <span className="sr-only">Choose editor section</span>
+              <select
+                value={activeEditorSection}
+                aria-label="Choose editor section"
+                onChange={(event) => {
+                  const nextSection = event.target.value as EditorSection;
+                  setActiveEditorSection(nextSection);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                {([
+                  ["profile", "Profile"],
+                  ["projects", "Projects"],
+                  ["experience", "Experience"],
+                  ["leadership", "Leadership"],
+                  ["taglines", "Taglines"],
+                  ["achievements", "Achievements"],
+                  ["resume", "Resume"],
+                  ["site-media", "Site media"],
+                ] as [EditorSection, string][]).map(([id, label]) => (
+                  <option key={id} value={id}>{label}</option>
+                ))}
+              </select>
+            </label>
             {([
               ["profile", "Profile", "Identity & links"],
               ["projects", "Projects", `${projects.length} published`],
