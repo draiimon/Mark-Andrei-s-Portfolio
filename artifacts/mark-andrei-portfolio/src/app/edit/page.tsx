@@ -180,6 +180,15 @@ type AmbientParticle = {
   trail: number;
   life: number;
   brightness: number;
+  fadeSpeed: number;
+};
+
+const editorDustState: {
+  particles: AmbientParticle[];
+  lastBurstCycle: number;
+} = {
+  particles: [],
+  lastBurstCycle: 0,
 };
 
 function BackgroundSparkBurst({
@@ -192,12 +201,12 @@ function BackgroundSparkBurst({
   burstStrength?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particlesRef = useRef<AmbientParticle[]>([]);
+  const particlesRef = useRef<AmbientParticle[]>(editorDustState.particles);
   const viewportRef = useRef({ width: 0, height: 0, pixelRatio: 1 });
   const wakeRendererRef = useRef<(() => void) | null>(null);
   const rendererRunningRef = useRef(false);
   const animationFrameRef = useRef<number | null>(null);
-  const lastBurstCycleRef = useRef(0);
+  const lastBurstCycleRef = useRef(editorDustState.lastBurstCycle);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -275,7 +284,11 @@ function BackgroundSparkBurst({
               Math.max(0, Math.sin(particle.life * (2.2 + particle.driftSpeed) + particle.phase)),
               5
             );
-        const alpha = shimmer * particle.brightness;
+        // Dust stays in place after spreading, then breathes through a slow
+        // fade loop. The floor keeps a few motes visible so the atmosphere
+        // never hard-resets to an empty canvas.
+        const fadeLoop = 0.24 + 0.76 * ((Math.sin(particle.life * particle.fadeSpeed + particle.phase) + 1) / 2);
+        const alpha = shimmer * fadeLoop * particle.brightness;
         const tailX = x - Math.sin(windTime + particle.phase) * particle.trail;
         const tailY = y - Math.cos(windTime * 0.73 + particle.phase * 1.7) * particle.trail;
 
@@ -293,6 +306,7 @@ function BackgroundSparkBurst({
       }
 
       particlesRef.current = activeParticles;
+      editorDustState.particles = activeParticles;
       context.globalCompositeOperation = "source-over";
       if (activeParticles.length > 0) {
         animationFrameRef.current = window.requestAnimationFrame(draw);
@@ -307,6 +321,9 @@ function BackgroundSparkBurst({
       lastTimestamp = performance.now();
       animationFrameRef.current = window.requestAnimationFrame(draw);
     };
+    if (particlesRef.current.length > 0) {
+      wakeRendererRef.current();
+    }
 
     return () => {
       if (animationFrameRef.current !== null) {
@@ -314,7 +331,6 @@ function BackgroundSparkBurst({
       }
       wakeRendererRef.current = null;
       rendererRunningRef.current = false;
-      particlesRef.current = [];
       window.removeEventListener("resize", resize);
       context.clearRect(0, 0, viewportRef.current.width, viewportRef.current.height);
     };
@@ -323,35 +339,34 @@ function BackgroundSparkBurst({
   useEffect(() => {
     if (burstCycle <= 0 || burstCycle <= lastBurstCycleRef.current) return;
     lastBurstCycleRef.current = burstCycle;
+    editorDustState.lastBurstCycle = burstCycle;
 
     const { width, height } = viewportRef.current;
-    const isInitialFill = particlesRef.current.length === 0;
     const isMobile = width <= 760;
     const strength = Math.max(0.25, Math.min(1, burstStrength));
-    const particleCount = isInitialFill
-      ? isMobile
-        ? Math.round(130 + Math.min(1, intensity) * 35 + strength * 45)
-        : Math.round(960 + Math.min(1, intensity) * 280 + strength * 360)
-      : isMobile
-        ? Math.round(30 + Math.min(1, intensity) * 48 + strength * 68)
-        : Math.round(130 + Math.min(1, intensity) * 190 + strength * 300);
+    const particleCount = isMobile
+      ? Math.round(34 + Math.min(1, intensity) * 30 + strength * 72)
+      : Math.round(90 + Math.min(1, intensity) * 120 + strength * 250);
     const seed = (burstCycle + 1) * 7919;
     const seeded = (value: number) => {
       const sample = Math.sin(value * 12.9898 + seed) * 43758.5453;
       return sample - Math.floor(sample);
     };
-    const solarMark = document.querySelector<HTMLElement>(".edit-login-mark");
-    const solarBounds = solarMark?.getBoundingClientRect();
-    const sourceX = solarBounds ? solarBounds.left + solarBounds.width / 2 : width * 0.6;
-    const sourceY = solarBounds ? solarBounds.top + solarBounds.height / 2 : height * 0.36;
+    const solarAura = document.querySelector<HTMLElement>(".edit-login-aura");
+    const solarBounds = solarAura?.getBoundingClientRect();
+    const sourceX = solarBounds ? solarBounds.left + solarBounds.width / 2 : width / 2;
+    const sourceY = solarBounds ? solarBounds.top + solarBounds.height / 2 : height / 2;
     const newParticles: AmbientParticle[] = Array.from(
       { length: particleCount },
       (_, index) => {
         return {
           // Each batch spreads once from the eclipse to a random full-viewport
           // settle point, then remains alive with only local air drift.
-          x: sourceX + (seeded(index + 30) - 0.5) * width * 0.04,
-          y: sourceY + (seeded(index + 31) - 0.5) * height * 0.04,
+          // Every mote starts at the exact center of the moon aura. The
+          // spread only begins after the burst, so the source reads as one
+          // central eclipse rather than a loose ring of emitters.
+          x: sourceX,
+          y: sourceY,
           settleX: seeded(index + 40) * width,
           settleY: seeded(index + 50) * height,
            spreadDuration: isMobile
@@ -372,6 +387,7 @@ function BackgroundSparkBurst({
            brightness: isMobile
               ? 0.82 + Math.min(1, intensity) * 0.18 + strength * 0.2 + seeded(index + 140) * 0.2
               : 0.58 + Math.min(1, intensity) * 0.3 + strength * 0.28 + seeded(index + 140) * 0.2,
+           fadeSpeed: 0.35 + seeded(index + 150) * 0.55 + strength * 0.18,
         };
       }
     );
@@ -381,6 +397,7 @@ function BackgroundSparkBurst({
       ...particlesRef.current,
       ...newParticles,
     ].slice(-maxParticles);
+    editorDustState.particles = particlesRef.current;
     wakeRendererRef.current?.();
   }, [burstCycle, intensity, burstStrength]);
 
@@ -390,49 +407,6 @@ function BackgroundSparkBurst({
       className="edit-background-spark-canvas"
       aria-hidden="true"
     />
-  );
-}
-
-function EditorBeatSparkles() {
-  const [burst, setBurst] = useState(0);
-  const [strength, setStrength] = useState(0.5);
-
-  useEffect(() => {
-    const handleBurst = (event: Event) => {
-      const detail = (event as CustomEvent<EclipseBurstDetail>).detail;
-      setStrength(Math.max(0.32, Math.min(1, detail?.strength ?? 0.5)));
-      setBurst((current) => current + 1);
-    };
-
-    window.addEventListener("portfolio:eclipse-burst", handleBurst);
-    return () => window.removeEventListener("portfolio:eclipse-burst", handleBurst);
-  }, []);
-
-  if (burst === 0) return null;
-
-  return (
-    <span
-      key={`beat-spark-burst-${burst}`}
-      className={`edit-login-sparks ${
-        burst % 2 === 0 ? "edit-login-spark-burst-a" : "edit-login-spark-burst-b"
-      }`}
-      aria-hidden="true"
-    >
-      {Array.from({ length: 12 + Math.round(strength * 14) }, (_, index) => (
-        <span
-          key={`beat-spark-${burst}-${index}`}
-          style={
-            {
-              "--spark-angle": `${index * (360 / (12 + Math.round(strength * 14))) + ((burst * 17 + index * 7) % 16) - 8}deg`,
-              "--spark-delay": `${(index * 11) % 80}ms`,
-              "--spark-distance": `${2.3 + strength * 1.55 + ((index * 7) % 7) * 0.1}rem`,
-              "--spark-duration": `${620 - strength * 150 + ((index * 13) % 6) * 28}ms`,
-              "--spark-length": `${0.58 + strength * 0.34 + (index % 4) * 0.1}rem`,
-            } as React.CSSProperties
-          }
-        />
-      ))}
-    </span>
   );
 }
 
@@ -483,6 +457,7 @@ export default function EditPage() {
   const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
   const [loginAuraBurstStrength, setLoginAuraBurstStrength] = useState(0.5);
+  const [loginAuraDustBurstCycle, setLoginAuraDustBurstCycle] = useState(0);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [activeEditorSection, setActiveEditorSection] = useState<EditorSection>("profile");
@@ -502,6 +477,7 @@ export default function EditPage() {
       const detail = (event as CustomEvent<{ strength?: number }>).detail;
       const strength = Math.max(0.25, Math.min(1, detail?.strength ?? 0.5));
       setLoginAuraBurstStrength(strength);
+      setLoginAuraDustBurstCycle((cycle) => cycle + 1);
       emitEclipseBurst(strength, "beat");
     };
 
@@ -515,6 +491,7 @@ export default function EditPage() {
     setLoginAuraMomentum(nextMomentum);
     setLoginAuraClickTick((tick) => tick + 1);
     setLoginAuraBurstStrength(strength);
+    setLoginAuraDustBurstCycle((cycle) => cycle + 1);
     emitEclipseBurst(strength, "click");
   };
 
@@ -917,9 +894,7 @@ export default function EditPage() {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const compactLogin =
       typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
-    const backgroundBurstCycle = compactLogin
-      ? loginAuraClickTick
-      : Math.floor(loginAuraClickTick / 10);
+    const backgroundBurstCycle = loginAuraDustBurstCycle;
 
     return (
       <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
@@ -986,7 +961,6 @@ export default function EditPage() {
                           reactiveToBursts
                         />
                       </span>
-                      <EditorBeatSparkles />
                     </button>
                     <div className="edit-login-heading-copy hero-copy-block">
                       <p className="edit-login-title music-reactive-copy">Sign in to edit portfolio</p>
@@ -1048,11 +1022,7 @@ export default function EditPage() {
   const totalContentItems =
     projects.length + experience.length + leadership.length + achievements.length + taglines.length;
   const editorBrand = profile?.brandName || "To the clouds.";
-  const editorCompact =
-    typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
-  const editorBackgroundBurstCycle = editorCompact
-    ? loginAuraClickTick
-    : Math.floor(loginAuraClickTick / 10);
+  const editorBackgroundBurstCycle = loginAuraDustBurstCycle;
   const editorBackgroundSparkIntensity = Math.min(1, loginAuraClickTick / 40);
 
   return (
@@ -1092,7 +1062,6 @@ export default function EditPage() {
                   />
                 </span>
               </span>
-              <EditorBeatSparkles />
             </button>
             <EditorBeatRails />
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
