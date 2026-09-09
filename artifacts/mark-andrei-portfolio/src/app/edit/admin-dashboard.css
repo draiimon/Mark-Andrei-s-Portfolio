@@ -1551,6 +1551,7 @@
 }
 
 .edit-control-center .edit-hero-nav {
+  counter-reset: editor-tile;
   position: relative;
   top: auto;
   display: grid;
@@ -1572,6 +1573,7 @@
 .edit-control-center .edit-hero-nav button,
 .edit-control-center .edit-hero-nav button:nth-of-type(4n),
 .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
+  counter-increment: editor-tile;
   position: relative;
   display: grid;
   grid-template-rows: 1fr auto;
@@ -1628,14 +1630,29 @@
 }
 
 .edit-control-center .edit-hero-nav button span {
+  position: relative;
   align-self: start;
-  padding-top: 0.35rem;
+  padding-top: 1.05rem;
   color: currentColor;
   font-size: clamp(0.78rem, 1.05vw, 1.08rem);
   font-weight: 760;
   letter-spacing: 0.08em;
   line-height: 1.08;
   text-transform: uppercase;
+}
+
+.edit-control-center .edit-hero-nav button span::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--editor-sun);
+  content: counter(editor-tile, decimal-leading-zero);
+  font-size: 0.55em;
+  font-weight: 650;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  opacity: 0.58;
+  transition: color 180ms ease, opacity 180ms ease;
 }
 
 .edit-control-center .edit-hero-nav button small {
@@ -1658,6 +1675,18 @@
     0 0 1.2rem rgba(240, 173, 88, 0.09);
 }
 
+.edit-control-center .edit-hero-nav button:hover span,
+.edit-control-center .edit-hero-nav button.is-active span {
+  transform: translateX(0.16rem);
+  transition: transform 180ms ease;
+}
+
+.edit-control-center .edit-hero-nav button:hover span::before,
+.edit-control-center .edit-hero-nav button.is-active span::before {
+  color: #fff1d2;
+  opacity: 1;
+}
+
 .edit-control-center .edit-hero-nav button:hover::before,
 .edit-control-center .edit-hero-nav button.is-active::before {
   opacity: 1;
@@ -1671,6 +1700,55 @@
 
 .edit-control-center .edit-hero-nav button.is-active small {
   color: var(--editor-sun-soft);
+}
+
+.edit-control-center .edit-hero-nav button.is-active {
+  background:
+    linear-gradient(135deg, rgba(240, 173, 88, 0.15), transparent 42%),
+    rgba(1, 4, 8, 0.28);
+  animation: edit-hero-active-breathe 3.6s ease-in-out infinite;
+}
+
+.edit-control-center .edit-hero-nav button.is-active::after {
+  animation: edit-hero-tactical-sweep 4.8s ease-in-out infinite;
+}
+
+.edit-control-center .edit-hero-nav button:focus-visible {
+  outline: 1px solid var(--editor-sun-soft);
+  outline-offset: 0.28rem;
+}
+
+@keyframes edit-hero-active-breathe {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 0 1px rgba(240, 173, 88, 0.12),
+      inset 0 -1.2rem rgba(240, 173, 88, 0.05),
+      0 0 1.2rem rgba(240, 173, 88, 0.09);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px rgba(240, 173, 88, 0.24),
+      inset 0 -1.2rem rgba(240, 173, 88, 0.08),
+      0 0 1.6rem rgba(240, 173, 88, 0.14);
+  }
+}
+
+@keyframes edit-hero-tactical-sweep {
+  0%,
+  18% {
+    opacity: 0;
+    transform: skewX(-18deg) translateX(-120%);
+  }
+  34%,
+  55% {
+    opacity: 1;
+  }
+  72%,
+  100% {
+    opacity: 0;
+    transform: skewX(-18deg) translateX(430%);
+  }
 }
 
 @media (max-width: 820px) {
