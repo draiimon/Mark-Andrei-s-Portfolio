@@ -6836,6 +6836,20 @@ html[data-mobile-lite] .cloud-light {
 
 .edit-page:not(.edit-control-center) .edit-login-shell::before,
 .edit-page:not(.edit-control-center) .edit-login-shell::after {
+  content: none !important;
+  display: none !important;
+}
+
+.edit-page:not(.edit-control-center) .edit-login-panel,
+.edit-page:not(.edit-control-center) .edit-login-shell,
+.edit-page:not(.edit-control-center) .edit-login-shell > .relative {
+  background: none !important;
+  background-image: none !important;
+  outline: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+.edit-page:not(.edit-control-center) .edit-login-shell .edit-orb {
   display: none !important;
 }
 
