@@ -375,6 +375,7 @@ export default function EditPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -817,7 +818,9 @@ export default function EditPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (loggingIn) return;
     setLoginError("");
+    setLoggingIn(true);
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
@@ -839,6 +842,8 @@ export default function EditPage() {
       await loadData();
     } catch {
       setLoginError("Login failed");
+    } finally {
+      setLoggingIn(false);
     }
   }
 
@@ -1013,8 +1018,8 @@ export default function EditPage() {
                     </label>
 
                     {loginError && <p className="edit-login-error" role="alert">{loginError}</p>}
-                    <button type="submit" className="edit-login-submit">
-                      <span>Enter Edit Mode</span>
+                    <button type="submit" className="edit-login-submit" disabled={loggingIn} aria-busy={loggingIn}>
+                      <span>{loggingIn ? "Checking access…" : "Enter Edit Mode"}</span>
                       <ArrowUpRight className="edit-login-submit-icon" aria-hidden="true" />
                     </button>
                   </form>
