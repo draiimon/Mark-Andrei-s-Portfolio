@@ -9,6 +9,7 @@ export default function SolarAura({
   className = "",
   showOrbits = true,
   momentum = 0,
+  reactiveToBursts = false,
   style,
 }: {
   small?: boolean;
@@ -16,14 +17,15 @@ export default function SolarAura({
   className?: string;
   showOrbits?: boolean;
   momentum?: number;
+  reactiveToBursts?: boolean;
   style?: CSSProperties;
 }) {
   const clampedMomentum = Math.max(0, Math.min(14, momentum));
   const auraRef = useRef<HTMLSpanElement>(null);
   const momentumRef = useRef(clampedMomentum);
+  const burstEnergyRef = useRef(0);
   const solarStyle = {
     ...style,
-    "--solar-angle": "0deg",
     "--solar-breathe-duration": "5s",
     "--solar-core-duration": "2.8s",
   } as CSSProperties;
@@ -31,6 +33,19 @@ export default function SolarAura({
   useEffect(() => {
     momentumRef.current = clampedMomentum;
   }, [clampedMomentum]);
+
+  useEffect(() => {
+    if (!reactiveToBursts) return;
+
+    const handleBurst = (event: Event) => {
+      const detail = (event as CustomEvent<{ strength?: number }>).detail;
+      const strength = Math.max(0, Math.min(1, detail?.strength ?? 0.5));
+      burstEnergyRef.current = Math.max(burstEnergyRef.current, strength);
+    };
+
+    window.addEventListener("portfolio:eclipse-burst", handleBurst);
+    return () => window.removeEventListener("portfolio:eclipse-burst", handleBurst);
+  }, [reactiveToBursts]);
 
   useEffect(() => {
     const aura = auraRef.current;
@@ -54,11 +69,16 @@ export default function SolarAura({
 
       // One rotating body with a soft velocity spring: clicks change the
       // target speed, while the current angle keeps moving continuously.
-      const targetVelocity = 30 + momentumRef.current * 12;
+      // Bass/click bursts add a short-lived velocity kick so stronger hits
+      // visibly spin the corona harder before it settles back down.
+      const burstEnergy = burstEnergyRef.current;
+      const targetVelocity = 30 + momentumRef.current * 12 + burstEnergy * 58;
       velocity += (targetVelocity - velocity) * (1 - Math.exp(-delta / 180));
       angle = (angle + (velocity * delta) / 1000) % 360;
       aura.style.setProperty("--solar-angle", `${angle}deg`);
       aura.style.setProperty("--solar-speed-energy", `${Math.min(1, velocity / 198)}`);
+      aura.style.setProperty("--solar-burst-energy", burstEnergy.toFixed(3));
+      burstEnergyRef.current = Math.max(0, burstEnergy - delta / 420);
       frame = requestAnimationFrame(animate);
     };
 

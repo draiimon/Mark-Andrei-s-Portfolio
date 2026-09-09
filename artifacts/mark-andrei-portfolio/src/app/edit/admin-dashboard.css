@@ -169,7 +169,11 @@
   align-self: center;
   grid-row: 1;
   z-index: 0;
-  width: calc(clamp(4.75rem, 34%, 8.5rem) + (var(--music-beat) * 1.25rem));
+  width: calc(
+    clamp(4.75rem, 34%, 8.5rem) +
+    (var(--music-beat) * 1.25rem) +
+    (var(--burst-strength, 0.5) * 1.2rem)
+  );
   height: 1px;
   margin-top: 0.35rem;
   border-radius: 0;
@@ -245,11 +249,15 @@
 /* Each detected bass hit remounts the rails so the energy starts at the orb
    and travels outward, matching the sparkle burst around the eclipse. */
 .edit-header-rail-left.is-beat-burst::after {
-  animation: editRailEnergyLeftOutward 850ms cubic-bezier(0.18, 0.82, 0.3, 1) both;
+  animation: editRailEnergyLeftOutward
+    calc(940ms - (var(--burst-strength, 0.5) * 260ms))
+    cubic-bezier(0.18, 0.82, 0.3, 1) both;
 }
 
 .edit-header-rail-right.is-beat-burst::after {
-  animation: editRailEnergyRightOutward 850ms cubic-bezier(0.18, 0.82, 0.3, 1) 45ms both;
+  animation: editRailEnergyRightOutward
+    calc(940ms - (var(--burst-strength, 0.5) * 260ms))
+    cubic-bezier(0.18, 0.82, 0.3, 1) 45ms both;
 }
 
 .edit-admin-identity {

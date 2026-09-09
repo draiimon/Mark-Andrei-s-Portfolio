@@ -96,6 +96,22 @@ type DragItem = {
   id: number;
 } | null;
 
+type EclipseBurstDetail = {
+  strength?: number;
+  source?: "click" | "beat";
+};
+
+function emitEclipseBurst(strength: number, source: EclipseBurstDetail["source"]) {
+  window.dispatchEvent(
+    new CustomEvent<EclipseBurstDetail>("portfolio:eclipse-burst", {
+      detail: {
+        strength: Math.max(0, Math.min(1, strength)),
+        source,
+      },
+    }),
+  );
+}
+
 async function apiJson<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, { ...init, credentials: "include" });
   if (!res.ok) {
@@ -115,10 +131,12 @@ function PortfolioSurface({
   children,
   backgroundBurstCycle = 0,
   backgroundSparkIntensity = 0,
+  backgroundBurstStrength = 0.5,
 }: {
   children: ReactNode;
   backgroundBurstCycle?: number;
   backgroundSparkIntensity?: number;
+  backgroundBurstStrength?: number;
 }) {
   return (
     <>
@@ -141,6 +159,7 @@ function PortfolioSurface({
         <BackgroundSparkBurst
           burstCycle={backgroundBurstCycle}
           intensity={backgroundSparkIntensity}
+          burstStrength={backgroundBurstStrength}
         />
         {children}
       </div>
@@ -166,9 +185,11 @@ type AmbientParticle = {
 function BackgroundSparkBurst({
   burstCycle,
   intensity = 0,
+  burstStrength = 0.5,
 }: {
   burstCycle: number;
   intensity?: number;
+  burstStrength?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<AmbientParticle[]>([]);
@@ -306,13 +327,14 @@ function BackgroundSparkBurst({
     const { width, height } = viewportRef.current;
     const isInitialFill = particlesRef.current.length === 0;
     const isMobile = width <= 760;
+    const strength = Math.max(0.25, Math.min(1, burstStrength));
     const particleCount = isInitialFill
       ? isMobile
-        ? Math.round(150 + Math.min(1, intensity) * 40)
-        : Math.round(1100 + Math.min(1, intensity) * 320)
+        ? Math.round(130 + Math.min(1, intensity) * 35 + strength * 45)
+        : Math.round(960 + Math.min(1, intensity) * 280 + strength * 360)
       : isMobile
-        ? Math.round(44 + Math.min(1, intensity) * 70)
-        : Math.round(180 + Math.min(1, intensity) * 280);
+        ? Math.round(30 + Math.min(1, intensity) * 48 + strength * 68)
+        : Math.round(130 + Math.min(1, intensity) * 190 + strength * 300);
     const seed = (burstCycle + 1) * 7919;
     const seeded = (value: number) => {
       const sample = Math.sin(value * 12.9898 + seed) * 43758.5453;
@@ -333,23 +355,23 @@ function BackgroundSparkBurst({
           settleX: seeded(index + 40) * width,
           settleY: seeded(index + 50) * height,
            spreadDuration: isMobile
-             ? 1.35 + seeded(index + 60) * 0.9
-             : 2.4 + seeded(index + 60) * 1.4,
+              ? 1.12 + seeded(index + 60) * 0.82 - strength * 0.12
+              : 2.05 + seeded(index + 60) * 1.25 - strength * 0.24,
            drift: isMobile
-             ? 2.5 + seeded(index + 80) * 6.5
-             : 2.5 + seeded(index + 80) * 8.5,
-          driftSpeed: 0.18 + seeded(index + 90) * 0.36,
+              ? 2.5 + seeded(index + 80) * 6.5 + strength * 3
+              : 2.5 + seeded(index + 80) * 8.5 + strength * 6,
+          driftSpeed: 0.18 + seeded(index + 90) * 0.36 + strength * 0.1,
           phase: seeded(index + 100) * Math.PI * 2,
            size: isMobile
              ? 0.8 + seeded(index + 110) * 1.35 + Math.min(1, intensity) * 0.45
-             : 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
+              : 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
            trail: isMobile
              ? 0.6 + seeded(index + 120) * 1.4
              : 0.3 + seeded(index + 120) * 1.2,
           life: -seeded(index + 130) * 0.18,
            brightness: isMobile
-             ? 0.88 + Math.min(1, intensity) * 0.18 + seeded(index + 140) * 0.2
-             : 0.62 + Math.min(1, intensity) * 0.3 + seeded(index + 140) * 0.2,
+              ? 0.82 + Math.min(1, intensity) * 0.18 + strength * 0.2 + seeded(index + 140) * 0.2
+              : 0.58 + Math.min(1, intensity) * 0.3 + strength * 0.28 + seeded(index + 140) * 0.2,
         };
       }
     );
@@ -360,7 +382,7 @@ function BackgroundSparkBurst({
       ...newParticles,
     ].slice(-maxParticles);
     wakeRendererRef.current?.();
-  }, [burstCycle, intensity]);
+  }, [burstCycle, intensity, burstStrength]);
 
   return (
     <canvas
@@ -376,14 +398,14 @@ function EditorBeatSparkles() {
   const [strength, setStrength] = useState(0.5);
 
   useEffect(() => {
-    const handleBeat = (event: Event) => {
-      const detail = (event as CustomEvent<{ strength?: number }>).detail;
+    const handleBurst = (event: Event) => {
+      const detail = (event as CustomEvent<EclipseBurstDetail>).detail;
       setStrength(Math.max(0.32, Math.min(1, detail?.strength ?? 0.5)));
       setBurst((current) => current + 1);
     };
 
-    window.addEventListener("portfolio:music-beat", handleBeat);
-    return () => window.removeEventListener("portfolio:music-beat", handleBeat);
+    window.addEventListener("portfolio:eclipse-burst", handleBurst);
+    return () => window.removeEventListener("portfolio:eclipse-burst", handleBurst);
   }, []);
 
   if (burst === 0) return null;
@@ -396,16 +418,16 @@ function EditorBeatSparkles() {
       }`}
       aria-hidden="true"
     >
-      {Array.from({ length: 18 }, (_, index) => (
+      {Array.from({ length: 12 + Math.round(strength * 14) }, (_, index) => (
         <span
           key={`beat-spark-${burst}-${index}`}
           style={
             {
-              "--spark-angle": `${index * (360 / 18) + ((burst * 17 + index * 7) % 16) - 8}deg`,
+              "--spark-angle": `${index * (360 / (12 + Math.round(strength * 14))) + ((burst * 17 + index * 7) % 16) - 8}deg`,
               "--spark-delay": `${(index * 11) % 80}ms`,
-              "--spark-distance": `${2.45 + strength * 0.85 + ((index * 7) % 7) * 0.1}rem`,
-              "--spark-duration": `${560 + ((index * 13) % 6) * 34}ms`,
-              "--spark-length": `${0.62 + strength * 0.18 + (index % 4) * 0.1}rem`,
+              "--spark-distance": `${2.3 + strength * 1.55 + ((index * 7) % 7) * 0.1}rem`,
+              "--spark-duration": `${620 - strength * 150 + ((index * 13) % 6) * 28}ms`,
+              "--spark-length": `${0.58 + strength * 0.34 + (index % 4) * 0.1}rem`,
             } as React.CSSProperties
           }
         />
@@ -416,11 +438,16 @@ function EditorBeatSparkles() {
 
 function EditorBeatRails() {
   const [burst, setBurst] = useState(0);
+  const [strength, setStrength] = useState(0.5);
 
   useEffect(() => {
-    const handleBeat = () => setBurst((current) => current + 1);
-    window.addEventListener("portfolio:music-beat", handleBeat);
-    return () => window.removeEventListener("portfolio:music-beat", handleBeat);
+    const handleBurst = (event: Event) => {
+      const detail = (event as CustomEvent<EclipseBurstDetail>).detail;
+      setStrength(Math.max(0.25, Math.min(1, detail?.strength ?? 0.5)));
+      setBurst((current) => current + 1);
+    };
+    window.addEventListener("portfolio:eclipse-burst", handleBurst);
+    return () => window.removeEventListener("portfolio:eclipse-burst", handleBurst);
   }, []);
 
   return (
@@ -428,11 +455,13 @@ function EditorBeatRails() {
       <span
         key={`editor-beat-rail-left-${burst}`}
         className={`edit-header-rail edit-header-rail-left ${burst > 0 ? "is-beat-burst" : ""}`}
+        style={{ "--burst-strength": strength } as React.CSSProperties}
         aria-hidden="true"
       />
       <span
         key={`editor-beat-rail-right-${burst}`}
         className={`edit-header-rail edit-header-rail-right ${burst > 0 ? "is-beat-burst" : ""}`}
+        style={{ "--burst-strength": strength } as React.CSSProperties}
         aria-hidden="true"
       />
     </>
@@ -453,6 +482,7 @@ export default function EditPage() {
   const [solarIntroFading, setSolarIntroFading] = useState(false);
   const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
+  const [loginAuraBurstStrength, setLoginAuraBurstStrength] = useState(0.5);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
   const [activeEditorSection, setActiveEditorSection] = useState<EditorSection>("profile");
@@ -466,6 +496,27 @@ export default function EditPage() {
 
     return () => window.clearTimeout(timer);
   }, [loginAuraMomentum, loginAuraClickTick]);
+
+  useEffect(() => {
+    const handleMusicBeat = (event: Event) => {
+      const detail = (event as CustomEvent<{ strength?: number }>).detail;
+      const strength = Math.max(0.25, Math.min(1, detail?.strength ?? 0.5));
+      setLoginAuraBurstStrength(strength);
+      emitEclipseBurst(strength, "beat");
+    };
+
+    window.addEventListener("portfolio:music-beat", handleMusicBeat);
+    return () => window.removeEventListener("portfolio:music-beat", handleMusicBeat);
+  }, []);
+
+  const handleEclipseClick = () => {
+    const nextMomentum = Math.min(14, loginAuraMomentum + 2);
+    const strength = Math.max(0.45, Math.min(1, 0.44 + nextMomentum / 18));
+    setLoginAuraMomentum(nextMomentum);
+    setLoginAuraClickTick((tick) => tick + 1);
+    setLoginAuraBurstStrength(strength);
+    emitEclipseBurst(strength, "click");
+  };
 
   const [profile, setProfile] = useState<Profile>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -866,16 +917,6 @@ export default function EditPage() {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const compactLogin =
       typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
-    const mobileSparkActive = compactLogin ? loginAuraClickTick > 0 : loginAuraClickTick >= 10;
-    const sparkCount =
-      mobileSparkActive
-        ? Math.min(
-            compactLogin ? 48 : 180,
-            compactLogin
-              ? 10 + loginAuraMomentum * 2 + loginAuraClickTick
-              : 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2
-          )
-        : 0;
     const backgroundBurstCycle = compactLogin
       ? loginAuraClickTick
       : Math.floor(loginAuraClickTick / 10);
@@ -885,6 +926,7 @@ export default function EditPage() {
         <PortfolioSurface
           backgroundBurstCycle={backgroundBurstCycle}
           backgroundSparkIntensity={starIntensity}
+          backgroundBurstStrength={loginAuraBurstStrength}
         >
           {solarIntroActive && (
              <div className={`edit-solar-reveal ${solarIntroFading ? "edit-solar-reveal-fading" : ""}`} role="status" aria-live="polite">
@@ -921,10 +963,7 @@ export default function EditPage() {
                     <button
                       type="button"
                       className={`edit-login-mark ${loginAuraMomentum > 0 ? "has-momentum" : ""}`}
-                      onClick={() => {
-                        setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
-                        setLoginAuraClickTick((tick) => tick + 1);
-                      }}
+                      onClick={handleEclipseClick}
                       aria-label="Speed up eclipse"
                       title="Click repeatedly to speed up the eclipse; it gradually slows down"
                     >
@@ -939,46 +978,15 @@ export default function EditPage() {
                         aria-hidden="true"
                       >
                         <SolarAura
-                        small
-                        state="idle"
-                        className="edit-login-aura"
-                        showOrbits={false}
-                        momentum={loginAuraMomentum}
+                          small
+                          state="idle"
+                          className="edit-login-aura"
+                          showOrbits={false}
+                          momentum={loginAuraMomentum}
+                          reactiveToBursts
                         />
                       </span>
                       <EditorBeatSparkles />
-                      <span
-                        className={`edit-login-sparks ${
-                          sparkCount > 0
-                            ? loginAuraClickTick % 2 === 0
-                              ? "edit-login-spark-burst-a"
-                              : "edit-login-spark-burst-b"
-                            : ""
-                        }`}
-                        aria-hidden="true"
-                      >
-                        {Array.from({ length: sparkCount }, (_, index) => {
-                          const angleJitter = (index * 17) % 13 - 6;
-                          const angle = index * (360 / Math.max(1, sparkCount)) + angleJitter;
-                          const distance = 2.55 + ((index * 7) % 13) * 0.12 + loginAuraMomentum * 0.06;
-                          const duration = 430 + ((index * 11) % 7) * 38 - loginAuraMomentum * 6;
-                          const length = 0.58 + ((index * 13) % 7) * 0.11;
-                          return (
-                            <span
-                              key={`eclipse-spark-${index}`}
-                              style={
-                                {
-                                  "--spark-angle": `${angle}deg`,
-                                  "--spark-delay": `${(index * 13) % 120}ms`,
-                                  "--spark-distance": `${distance}rem`,
-                                  "--spark-duration": `${duration}ms`,
-                                  "--spark-length": `${length}rem`,
-                                } as React.CSSProperties
-                              }
-                            />
-                          );
-                        })}
-                      </span>
                     </button>
                     <div className="edit-login-heading-copy hero-copy-block">
                       <p className="edit-login-title music-reactive-copy">Sign in to edit portfolio</p>
@@ -1052,16 +1060,14 @@ export default function EditPage() {
       <PortfolioSurface
         backgroundBurstCycle={editorBackgroundBurstCycle}
         backgroundSparkIntensity={editorBackgroundSparkIntensity}
+        backgroundBurstStrength={loginAuraBurstStrength}
       >
         <div className="edit-admin-shell mx-auto px-4 sm:px-6">
           <header className="edit-topbar">
             <button
               type="button"
               className={`edit-topbar-orb edit-login-mark ${loginAuraMomentum > 0 ? "has-momentum" : ""}`}
-              onClick={() => {
-                setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
-                setLoginAuraClickTick((tick) => tick + 1);
-              }}
+              onClick={handleEclipseClick}
               aria-label="Speed up eclipse"
               title="Click repeatedly to speed up the eclipse; it gradually slows down"
             >
@@ -1082,38 +1088,11 @@ export default function EditPage() {
                     className="edit-login-aura"
                     showOrbits={false}
                     momentum={loginAuraMomentum}
+                    reactiveToBursts
                   />
                 </span>
               </span>
               <EditorBeatSparkles />
-              <span
-                className={`edit-login-sparks ${
-                  loginAuraClickTick > 0
-                    ? loginAuraClickTick % 2 === 0
-                      ? "edit-login-spark-burst-a"
-                      : "edit-login-spark-burst-b"
-                    : ""
-                }`}
-                aria-hidden="true"
-              >
-                {Array.from({ length: loginAuraClickTick > 0 ? Math.min(18, 5 + loginAuraMomentum + loginAuraClickTick) : 0 }, (_, index) => {
-                  const angle = index * (360 / Math.max(1, loginAuraClickTick));
-                  return (
-                    <span
-                      key={`editor-eclipse-spark-${index}`}
-                      style={
-                        {
-                          "--spark-angle": `${angle}deg`,
-                          "--spark-delay": `${(index * 13) % 120}ms`,
-                          "--spark-distance": `${2.55 + loginAuraMomentum * 0.06}rem`,
-                          "--spark-duration": `${520 - loginAuraMomentum * 6}ms`,
-                          "--spark-length": `${0.58 + (index % 4) * 0.1}rem`,
-                        } as React.CSSProperties
-                      }
-                    />
-                  );
-                })}
-              </span>
             </button>
             <EditorBeatRails />
             <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">

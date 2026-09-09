@@ -5918,14 +5918,28 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .edit-login-mark .edit-login-aura {
   animation-duration: var(--solar-breathe-duration, var(--login-aura-speed, 5s)) !important;
+  box-shadow:
+    0 0 calc(15px + (var(--solar-burst-energy, 0) * 30px))
+      rgba(255, 182, 77, calc(0.22 + (var(--solar-burst-energy, 0) * 0.42))),
+    inset 0 0 calc(8px + (var(--solar-burst-energy, 0) * 12px))
+      rgba(255, 225, 171, calc(0.1 + (var(--solar-burst-energy, 0) * 0.16)));
+  filter:
+    brightness(calc(1 + (var(--solar-burst-energy, 0) * 0.2)))
+    saturate(calc(1 + (var(--solar-burst-energy, 0) * 0.28)));
+  transition: box-shadow 120ms ease-out, filter 120ms ease-out;
 }
 
 .edit-login-mark .edit-login-aura::before {
   animation-duration: var(--solar-corona-duration, var(--login-aura-corona-speed, 4.6s)) !important;
+  inset: calc(-15% - (var(--solar-burst-energy, 0) * 15%));
+  opacity: calc(0.7 + (var(--solar-burst-energy, 0) * 0.3));
+  filter: blur(calc(1px + (var(--solar-burst-energy, 0) * 8px))) saturate(1.18);
+  transition: inset 160ms ease-out, opacity 160ms ease-out, filter 160ms ease-out;
 }
 
 .edit-login-mark .edit-login-aura::after {
   animation-duration: var(--solar-core-duration, var(--login-aura-core-speed, 2.8s)) !important;
+  opacity: calc(0.72 + (var(--solar-burst-energy, 0) * 0.25));
 }
 
 /* One physical rotation only: the corona is the single rotating body.
