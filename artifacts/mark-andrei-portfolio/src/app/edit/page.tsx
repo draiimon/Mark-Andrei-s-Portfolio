@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
+import { ArrowUpRight, Eye, EyeOff, ExternalLink, GripVertical, LogOut } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
+import "./admin-dashboard.css";
 
 const EDIT_SOLAR_INTRO_MOBILE_DURATION_MS = 3000;
 const EDIT_SOLAR_INTRO_DESKTOP_DURATION_MS = 3000;
@@ -89,6 +90,7 @@ type ApiError = {
 };
 
 type SortableSection = "experience" | "leadership" | "achievements" | "taglines";
+type EditorSection = "profile" | "projects" | "experience" | "leadership" | "taglines" | "achievements" | "resume" | "site-media";
 type DragItem = {
   section: SortableSection;
   id: number;
@@ -385,8 +387,7 @@ export default function EditPage() {
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
-  const [deckScrolling, setDeckScrolling] = useState(false);
-  const scrollAnimationRef = useRef<number | null>(null);
+  const [activeEditorSection, setActiveEditorSection] = useState<EditorSection>("profile");
 
   useEffect(() => {
     if (loginAuraMomentum <= 0) return;
@@ -514,25 +515,6 @@ export default function EditPage() {
       window.clearTimeout(hideTimer);
     };
   }, [auth]);
-
-  useEffect(() => {
-    const cancelDeckScroll = () => {
-      if (scrollAnimationRef.current === null) return;
-      window.cancelAnimationFrame(scrollAnimationRef.current);
-      scrollAnimationRef.current = null;
-      setDeckScrolling(false);
-    };
-
-    window.addEventListener("wheel", cancelDeckScroll, { passive: true });
-    window.addEventListener("touchstart", cancelDeckScroll, { passive: true });
-    return () => {
-      window.removeEventListener("wheel", cancelDeckScroll);
-      window.removeEventListener("touchstart", cancelDeckScroll);
-      if (scrollAnimationRef.current !== null) {
-        window.cancelAnimationFrame(scrollAnimationRef.current);
-      }
-    };
-  }, []);
 
   async function loadData() {
     try {
@@ -772,50 +754,6 @@ export default function EditPage() {
     return "";
   }
 
-  function smoothScrollToId(id: string) {
-    const target = document.getElementById(id);
-    if (!target) return;
-
-    if (scrollAnimationRef.current !== null) {
-      window.cancelAnimationFrame(scrollAnimationRef.current);
-      scrollAnimationRef.current = null;
-    }
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const targetY = target.getBoundingClientRect().top + window.scrollY - 96;
-
-    if (prefersReducedMotion) {
-      window.scrollTo(0, targetY);
-      return;
-    }
-
-    const startY = window.scrollY;
-    const distance = targetY - startY;
-    const duration = 850;
-    const start = performance.now();
-
-    setDeckScrolling(true);
-
-    const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-    const step = (now: number) => {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / duration);
-      const eased = easeInOutCubic(t);
-      window.scrollTo(0, startY + distance * eased);
-
-      if (t < 1) {
-        scrollAnimationRef.current = requestAnimationFrame(step);
-      } else {
-        scrollAnimationRef.current = null;
-        window.setTimeout(() => setDeckScrolling(false), 120);
-      }
-    };
-
-    scrollAnimationRef.current = requestAnimationFrame(step);
-  }
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     if (loggingIn) return;
@@ -1034,114 +972,78 @@ export default function EditPage() {
     projects.length + experience.length + leadership.length + achievements.length + taglines.length;
 
   return (
-    <main className={`edit-page edit-control-center site-shell min-h-screen text-white ${deckScrolling ? "deck-scrolling" : ""}`}>
+    <main className="edit-page edit-control-center site-shell min-h-screen text-white">
       <PortfolioSurface>
-        <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6 md:space-y-10 md:py-14">
-          <header className="topbar edit-topbar rounded-2xl px-4 py-3 md:px-5">
-          <div className="edit-orb one" />
-          <div className="edit-orb two" />
-          <div className="relative z-10 flex w-full items-center justify-between gap-3">
-            <a href="/home" className="flex items-center gap-2.5 text-white">
-              <span className="rounded-lg border border-white/20 bg-black/35 p-1.5">
-                <Cloud className="h-5 w-5 text-awsOrange" />
-              </span>
+        <div className="edit-admin-shell mx-auto px-4 sm:px-6">
+          <header className="edit-topbar">
+            <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
+              <span className="edit-admin-mark" aria-hidden="true" />
               <span>
-                <span className="block text-xs uppercase tracking-[0.18em] text-neutral-400">Control Center</span>
-                <span className="block font-semibold leading-tight">Portfolio Edit</span>
+                <span>Mark Andrei</span>
+                <small>Portfolio editor</small>
               </span>
             </a>
-            <a
-              href="/home"
-              className="rounded-lg border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-medium text-neutral-200 transition hover:border-awsOrange/60 hover:text-awsOrange"
-            >
-              View site
-            </a>
-            <button
-              type="button"
-              onClick={() => void handleLogout()}
-              className="rounded-lg border border-red-400/35 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-200 transition hover:border-red-300/70 hover:text-red-100"
-            >
-              Logout
-            </button>
-          </div>
+            <div className="edit-admin-status" aria-live="polite">
+              <span className={saving ? "is-saving" : ""} aria-hidden="true" />
+              {saving ? "Saving changes" : success ? "Changes saved" : "All changes synced"}
+            </div>
+            <div className="edit-admin-actions">
+              <a href="/home" className="edit-action-secondary">
+                <span>View portfolio</span>
+                <ExternalLink aria-hidden="true" />
+              </a>
+              <button type="button" onClick={() => void handleLogout()} className="edit-action-quiet" aria-label="Log out">
+                <LogOut aria-hidden="true" />
+                <span>Logout</span>
+              </button>
+            </div>
           </header>
 
         {(error || success) && (
-          <div className={`space-y-2 ${dragItem?.section === "experience" ? "drag-lane-active" : ""}`}>
-            {error && <p className="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
-            {success && <p className="rounded border border-green-500/40 bg-green-500/10 px-3 py-2 text-sm text-green-300">{success}</p>}
+          <div className="edit-notices" role="status" aria-live="polite">
+            {error && <p className="edit-notice is-error">{error}</p>}
+            {success && <p className="edit-notice is-success">{success}</p>}
           </div>
         )}
 
-        <section className="edit-dashboard-hero" aria-labelledby="edit-dashboard-title">
-          <div className="edit-dashboard-hero-copy">
-            <p className="edit-dashboard-eyebrow">Mark Andrei / Portfolio</p>
-            <h1 id="edit-dashboard-title">
-              Shape the story
-              <span>behind the work.</span>
-            </h1>
-            <p className="edit-dashboard-description">
-              A quiet control room for the ideas, projects, and proof behind the public profile.
-            </p>
-            <div className="edit-dashboard-stats" aria-label="Portfolio status">
-              <div>
-                <strong>{totalContentItems}</strong>
-                <span>content records</span>
-              </div>
-              <div>
-                <strong>{projects.length}</strong>
-                <span>projects live</span>
-              </div>
-              <div>
-                <strong>{profile?.updatedAt ? new Date(profile.updatedAt).toLocaleDateString() : "Ready"}</strong>
-                <span>last update</span>
-              </div>
-            </div>
+        <section className="edit-dashboard-intro" aria-labelledby="edit-dashboard-title">
+          <div>
+            <p>Portfolio / Edit mode</p>
+            <h1 id="edit-dashboard-title">Shape what people see.</h1>
           </div>
-          <div className="edit-dashboard-hero-orbit" aria-hidden="true">
-            <span className="edit-dashboard-orbit-glow edit-dashboard-orbit-glow-one" />
-            <span className="edit-dashboard-orbit-glow edit-dashboard-orbit-glow-two" />
-            <SolarAura small state="idle" showOrbits={false} className="edit-dashboard-aura" />
-            <span className="edit-dashboard-orbit-label">Control / Ready</span>
-          </div>
+          <p>{totalContentItems} content records · {projects.length} projects live · {profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}</p>
         </section>
 
-        <section className="control-deck rounded-2xl p-5">
-          <div className="deck-glow one" />
-          <div className="deck-glow two" />
-          <div className="relative z-10">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Gauge className="h-4 w-4 text-awsOrange" />
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-300">Control Deck</p>
-              </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[11px] text-neutral-300">
-                <Sparkles className="h-3.5 w-3.5 text-awsOrange" />
-                {totalContentItems} content records managed
-              </div>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-4">
-              {[
-                { id: "resume", label: "Resume" },
-                { id: "profile", label: "Profile" },
-                { id: "projects", label: "Projects" },
-                { id: "experience", label: "Experience" },
-                { id: "leadership", label: "Leadership" },
-                { id: "taglines", label: "Taglines" },
-                { id: "achievements", label: "Achievements" }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="deck-link"
-                  onClick={() => smoothScrollToId(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+        <div className="edit-admin-layout">
+          <nav className="edit-admin-nav" aria-label="Portfolio sections">
+            <p>Content</p>
+            {([
+              ["profile", "Profile", "Identity & links"],
+              ["projects", "Projects", `${projects.length} published`],
+              ["experience", "Experience", `${experience.length} entries`],
+              ["leadership", "Leadership", `${leadership.length} entries`],
+              ["taglines", "Taglines", `${taglines.length} rotating`],
+              ["achievements", "Achievements", `${achievements.length} entries`],
+              ["resume", "Resume", "PDF document"],
+              ["site-media", "Site media", "Icons & sharing"],
+            ] as [EditorSection, string, string][]).map(([id, label, meta]) => (
+              <button
+                key={id}
+                type="button"
+                className={activeEditorSection === id ? "is-active" : ""}
+                aria-current={activeEditorSection === id ? "page" : undefined}
+                onClick={() => {
+                  setActiveEditorSection(id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                <span>{label}</span>
+                <small>{meta}</small>
+              </button>
+            ))}
+          </nav>
+
+          <div className="edit-workspace" data-active-section={activeEditorSection}>
 
         <section id="resume" className="feature-card edit-section space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Resume (PDF)</h2>
@@ -2056,6 +1958,8 @@ export default function EditPage() {
             Back to site
           </a>
         </p>
+          </div>
+        </div>
         </div>
       </PortfolioSurface>
     </main>
