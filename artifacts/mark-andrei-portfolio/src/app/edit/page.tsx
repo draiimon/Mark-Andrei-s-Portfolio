@@ -1102,7 +1102,7 @@ export default function EditPage() {
 
         <section className="edit-dashboard-intro" aria-labelledby="edit-dashboard-title">
           <div>
-            <p>Portfolio / Edit mode</p>
+            <p>Hi Mark Andrei!</p>
             <h1 id="edit-dashboard-title">Shape what people see.</h1>
           </div>
           <p>{totalContentItems} content records · {projects.length} projects live · {profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}</p>
