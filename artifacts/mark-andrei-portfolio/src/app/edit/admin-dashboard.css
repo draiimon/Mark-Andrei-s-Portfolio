@@ -108,7 +108,8 @@
   min-height: 7.3rem;
   min-width: 0;
   max-width: 100%;
-  --edit-rail-reach: clamp(0rem, calc(3vw - 0.05rem), 3rem);
+  --edit-rail-reach: clamp(0rem, calc(1.2vw - 0.05rem), 1.2rem);
+  --edit-rail-inset: clamp(9rem, 12vw, 11.5rem);
   padding: 1.05rem 0 1.55rem;
   border: 0;
   border-radius: 0;
@@ -170,7 +171,7 @@
   align-self: end;
   grid-row: 1;
   z-index: 0;
-  width: calc(90% + (var(--music-beat) * 10%) + var(--edit-rail-reach, 0rem));
+  width: calc(100% - var(--edit-rail-inset) + (var(--music-beat) * 1rem) + var(--edit-rail-reach, 0rem));
   height: 4px;
   margin-bottom: 1.52rem;
   border-radius: 999px;
@@ -221,6 +222,7 @@
 .edit-header-rail-left {
   grid-column: 1;
   justify-self: start;
+  margin-left: var(--edit-rail-inset);
   clip-path: polygon(0 0, 100% 38%, 100% 62%, 0 100%);
   background: linear-gradient(
     90deg,
@@ -243,6 +245,7 @@
 .edit-header-rail-right {
   grid-column: 3;
   justify-self: end;
+  margin-right: var(--edit-rail-inset);
   clip-path: polygon(0 38%, 0 62%, 100% 100%, 100% 0);
   background: linear-gradient(
     270deg,
@@ -274,7 +277,7 @@
 .edit-admin-identity {
   position: relative;
   display: grid;
-  gap: 0.28rem;
+  gap: 0.34rem;
   grid-column: 1;
   grid-row: 1;
   z-index: 1;
@@ -327,10 +330,11 @@
   grid-row: 1;
   z-index: 1;
   justify-self: end;
-  gap: 0.4rem;
+  gap: 0.72rem;
   min-width: 0;
   max-width: 100%;
   padding-right: clamp(0rem, 1.2vw, 1.25rem);
+  align-self: center;
 }
 
 .edit-admin-identity small {
@@ -373,14 +377,14 @@
   align-items: center;
   justify-content: center;
   gap: 0.42rem;
-  min-height: 2.45rem;
+  min-height: 2.2rem;
   max-width: 100%;
-  padding: 0 0.6rem;
+  padding: 0 0.28rem;
   border: 0;
   border-bottom: 1px solid transparent;
   border-radius: 0;
   color: #d1d2d3;
-  font-size: 0.73rem;
+  font-size: 0.78rem;
   font-weight: 720;
   letter-spacing: 0.035em;
   line-height: 1;
@@ -1026,7 +1030,8 @@
   .edit-control-center .edit-topbar {
     top: calc(0.65rem + env(safe-area-inset-top));
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    --edit-rail-reach: 0.25rem;
+    --edit-rail-reach: 0.4rem;
+    --edit-rail-inset: clamp(4.8rem, 16vw, 6.5rem);
     gap: 0.5rem;
     min-height: 5.4rem;
     padding: 0.7rem 0 1rem;
@@ -1047,6 +1052,10 @@
 
   .edit-header-rail {
     margin-bottom: 0.52rem;
+  }
+
+  .edit-admin-identity {
+    padding-left: 0;
   }
 
   .edit-admin-actions a,
@@ -1179,7 +1188,8 @@
 
   .edit-control-center .edit-topbar {
     top: calc(0.55rem + env(safe-area-inset-top));
-    --edit-rail-reach: 0.12rem;
+    --edit-rail-reach: 0.22rem;
+    --edit-rail-inset: clamp(4.1rem, 15vw, 5.4rem);
     gap: 0.32rem;
     min-height: 4.75rem;
     padding-block: 0.55rem 0.72rem;
