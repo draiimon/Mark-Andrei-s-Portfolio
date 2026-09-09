@@ -1572,23 +1572,77 @@
 .edit-control-center .edit-hero-nav button,
 .edit-control-center .edit-hero-nav button:nth-of-type(4n),
 .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-content: stretch;
+  justify-items: start;
+  gap: 0.55rem;
   min-height: clamp(5rem, 7.6vw, 6.7rem);
-  padding: 0.72rem 0.58rem;
+  padding: 0.95rem 1rem 0.8rem;
+  overflow: hidden;
   border: 1px solid var(--editor-line-strong);
   border-radius: 0;
   background: rgba(1, 4, 8, 0.18);
   color: #85888d;
-  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+  text-align: left;
+  clip-path: polygon(0 0, calc(100% - 0.9rem) 0, 100% 0.9rem, 100% 100%, 0.9rem 100%, 0 calc(100% - 0.9rem));
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 -1.2rem rgba(0, 0, 0, 0.08);
+}
+
+.edit-control-center .edit-hero-nav button::before {
+  position: absolute;
+  top: 0.72rem;
+  left: 0.85rem;
+  display: block;
+  width: 1.5rem;
+  height: 2px;
+  border-radius: 0;
+  background: var(--editor-sun);
+  box-shadow: 0 0 0.7rem rgba(240, 173, 88, 0.45);
+  content: "";
+  opacity: 0.32;
+  transform: scaleX(0.72);
+  transform-origin: left center;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.edit-control-center .edit-hero-nav button::after {
+  position: absolute;
+  inset: 0 auto 0 -45%;
+  display: block;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, rgba(240, 173, 88, 0.18), transparent);
+  content: "";
+  pointer-events: none;
+  transform: skewX(-18deg) translateX(-120%);
+  transition: transform 520ms ease;
 }
 
 .edit-control-center .edit-hero-nav button span {
+  align-self: start;
+  padding-top: 0.35rem;
+  color: currentColor;
   font-size: clamp(0.78rem, 1.05vw, 1.08rem);
   font-weight: 760;
+  letter-spacing: 0.08em;
   line-height: 1.08;
+  text-transform: uppercase;
 }
 
 .edit-control-center .edit-hero-nav button small {
+  align-self: end;
+  color: #777c83;
   font-size: clamp(0.58rem, 0.72vw, 0.72rem);
+  letter-spacing: 0.04em;
   line-height: 1.2;
 }
 
@@ -1597,9 +1651,22 @@
   border-color: rgba(240, 173, 88, 0.76);
   background: rgba(240, 173, 88, 0.08);
   color: #f3eee4;
+  transform: translateY(-2px);
   box-shadow:
     inset 0 0 0 1px rgba(240, 173, 88, 0.12),
+    inset 0 -1.2rem rgba(240, 173, 88, 0.05),
     0 0 1.2rem rgba(240, 173, 88, 0.09);
+}
+
+.edit-control-center .edit-hero-nav button:hover::before,
+.edit-control-center .edit-hero-nav button.is-active::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.edit-control-center .edit-hero-nav button:hover::after,
+.edit-control-center .edit-hero-nav button.is-active::after {
+  transform: skewX(-18deg) translateX(430%);
 }
 
 .edit-control-center .edit-hero-nav button.is-active small {
@@ -1662,7 +1729,7 @@
   .edit-control-center .edit-hero-nav button:nth-of-type(4n),
   .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
     min-height: 4.15rem;
-    padding-inline: 0.25rem;
+    padding: 0.72rem 0.68rem 0.62rem;
   }
 
   .edit-control-center .edit-hero-nav button span {
