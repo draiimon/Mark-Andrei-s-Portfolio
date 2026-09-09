@@ -597,7 +597,7 @@ export default function EditPage() {
   }, []);
 
   useEffect(() => {
-    if (auth !== false) return;
+    if (auth === null) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setSolarIntroActive(false);
@@ -955,6 +955,9 @@ export default function EditPage() {
     achievements.length,
   ]);
 
+  const editorHeadlineParts = editorHeadline.split(/(\s+)/);
+  let editorHeadlineLetterIndex = 0;
+
   if (auth !== true) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
     const compactLogin =
@@ -1162,17 +1165,42 @@ export default function EditPage() {
         <section className="edit-dashboard-intro" aria-labelledby="edit-dashboard-title">
           <div>
             <p>Hi Mark Andrei!</p>
-            <h1 id="edit-dashboard-title" aria-live="polite" aria-label={editorHeadline}>
+            <h1
+              id="edit-dashboard-title"
+              aria-live="polite"
+              aria-label={editorHeadline}
+              style={{ ["--editor-title-length" as any]: Math.max(1, editorHeadline.length) }}
+            >
               <span className="brand-wave edit-headline-wave" aria-hidden="true">
-                {editorHeadline.split("").map((ch, index) => (
-                  <span
-                    key={`${index}-${ch}`}
-                    className="brand-letter edit-headline-letter"
-                    style={{ animationDelay: `${index * 0.04}s`, ["--i" as any]: index }}
-                  >
-                    {ch === " " ? "\u00A0" : ch}
-                  </span>
-                ))}
+                {editorHeadlineParts.map((part, partIndex) => {
+                  if (/^\s+$/.test(part)) {
+                    return (
+                      <span key={`headline-space-${partIndex}`} className="edit-headline-space">
+                        {"\u00A0"}
+                      </span>
+                    );
+                  }
+
+                  return (
+                    <span key={`headline-word-${partIndex}`} className="edit-headline-word">
+                      {[...part].map((ch, letterIndex) => {
+                        const animationIndex = editorHeadlineLetterIndex++;
+                        return (
+                          <span
+                            key={`${partIndex}-${letterIndex}`}
+                            className="brand-letter edit-headline-letter"
+                            style={{
+                              animationDelay: `${animationIndex * 0.04}s`,
+                              ["--i" as any]: animationIndex,
+                            }}
+                          >
+                            {ch}
+                          </span>
+                        );
+                      })}
+                    </span>
+                  );
+                })}
               </span>
               {editorHeadlineTyping && <span className="edit-headline-cursor" aria-hidden="true" />}
             </h1>
@@ -1187,13 +1215,14 @@ export default function EditPage() {
             <label className="edit-mobile-section-picker">
               <span className="sr-only">Choose editor section</span>
               <select
-                value={activeEditorSection}
+                value={editorHasSelectedSection ? activeEditorSection : ""}
                 aria-label="Choose editor section"
                 onChange={(event) => {
                   const nextSection = event.target.value as EditorSection;
                   selectEditorSection(nextSection);
                 }}
               >
+                <option value="" disabled>Select a section</option>
                 {([
                   ["profile", "Profile"],
                   ["projects", "Projects"],
@@ -1209,23 +1238,25 @@ export default function EditPage() {
               </select>
             </label>
             {([
-              ["profile", "Profile", "Identity & links"],
-              ["projects", "Projects", `${projects.length} published`],
-              ["experience", "Experience", `${experience.length} entries`],
-              ["leadership", "Leadership", `${leadership.length} entries`],
-              ["taglines", "Taglines", `${taglines.length} rotating`],
-              ["achievements", "Achievements", `${achievements.length} entries`],
-              ["resume", "Resume", "PDF document"],
-              ["site-media", "Site media", "Icons & sharing"],
-            ] as [EditorSection, string, string][]).map(([id, label, meta]) => (
+              ["profile", "Profile", "PRFL", "Identity & links"],
+              ["projects", "Projects", "PRJ", `${projects.length} published`],
+              ["experience", "Experience", "EXP", `${experience.length} entries`],
+              ["leadership", "Leadership", "LDR", `${leadership.length} entries`],
+              ["taglines", "Taglines", "TAG", `${taglines.length} rotating`],
+              ["achievements", "Achievements", "ACH", `${achievements.length} entries`],
+              ["resume", "Resume", "RES", "PDF document"],
+              ["site-media", "Site media", "MEDIA", "Icons & sharing"],
+            ] as [EditorSection, string, string, string][]).map(([id, label, acronym, meta]) => (
               <button
                 key={id}
                 type="button"
-                className={activeEditorSection === id ? "is-active" : ""}
-                aria-current={activeEditorSection === id ? "page" : undefined}
+                data-section={id}
+                aria-label={label}
+                className={editorHasSelectedSection && activeEditorSection === id ? "is-active" : ""}
+                aria-current={editorHasSelectedSection && activeEditorSection === id ? "page" : undefined}
                 onClick={() => selectEditorSection(id)}
               >
-                <span>{label}</span>
+                <span data-acronym={acronym}>{label}</span>
                 <small>{meta}</small>
               </button>
             ))}

@@ -8,6 +8,7 @@
  */
 
 .edit-control-center {
+  --editor-gutter: clamp(0.85rem, 1.6vw, 1.75rem);
   --editor-ink: #f3f0ea;
   --editor-copy: #c3c0ba;
   --editor-muted: #8c8c8d;
@@ -57,7 +58,7 @@
   max-width: none;
   min-width: 0;
   margin-inline: auto;
-  padding: 0.85rem clamp(0.85rem, 1.6vw, 1.75rem) 5.5rem;
+  padding: 0.85rem var(--editor-gutter) 5.5rem;
 }
 
 /* Bring the public home atmosphere into the authenticated dashboard without
@@ -275,7 +276,6 @@
   grid-column: 1;
   grid-row: 1;
   z-index: 1;
-  padding-left: clamp(0rem, 1.2vw, 1.25rem);
   justify-self: start;
 }
 
@@ -338,7 +338,6 @@
   gap: 0.72rem;
   min-width: 0;
   max-width: 100%;
-  padding-right: clamp(0rem, 1.2vw, 1.25rem);
   align-self: center;
 }
 
@@ -473,11 +472,8 @@
 
 .edit-dashboard-intro > div {
   position: relative;
-  top: -72px;
-  left: clamp(0rem, 1.2vw, 1.25rem);
   z-index: 3;
   min-width: 0;
-  transform: translateY(-clamp(2rem, 4vw, 3.35rem));
 }
 
 .edit-dashboard-intro > div > p:not(.edit-dashboard-meta) {
@@ -1144,8 +1140,6 @@
 
   .edit-dashboard-intro > div {
     left: 0;
-    top: -52px;
-    transform: translateY(-1rem);
   }
 
   .edit-dashboard-intro h1 {
@@ -1157,9 +1151,6 @@
     max-width: 34ch;
     margin-top: 1.25rem;
     text-align: left;
-    right: 0;
-    top: -52px;
-    transform: translateY(-0.35rem);
   }
 
   .edit-admin-layout {
@@ -1325,8 +1316,6 @@
 
   .edit-dashboard-intro > div {
     left: 0;
-    top: -46px;
-    transform: translateY(-0.7rem);
   }
 
   .edit-dashboard-intro h1 {
@@ -1338,9 +1327,6 @@
   .edit-dashboard-intro > p {
     max-width: 30ch;
     line-height: 1.5;
-    right: 0;
-    top: -46px;
-    transform: translateY(-0.15rem);
   }
 
   .edit-admin-nav {
@@ -1503,7 +1489,7 @@
   }
 }
 
-/* Reference composition: open editorial hero with a separated 4 × 2 tile rail. */
+/* Reference composition: open editorial hero with a balanced 4 × 2 tile rail. */
 .edit-control-center .edit-dashboard-intro {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
@@ -1518,10 +1504,7 @@
 }
 
 .edit-control-center .edit-dashboard-intro > div {
-  top: auto;
-  left: 0;
   z-index: 1;
-  transform: none;
 }
 
 .edit-control-center .edit-dashboard-intro > div > p:not(.edit-dashboard-meta) {
@@ -1532,20 +1515,34 @@
 }
 
 .edit-control-center .edit-dashboard-intro h1 {
-  width: auto;
-  max-width: 9ch;
+  width: 100%;
+  max-width: none;
   padding-left: 0;
-  font-size: clamp(4rem, 8vw, 8.6rem);
+  font-size: clamp(
+    2.25rem,
+    calc(11vw - (var(--editor-title-length, 1) * 0.35vw)),
+    8.6rem
+  );
   letter-spacing: -0.09em;
   line-height: 0.88;
-  text-wrap: balance;
+  white-space: nowrap;
+  text-wrap: nowrap;
 }
 
 .edit-control-center .edit-headline-wave {
-  display: inline-flex;
+  display: inline;
   max-width: 100%;
-  flex-wrap: wrap;
   vertical-align: top;
+}
+
+.edit-control-center .edit-headline-word {
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+.edit-control-center .edit-headline-space {
+  display: inline-block;
+  white-space: pre;
 }
 
 .edit-control-center .edit-headline-letter {
@@ -1578,11 +1575,12 @@
   top: auto;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(4.3rem, 1fr));
+  grid-template-rows: repeat(2, minmax(6.35rem, 1fr));
   align-self: center;
   justify-self: stretch;
   gap: clamp(0.48rem, 1vw, 0.72rem);
   width: 100%;
+  margin-inline: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -1598,12 +1596,13 @@
   counter-increment: editor-tile;
   position: relative;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr;
   align-content: stretch;
   justify-items: start;
   gap: 0.55rem;
-  min-height: clamp(5rem, 7.6vw, 6.7rem);
-  padding: 0.95rem 1rem 0.8rem;
+  min-height: 0;
+  height: 100%;
+  padding: 1rem;
   overflow: hidden;
   border: 1px solid var(--editor-line-strong);
   border-radius: 0;
@@ -1620,6 +1619,10 @@
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.05),
     inset 0 -1.2rem rgba(0, 0, 0, 0.08);
+}
+
+.edit-control-center .edit-hero-nav button small {
+  white-space: nowrap;
 }
 
 .edit-control-center .edit-hero-nav button::before {
@@ -1654,6 +1657,7 @@
 .edit-control-center .edit-hero-nav button span {
   position: relative;
   align-self: start;
+  min-height: 2.55rem;
   padding-top: 1.05rem;
   color: currentColor;
   font-size: clamp(0.78rem, 1.05vw, 1.08rem);
@@ -1679,6 +1683,7 @@
 
 .edit-control-center .edit-hero-nav button small {
   align-self: end;
+  min-height: 1.2rem;
   color: #777c83;
   font-size: clamp(0.58rem, 0.72vw, 0.72rem);
   letter-spacing: 0.04em;
@@ -1785,12 +1790,16 @@
   }
 
   .edit-control-center .edit-dashboard-intro h1 {
-    font-size: clamp(3.4rem, 10vw, 6.2rem);
+    font-size: clamp(
+      2.25rem,
+      calc(11vw - (var(--editor-title-length, 1) * 0.35vw)),
+      6.2rem
+    );
   }
 
   .edit-control-center .edit-hero-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(4.7rem, 1fr));
+    grid-template-rows: repeat(4, minmax(6rem, 1fr));
     gap: 0.5rem;
   }
 
@@ -1798,8 +1807,9 @@
   .edit-control-center .edit-hero-nav button:nth-of-type(4n),
   .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
     display: grid;
-    min-height: 4.7rem;
-    padding: 0.8rem 0.75rem 0.65rem;
+    grid-column: auto;
+    min-height: 0;
+    padding: 0.85rem 0.8rem;
   }
 
   .edit-control-center .edit-hero-nav button span {
@@ -1832,20 +1842,16 @@
 
   .edit-control-center .edit-hero-nav {
     width: 100%;
+    margin-inline: 0;
   }
 }
 
 @media (min-width: 821px) and (max-width: 1080px) {
   .edit-control-center .edit-hero-nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(4.4rem, 1fr));
+    grid-template-rows: repeat(4, minmax(5.75rem, 1fr));
   }
-}
 
-@media (min-width: 821px) {
-  .edit-control-center .edit-dashboard-intro {
-    margin-top: -50px;
-  }
 }
 
 @media (max-width: 620px) {
@@ -1859,8 +1865,12 @@
   }
 
   .edit-control-center .edit-dashboard-intro h1 {
-    max-width: 11ch;
-    font-size: clamp(3.15rem, 13vw, 4.5rem);
+    max-width: 100%;
+    font-size: clamp(
+      2rem,
+      calc(11vw - (var(--editor-title-length, 1) * 0.35vw)),
+      4.5rem
+    );
     letter-spacing: -0.075em;
     line-height: 0.9;
   }
@@ -1872,8 +1882,8 @@
   .edit-control-center .edit-hero-nav button,
   .edit-control-center .edit-hero-nav button:nth-of-type(4n),
   .edit-control-center .edit-hero-nav button:nth-last-of-type(-n + 4) {
-    min-height: 4.6rem;
-    padding: 0.72rem 0.68rem 0.62rem;
+    min-height: 0;
+    padding: 0.78rem 0.72rem;
   }
 
   .edit-control-center .edit-hero-nav button span {
@@ -1882,6 +1892,18 @@
 
   .edit-control-center .edit-hero-nav button small {
     font-size: 0.52rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .edit-control-center .edit-dashboard-intro h1 {
+    font-size: clamp(
+      1.9rem,
+      calc(10vw - (var(--editor-title-length, 1) * 0.2vw)),
+      3.4rem
+    );
+    white-space: normal;
+    text-wrap: pretty;
   }
 }
 
