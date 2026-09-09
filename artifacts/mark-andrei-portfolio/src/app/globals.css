@@ -4498,7 +4498,6 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (max-width: 768px) {
   .edit-page .edit-topbar,
-  .edit-page .login-shell,
   .edit-page .feature-card.edit-section,
   .edit-page .control-deck {
     backdrop-filter: blur(8px) saturate(115%);
@@ -4550,7 +4549,6 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 :root[data-mobile-lite="true"] .edit-page .edit-topbar,
-:root[data-mobile-lite="true"] .edit-page .login-shell,
 :root[data-mobile-lite="true"] .edit-page .feature-card.edit-section,
 :root[data-mobile-lite="true"] .edit-page .control-deck {
   box-shadow:
@@ -4564,28 +4562,20 @@ html:has(.pre-intro) .ask-ai-wrap {
   contain-intrinsic-size: 1px 420px;
 }
 
-/* Solar Control Center login: editorial, transparent, and consistent with the
-   public portfolio instead of a generic glossy auth card. */
+/* The unauthenticated editor login is free-form over the page surface. Keep
+   this as the single source of truth for its outer wrapper. */
 .edit-login-shell {
-  overflow: hidden;
+  width: 100%;
+  overflow: visible;
+  padding: 0;
   border: 0;
-  border-left: 0;
-  border-radius: 0 !important;
-  background:
-    radial-gradient(circle at 18% 16%, rgba(255, 153, 0, 0.08), transparent 42%),
-    linear-gradient(135deg, rgba(5, 8, 13, 0.3), rgba(5, 8, 13, 0.08));
+  border-radius: 0;
+  background: transparent;
+  background-image: none;
+  outline: 0;
   box-shadow: none;
-  backdrop-filter: blur(4px) saturate(110%);
-  -webkit-backdrop-filter: blur(4px) saturate(110%);
-}
-
-.edit-login-shell::after {
-  display: none;
-}
-
-.edit-login-shell .edit-orb {
-  opacity: 0.14;
-  filter: blur(46px) saturate(112%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .edit-login-heading {
@@ -4683,16 +4673,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-login-form {
     padding-top: 0.45rem;
   }
-}
-
-:root[data-mobile-lite="true"] .edit-login-shell {
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-:root[data-mobile-lite="true"] .edit-login-shell .edit-orb {
-  display: none;
 }
 
 /* The auth screen follows the portfolio's editorial rhythm: identity first,
@@ -5123,13 +5103,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   justify-self: end;
 }
 
-.edit-login-shell {
-  padding: 0 !important;
-  background: transparent;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
 .edit-login-shell > .relative {
   width: 100%;
 }
@@ -5448,25 +5421,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
-/* Keep the auth surface atmospheric rather than card-shaped. The extra
-   breathing room also protects the aura's soft corona from being clipped. */
-.edit-login-shell {
-  overflow: visible !important;
-  padding: 1.15rem 0.85rem 1.3rem !important;
-  border: 0 !important;
-  background:
-    linear-gradient(145deg, rgba(18, 25, 35, 0.22), rgba(5, 9, 15, 0.08));
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-}
-
-.edit-login-shell .edit-orb {
-  opacity: 0.07;
-}
-
 .edit-login-heading {
   margin-bottom: 2.35rem;
 }
@@ -5545,17 +5499,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
-/* Minimal final auth treatment: larger title, nearly weightless glass, and a
-   quiet text-led action instead of a filled CTA block. */
-.edit-login-shell {
-  background: rgba(10, 16, 24, 0.045);
-  box-shadow:
-    0 18px 46px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.018);
-  backdrop-filter: blur(22px) saturate(118%);
-  -webkit-backdrop-filter: blur(22px) saturate(118%);
-}
-
 .edit-login-title {
   max-width: 13ch;
   font-size: clamp(1.78rem, 3.4vw, 2.35rem);
@@ -5623,21 +5566,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-login-submit {
     width: 100%;
   }
-}
-
-/* Free-form editor login: the page is the surface, not a card. */
-.edit-login-shell {
-  overflow: visible !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-.edit-login-shell .edit-orb {
-  display: none;
 }
 
 .edit-login-heading {
@@ -6813,44 +6741,6 @@ html[data-mobile-lite] .site-shell::before,
 html[data-mobile-lite] .site-shell::after,
 html[data-mobile-lite] .cloud-light {
   will-change: auto;
-}
-
-/* Final surface corrections:
-   keep the editor auth surface genuinely open over the eclipse, and keep the
-   home entry copy crisp while only the page behind it receives the blur. */
-.edit-page:not(.edit-control-center) .edit-login-panel,
-.edit-page:not(.edit-control-center) .edit-login-shell,
-.edit-page:not(.edit-control-center) .edit-login-shell > .relative {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-
-.edit-page:not(.edit-control-center) .edit-login-shell {
-  overflow: visible !important;
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-.edit-page:not(.edit-control-center) .edit-login-shell::before,
-.edit-page:not(.edit-control-center) .edit-login-shell::after {
-  content: none !important;
-  display: none !important;
-}
-
-.edit-page:not(.edit-control-center) .edit-login-panel,
-.edit-page:not(.edit-control-center) .edit-login-shell,
-.edit-page:not(.edit-control-center) .edit-login-shell > .relative {
-  background: none !important;
-  background-image: none !important;
-  outline: none !important;
-  -webkit-box-shadow: none !important;
-}
-
-.edit-page:not(.edit-control-center) .edit-login-shell .edit-orb {
-  display: none !important;
 }
 
 .site-shell:not(.edit-page) .pre-intro {

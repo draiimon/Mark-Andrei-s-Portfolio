@@ -909,9 +909,7 @@ export default function EditPage() {
             </div>
 
             <div className="edit-login-panel">
-              <div className="login-shell edit-login-shell w-full fade-rise">
-                <div className="edit-orb one" />
-                <div className="edit-orb two" />
+              <div className="edit-login-shell w-full fade-rise">
                 <div className="relative z-10">
                   <div className="edit-login-heading">
                     <button
