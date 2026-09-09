@@ -1101,17 +1101,14 @@ export default function EditPage() {
               <small>Portfolio editor</small>
             </a>
             <div className="edit-admin-actions">
-              <span className="edit-admin-status">Editor active</span>
-              <div className="edit-admin-action-row">
-                <a href="/home" className="edit-action-secondary">
-                  <span>View portfolio</span>
-                  <ExternalLink aria-hidden="true" />
-                </a>
-                <button type="button" onClick={() => void handleLogout()} className="edit-action-quiet" aria-label="Log out">
-                  <LogOut aria-hidden="true" />
-                  <span>Logout</span>
-                </button>
-              </div>
+              <a href="/home" className="edit-action-secondary">
+                <span>View portfolio</span>
+                <ExternalLink aria-hidden="true" />
+              </a>
+              <button type="button" onClick={() => void handleLogout()} className="edit-action-quiet" aria-label="Log out">
+                <LogOut aria-hidden="true" />
+                <span>Logout</span>
+              </button>
             </div>
           </header>
 

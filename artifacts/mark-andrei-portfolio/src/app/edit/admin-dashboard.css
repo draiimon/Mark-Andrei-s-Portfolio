@@ -127,8 +127,8 @@
   grid-column: 2;
   grid-row: 1;
   z-index: 2;
-  width: 6.25rem !important;
-  height: 6.25rem !important;
+  width: 5.5rem !important;
+  height: 5.5rem !important;
   margin: 0;
   justify-self: center;
   transform: none !important;
@@ -161,8 +161,8 @@
 
 .edit-control-center .edit-topbar-orb .edit-login-aura,
 .edit-control-center .edit-topbar-orb .edit-login-aura.chat-aura-small {
-  width: 6.25rem;
-  height: 6.25rem;
+  width: 5.5rem;
+  height: 5.5rem;
 }
 
 .edit-header-rail {
@@ -176,6 +176,7 @@
   border-radius: 999px;
   pointer-events: none;
   opacity: calc(0.68 + (var(--music-beat) * 0.25));
+  filter: blur(0.22px);
   box-shadow:
     0 0 calc(0.5rem + (var(--music-beat) * 0.72rem))
       rgba(255, 153, 0, calc(0.3 + (var(--music-beat) * 0.3))),
@@ -212,6 +213,7 @@
   box-shadow: 0 0 0.55rem rgba(255, 186, 93, 0.32);
   content: "";
   opacity: 0;
+  filter: blur(0.7px);
   transform: translateY(-50%);
   will-change: transform, opacity;
 }
@@ -276,7 +278,7 @@
   grid-column: 1;
   grid-row: 1;
   z-index: 1;
-  padding-left: 0;
+  padding-left: clamp(0rem, 1.2vw, 1.25rem);
   justify-self: start;
 }
 
@@ -319,35 +321,16 @@
 
 .edit-admin-actions {
   position: relative;
-  display: grid;
-  justify-items: end;
+  display: flex;
   align-items: center;
   grid-column: 3;
   grid-row: 1;
   z-index: 1;
   justify-self: end;
-  gap: 0.38rem;
+  gap: 0.4rem;
   min-width: 0;
   max-width: 100%;
-  padding-left: 0;
-}
-
-.edit-admin-status {
-  color: var(--editor-copy);
-  font-size: 0.54rem;
-  font-weight: 680;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.edit-admin-action-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.24rem;
-  min-width: 0;
+  padding-right: clamp(0rem, 1.2vw, 1.25rem);
 }
 
 .edit-admin-identity small {
@@ -1058,17 +1041,8 @@
   }
 
   .edit-admin-actions {
-    gap: 0.28rem;
-    padding-left: 0;
-  }
-
-  .edit-admin-status {
-    font-size: 0.48rem;
-    letter-spacing: 0.16em;
-  }
-
-  .edit-admin-action-row {
     gap: 0.08rem;
+    padding-right: 0;
   }
 
   .edit-header-rail {
@@ -1084,14 +1058,14 @@
   .edit-topbar-orb {
     top: 0.22rem;
     grid-column: 2;
-    width: 4.7rem !important;
-    height: 4.7rem !important;
+    width: 4.25rem !important;
+    height: 4.25rem !important;
   }
 
   .edit-control-center .edit-topbar-orb .edit-login-aura,
   .edit-control-center .edit-topbar-orb .edit-login-aura.chat-aura-small {
-    width: 4.7rem;
-    height: 4.7rem;
+    width: 4.25rem;
+    height: 4.25rem;
   }
 
   .edit-dashboard-intro {
@@ -1229,11 +1203,6 @@
     display: none;
   }
 
-  .edit-admin-status {
-    font-size: 0.43rem;
-    letter-spacing: 0.12em;
-  }
-
   .edit-admin-actions a,
   .edit-admin-actions button {
     width: 2.52rem;
@@ -1244,14 +1213,14 @@
   .edit-topbar-orb {
     top: 0.16rem;
     grid-column: 2;
-    width: 4.15rem !important;
-    height: 4.15rem !important;
+    width: 3.8rem !important;
+    height: 3.8rem !important;
   }
 
   .edit-control-center .edit-topbar-orb .edit-login-aura,
   .edit-control-center .edit-topbar-orb .edit-login-aura.chat-aura-small {
-    width: 4.15rem;
-    height: 4.15rem;
+    width: 3.8rem;
+    height: 3.8rem;
   }
 
   .edit-dashboard-intro {
