@@ -1,4 +1,4 @@
-const CACHE_NAME = "mark-andrei-static-v2";
+const CACHE_NAME = "mark-andrei-static-v3-20260909";
 const MEDIA_PATHS = ["/assets/", "/uploads/"];
 const CACHEABLE_DESTINATIONS = new Set(["script", "style", "font", "image", "video", "audio"]);
 

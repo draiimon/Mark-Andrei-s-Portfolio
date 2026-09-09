@@ -33,6 +33,10 @@ ENV NODE_ENV=production
 ENV PORT=5000
 ENV HOST=0.0.0.0
 ENV STATIC_ROOT=/app/artifacts/mark-andrei-portfolio/dist/public
+ARG GIT_COMMIT=unknown
+ENV APP_COMMIT_SHA=$GIT_COMMIT
+
+RUN echo "Building portfolio commit ${GIT_COMMIT}"
 
 COPY --from=build /app/artifacts/api-server/dist ./artifacts/api-server/dist
 COPY --from=build /app/artifacts/mark-andrei-portfolio/dist/public ./artifacts/mark-andrei-portfolio/dist/public

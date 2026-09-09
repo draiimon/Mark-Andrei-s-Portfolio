@@ -12,6 +12,7 @@ if (Number.isNaN(port) || port <= 0) {
 
 logger.info(
   {
+    commit: process.env.RENDER_GIT_COMMIT?.trim() || process.env.APP_COMMIT_SHA?.trim() || "unknown",
     configuration: {
       database: Boolean(process.env.DATABASE_URL?.trim()),
       ai: Boolean(process.env.GROQ_API_KEY?.trim()),

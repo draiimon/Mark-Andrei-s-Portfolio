@@ -79,7 +79,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!import.meta.env.PROD || !("serviceWorker" in navigator)) return;
     const cancel = runWhenIdle(() => {
-      void navigator.serviceWorker.register("/sw.js?v=2", { scope: "/" });
+      void navigator.serviceWorker.register("/sw.js?v=3-20260909", { scope: "/" });
     }, 3500);
     return cancel;
   }, []);
