@@ -6,6 +6,7 @@ import path from "node:path";
 import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { getSessionSecret } from "./lib/session";
 
 const app: Express = express();
 
@@ -30,7 +31,7 @@ app.use(
 );
 app.use(cors());
 app.set("trust proxy", 1);
-app.use(cookieParser(process.env.SESSION_SECRET?.trim()));
+app.use(cookieParser(getSessionSecret()));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -1,5 +1,6 @@
 import express, { Router, type Request, type Response } from "express";
 import { pool } from "@workspace/db";
+import { getSessionSecret } from "../lib/session";
 
 type Profile = Record<string, unknown> & { id: number; viewCount: number };
 type Project = {
@@ -456,7 +457,7 @@ router.post("/admin/login", (req, res) => {
   if (req.body?.username !== username || req.body?.password !== password) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
-  if (!process.env.SESSION_SECRET?.trim()) {
+  if (!getSessionSecret()) {
     req.log.error("SESSION_SECRET is not configured");
     return res.status(503).json({ error: "Admin session is not configured" });
   }

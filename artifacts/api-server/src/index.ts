@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { getSessionSecret } from "./lib/session";
 
 const rawPort = process.env["PORT"] ?? "5000";
 
@@ -15,7 +16,7 @@ logger.info(
       database: Boolean(process.env.DATABASE_URL?.trim()),
       ai: Boolean(process.env.GROQ_API_KEY?.trim()),
       admin: Boolean(process.env.ADMIN_USERNAME?.trim() && process.env.ADMIN_PASSWORD?.trim()),
-      session: Boolean(process.env.SESSION_SECRET?.trim()),
+      session: Boolean(getSessionSecret()),
     },
   },
   "Runtime configuration loaded",
