@@ -6814,3 +6814,43 @@ html[data-mobile-lite] .site-shell::after,
 html[data-mobile-lite] .cloud-light {
   will-change: auto;
 }
+
+/* Final glass corrections:
+   keep the editor auth surface fully open over the eclipse, while the home
+   entry screen uses a real backdrop blur instead of a faint tint. */
+.edit-page .edit-login-panel,
+.edit-page .edit-login-shell,
+.edit-page .edit-login-shell > .relative {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.edit-page .edit-login-shell {
+  overflow: visible !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.edit-page .edit-login-shell::before,
+.edit-page .edit-login-shell::after {
+  display: none !important;
+}
+
+.site-shell:not(.edit-page) .pre-intro {
+  background: rgba(8, 10, 14, 0.24) !important;
+  backdrop-filter: blur(22px) saturate(118%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(118%) !important;
+}
+
+.site-shell:not(.edit-page) .pre-intro::before {
+  opacity: 0.42;
+}
+
+@media (max-width: 768px) {
+  .site-shell:not(.edit-page) .pre-intro {
+    background: rgba(8, 10, 14, 0.28) !important;
+    backdrop-filter: blur(16px) saturate(116%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(116%) !important;
+  }
+}
