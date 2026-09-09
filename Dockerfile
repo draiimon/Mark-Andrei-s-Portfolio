@@ -1,4 +1,4 @@
-FROM node:24-alpine AS build
+FROM node:24-slim AS build
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ ENV BASE_PATH=/
 RUN pnpm --filter @workspace/mark-andrei-portfolio run build
 RUN pnpm --filter @workspace/api-server run build
 
-FROM node:24-alpine AS runtime
+FROM node:24-slim AS runtime
 
 WORKDIR /app
 
