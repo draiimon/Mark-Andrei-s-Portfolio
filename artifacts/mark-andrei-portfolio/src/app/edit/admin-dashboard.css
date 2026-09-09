@@ -462,11 +462,11 @@
 }
 
 .edit-dashboard-intro > div > p {
-  margin: 0 0 0.9rem;
+  margin: 0 0 1.05rem;
   color: var(--editor-sun);
-  font-size: 0.58rem;
-  font-weight: 720;
-  letter-spacing: 0.2em;
+  font-size: clamp(0.88rem, 1.25vw, 1.12rem);
+  font-weight: 760;
+  letter-spacing: 0.12em;
   line-height: 1.2;
   text-transform: uppercase;
 }
