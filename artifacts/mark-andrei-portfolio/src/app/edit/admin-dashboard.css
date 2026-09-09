@@ -1538,6 +1538,7 @@
   font-size: clamp(4rem, 8vw, 8.6rem);
   letter-spacing: -0.09em;
   line-height: 0.88;
+  text-wrap: balance;
 }
 
 .edit-control-center .edit-dashboard-meta {
@@ -1766,6 +1767,19 @@
     font-size: clamp(3.4rem, 10vw, 6.2rem);
   }
 
+  .edit-control-center .edit-mobile-section-picker select {
+    font-size: 0.7rem;
+    letter-spacing: 0.045em;
+  }
+
+  .edit-control-center .edit-hero-nav button span {
+    letter-spacing: 0.045em;
+  }
+
+  .edit-control-center .edit-hero-nav button small {
+    letter-spacing: 0.025em;
+  }
+
   .edit-control-center .edit-hero-nav {
     width: 100%;
   }
@@ -1795,8 +1809,10 @@
   }
 
   .edit-control-center .edit-dashboard-intro h1 {
-    max-width: 8ch;
-    font-size: clamp(3.25rem, 15vw, 5rem);
+    max-width: 11ch;
+    font-size: clamp(3.15rem, 13vw, 4.5rem);
+    letter-spacing: -0.075em;
+    line-height: 0.9;
   }
 
   .edit-control-center .edit-hero-nav {
