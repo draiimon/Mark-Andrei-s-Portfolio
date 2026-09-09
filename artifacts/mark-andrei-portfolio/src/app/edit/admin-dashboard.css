@@ -64,10 +64,10 @@
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: clamp(0.8rem, 3vw, 3.2rem);
-  min-height: 4.8rem;
+  min-height: 7.3rem;
   min-width: 0;
   max-width: 100%;
-  padding: 0.88rem 0 1.05rem;
+  padding: 1.05rem 0 1.55rem;
   border: 0;
   border-radius: 0;
   background: transparent !important;
@@ -79,13 +79,36 @@
   isolation: isolate;
 }
 
+.edit-control-center .edit-topbar::after {
+  position: absolute;
+  right: 0;
+  bottom: 0.42rem;
+  left: 0;
+  z-index: 0;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(240, 173, 88, 0.18) 12%,
+    rgba(240, 173, 88, 0.72) 34%,
+    var(--editor-sun) 50%,
+    rgba(240, 173, 88, 0.72) 66%,
+    rgba(240, 173, 88, 0.18) 88%,
+    transparent
+  );
+  box-shadow: 0 0 0.9rem rgba(240, 145, 44, 0.64);
+}
+
 .edit-topbar-orb {
   position: relative;
+  top: 0.35rem;
   grid-column: 2;
   grid-row: 1;
   z-index: 2;
-  width: 3.15rem !important;
-  height: 3.15rem !important;
+  width: 6.25rem !important;
+  height: 6.25rem !important;
   margin: 0;
   justify-self: center;
   transform: none !important;
@@ -99,12 +122,13 @@
   transform:
     translate3d(
       0,
-      calc((var(--music-vibe) * -0.04rem) + (var(--music-beat) * -0.2rem)),
+      calc((var(--music-vibe) * -0.12rem) + (var(--music-beat) * -0.9rem)),
       0
     )
-    rotate(calc(var(--music-beat) * 1deg))
-    scale(calc(1 + (var(--music-vibe) * 0.018) + (var(--music-beat) * 0.045)));
-  transition: filter 180ms ease-out;
+    rotate(calc((var(--music-vibe) * -1.5deg) + (var(--music-beat) * 5deg)))
+    scale(calc(1 + (var(--music-vibe) * 0.025) + (var(--music-beat) * 0.11)));
+  filter: drop-shadow(0 0 calc(0.8rem + (var(--music-beat) * 1.25rem)) rgba(255, 142, 38, calc(0.24 + (var(--music-beat) * 0.35))));
+  transition: transform 110ms cubic-bezier(0.2, 0.8, 0.25, 1), filter 110ms ease-out;
   will-change: transform, filter;
 }
 
@@ -117,19 +141,32 @@
 
 .edit-control-center .edit-topbar-orb .edit-login-aura,
 .edit-control-center .edit-topbar-orb .edit-login-aura.chat-aura-small {
-  width: 3.15rem;
-  height: 3.15rem;
+  width: 6.25rem;
+  height: 6.25rem;
 }
 
 .edit-admin-identity {
+  position: relative;
   grid-column: 1;
   grid-row: 1;
+  z-index: 1;
   padding-left: 0;
+  justify-self: start;
 }
 
 .edit-admin-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
   grid-column: 3;
   grid-row: 1;
+  z-index: 1;
+  justify-self: end;
+  gap: 0.24rem;
+  min-width: 0;
+  max-width: 100%;
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--editor-line);
 }
 
 .edit-admin-identity > span:last-child {
@@ -790,8 +827,13 @@
   .edit-control-center .edit-topbar {
     top: calc(0.65rem + env(safe-area-inset-top));
     grid-template-columns: minmax(0, 1fr) auto auto;
-    min-height: 3.8rem;
-    padding: 0.68rem 0 0.8rem;
+    gap: 0.5rem;
+    min-height: 5.4rem;
+    padding: 0.7rem 0 1rem;
+  }
+
+  .edit-control-center .edit-topbar::after {
+    bottom: 0.34rem;
   }
 
   .edit-admin-identity {
@@ -804,7 +846,8 @@
 
   .edit-admin-actions {
     flex-wrap: nowrap;
-    padding-left: 0.5rem;
+    gap: 0.08rem;
+    padding-left: 0.48rem;
   }
 
   .edit-admin-actions a,
@@ -814,9 +857,16 @@
   }
 
   .edit-topbar-orb {
+    top: 0.22rem;
     grid-column: 2;
-    width: 3.2rem !important;
-    height: 3.2rem !important;
+    width: 4.7rem !important;
+    height: 4.7rem !important;
+  }
+
+  .edit-control-center .edit-topbar-orb .edit-login-aura,
+  .edit-control-center .edit-topbar-orb .edit-login-aura.chat-aura-small {
+    width: 4.7rem;
+    height: 4.7rem;
   }
 
   .edit-dashboard-intro {
@@ -841,7 +891,7 @@
 
   .edit-admin-nav {
     position: sticky;
-    top: calc(0.65rem + env(safe-area-inset-top) + 3.8rem + 0.48rem);
+    top: calc(0.65rem + env(safe-area-inset-top) + 4.45rem + 0.48rem);
     z-index: 30;
     display: block;
     margin: 0 -1rem 1.85rem;
@@ -930,8 +980,9 @@
 
   .edit-control-center .edit-topbar {
     top: calc(0.55rem + env(safe-area-inset-top));
-    min-height: 3.55rem;
-    padding-block: 0.58rem 0.72rem;
+    gap: 0.32rem;
+    min-height: 4.75rem;
+    padding-block: 0.55rem 0.72rem;
   }
 
   .edit-admin-identity {
@@ -954,15 +1005,22 @@
 
   .edit-admin-actions a,
   .edit-admin-actions button {
-    width: 2.78rem;
-    min-width: 2.78rem;
+    width: 2.52rem;
+    min-width: 2.52rem;
     padding: 0;
   }
 
   .edit-topbar-orb {
+    top: 0.16rem;
     grid-column: 2;
-    width: 3rem !important;
-    height: 3rem !important;
+    width: 4.15rem !important;
+    height: 4.15rem !important;
+  }
+
+  .edit-control-center .edit-topbar-orb .edit-login-aura,
+  .edit-control-center .edit-topbar-orb .edit-login-aura.chat-aura-small {
+    width: 4.15rem;
+    height: 4.15rem;
   }
 
   .edit-dashboard-intro {
@@ -980,7 +1038,7 @@
   }
 
   .edit-admin-nav {
-    top: calc(0.55rem + env(safe-area-inset-top) + 3.55rem + 0.42rem);
+    top: calc(0.55rem + env(safe-area-inset-top) + 4.75rem + 0.42rem);
     margin-inline: -0.9rem;
     padding-inline: 0.9rem;
   }
