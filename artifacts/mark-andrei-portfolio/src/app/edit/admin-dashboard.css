@@ -483,7 +483,10 @@
   max-width: 13ch;
   margin: 0;
   overflow: visible;
-  padding-inline-start: 0.06em;
+  padding: 0.02em 0 0.14em 0.06em;
+  clip-path: none;
+  mask: none;
+  -webkit-mask: none;
   color: #f3f0ea;
   -webkit-text-fill-color: transparent;
   background-image: linear-gradient(
@@ -503,7 +506,7 @@
   font-size: clamp(2.8rem, 5.9vw, 5.6rem);
   font-weight: 700;
   letter-spacing: -0.075em;
-  line-height: 0.86;
+  line-height: 0.98;
   text-wrap: balance;
   animation: editHeadlineLightSweep 6.8s cubic-bezier(0.2, 0.72, 0.2, 1) infinite;
 }
