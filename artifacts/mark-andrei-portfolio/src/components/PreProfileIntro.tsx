@@ -83,6 +83,7 @@ export default function PreProfileIntro({ brand, onDone }: PreProfileIntroProps)
   return createPortal(
     <div
       className={`pre-intro ${phase === "fade" ? "pre-intro-fade" : ""} ${phase === "idle" ? "pre-intro-clickable" : ""}`}
+      data-phase={phase}
       onWheelCapture={(e) => {
         if (phase === "idle") e.preventDefault();
       }}

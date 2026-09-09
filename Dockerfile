@@ -1,24 +1,47 @@
-FROM node:24-bookworm-slim AS builder
-WORKDIR /app
-RUN npm install --global pnpm@11.6.0
+FROM node:24-slim AS build
 
-COPY . .
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@10.26.1 --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY artifacts/api-server/package.json artifacts/api-server/package.json
+COPY artifacts/mark-andrei-portfolio/package.json artifacts/mark-andrei-portfolio/package.json
+COPY artifacts/mockup-sandbox/package.json artifacts/mockup-sandbox/package.json
+COPY lib/api-client-react/package.json lib/api-client-react/package.json
+COPY lib/api-spec/package.json lib/api-spec/package.json
+COPY lib/api-zod/package.json lib/api-zod/package.json
+COPY lib/db/package.json lib/db/package.json
+COPY scripts/package.json scripts/package.json
+COPY scripts/check-package-manager.cjs scripts/check-package-manager.cjs
+
 RUN pnpm install --frozen-lockfile
 
-# Only the public site URL is needed while compiling browser assets.
-ARG NEXT_PUBLIC_SITE_URL=""
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
-ENV PORT=3000 BASE_PATH=/
-RUN pnpm run build
+COPY . .
 
-FROM node:24-bookworm-slim AS runner
+ENV NODE_ENV=production
+ENV PORT=5000
+ENV BASE_PATH=/
+
+RUN pnpm --filter @workspace/mark-andrei-portfolio run build
+RUN pnpm --filter @workspace/api-server run build
+
+FROM node:24-slim AS runtime
+
 WORKDIR /app
-ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
 
-# The API build bundles its dependencies, including its logging workers.
-COPY --from=builder --chown=node:node /app/artifacts/api-server/dist ./artifacts/api-server/dist
-COPY --from=builder --chown=node:node /app/artifacts/mark-andrei-portfolio/dist/public ./artifacts/mark-andrei-portfolio/dist/public
+ENV NODE_ENV=production
+ENV PORT=5000
+ENV HOST=0.0.0.0
+ENV STATIC_ROOT=/app/artifacts/mark-andrei-portfolio/dist/public
+ARG GIT_COMMIT=unknown
+ENV APP_COMMIT_SHA=$GIT_COMMIT
 
-USER node
-EXPOSE 3000
-CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
+RUN echo "Building portfolio commit ${GIT_COMMIT}"
+
+COPY --from=build /app/artifacts/api-server/dist ./artifacts/api-server/dist
+COPY --from=build /app/artifacts/mark-andrei-portfolio/dist/public ./artifacts/mark-andrei-portfolio/dist/public
+
+EXPOSE 5000
+
+CMD ["node", "--enable-source-maps", "/app/artifacts/api-server/dist/index.mjs"]

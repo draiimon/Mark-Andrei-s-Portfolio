@@ -31,7 +31,7 @@ const socialUrlPlugin = () => ({
   name: "portfolio-social-url",
   transformIndexHtml(html: string) {
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.VITE_SITE_URL || "").trim().replace(/\/+$/, "");
-    return html.replaceAll("__SITE_URL__", siteUrl);
+    return siteUrl ? html.replaceAll("__SITE_URL__", siteUrl) : html;
   },
 });
 
@@ -59,12 +59,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src'),
-      '@assets': path.resolve(
-        import.meta.dirname,
-        '..',
-        '..',
-        'attached_assets',
-      ),
     },
     dedupe: ['react', 'react-dom'],
   },

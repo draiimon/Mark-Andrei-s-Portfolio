@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, type ReactNode } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import AppShell from "@/components/AppShell";
-import { usePageLoading } from "@/components/PageLoading";
+import { PageLoadingProvider, usePageLoading } from "@/components/PageLoading";
 import { Toaster } from "@/components/ui/toaster";
 import Home from "@/app/home/page";
 import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
@@ -10,11 +10,13 @@ const EditPage = lazy(() => import("@/app/edit/page"));
 
 function Router() {
   const [location] = useLocation();
-  const { beginRoute } = usePageLoading();
+  const { beginRoute, markPageReady } = usePageLoading();
 
   useEffect(() => {
     beginRoute(location);
-  }, [beginRoute, location]);
+    const readyTimer = window.setTimeout(() => markPageReady(location), 0);
+    return () => window.clearTimeout(readyTimer);
+  }, [beginRoute, location, markPageReady]);
 
   return (
     <RoutedErrorBoundary>
@@ -42,12 +44,14 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 function App() {
   return (
     <ErrorBoundary>
-      <AppShell>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
-        </WouterRouter>
-      </AppShell>
-      <Toaster />
+      <PageLoadingProvider>
+        <AppShell>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <Router />
+          </WouterRouter>
+        </AppShell>
+        <Toaster />
+      </PageLoadingProvider>
     </ErrorBoundary>
   );
 }

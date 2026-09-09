@@ -1,5 +1,5 @@
-import { effectBudget, getPerformanceProfile } from "@/lib/adaptive-performance";
 import { useEffect, useRef, type CSSProperties } from "react";
+import { isLowPowerDevice } from "@/lib/performance";
 
 export type SolarAuraState = "idle" | "thinking" | "typing";
 
@@ -38,24 +38,19 @@ export default function SolarAura({
 
     let frame = 0;
     let lastTime = performance.now();
+    let lastPaintTime = 0;
     let angle = 0;
     let velocity = 30;
-    let visible = true;
-    let lastPaint = 0;
-
+    const lowPower = isLowPowerDevice();
 
     const animate = (time: number) => {
-      if (!visible || document.hidden || getPerformanceProfile().reducedMotion) {
-        frame = 0;
-        return;
-      }
-      if (lastPaint && time - lastPaint < effectBudget().frameMs) {
+      if (lowPower && lastPaintTime && time - lastPaintTime < 32) {
         frame = requestAnimationFrame(animate);
         return;
       }
-      lastPaint = time;
-      const delta = Math.min(100, Math.max(0, time - lastTime));
+      const delta = Math.min(40, Math.max(0, time - lastTime));
       lastTime = time;
+      lastPaintTime = time;
 
       // One rotating body with a soft velocity spring: clicks change the
       // target speed, while the current angle keeps moving continuously.
@@ -67,28 +62,8 @@ export default function SolarAura({
       frame = requestAnimationFrame(animate);
     };
 
-    const updateRunning = () => {
-      if (visible && !document.hidden && !frame) {
-        lastTime = performance.now();
-        frame = requestAnimationFrame(animate);
-      } else if ((!visible || document.hidden) && frame) {
-        cancelAnimationFrame(frame);
-        frame = 0;
-      }
-    };
-    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      updateRunning();
-    }, { rootMargin: "96px" });
-
-    observer?.observe(aura);
-    document.addEventListener("visibilitychange", updateRunning);
-    updateRunning();
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      observer?.disconnect();
-      document.removeEventListener("visibilitychange", updateRunning);
-    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   return (

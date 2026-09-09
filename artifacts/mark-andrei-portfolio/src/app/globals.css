@@ -223,26 +223,6 @@ body {
   will-change: transform, filter;
 }
 
-.offline-status {
-  position: fixed;
-  right: 1rem;
-  bottom: calc(1rem + env(safe-area-inset-bottom));
-  z-index: 80;
-  max-width: min(22rem, calc(100vw - 2rem));
-  padding: 0.6rem 0.8rem;
-  border: 1px solid rgba(255, 190, 104, 0.28);
-  border-radius: 999px;
-  background: rgba(4, 7, 12, 0.86);
-  color: rgba(255, 237, 207, 0.88);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  line-height: 1.2;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
 .site-video-shade {
   z-index: 1;
   background:
@@ -303,7 +283,10 @@ body {
 }
 
 .edit-page {
-  scroll-behavior: smooth;
+  /* smoothScrollToId owns the animation; a second browser smooth-scroll
+     animation makes touch navigation feel delayed and can keep moving after
+     the finger has stopped. */
+  scroll-behavior: auto;
 }
 
 .cloud-light {
@@ -376,7 +359,6 @@ body {
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  contain: strict;
 }
 
 .topbar {
@@ -387,8 +369,8 @@ body {
   background: transparent;
   border: 0;
   box-shadow: none;
-  -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .edit-topbar {
@@ -726,8 +708,8 @@ body {
   border: 0;
   background: transparent;
   box-shadow: none;
-  -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .portfolio-refinement .topbar .brand-wave {
@@ -873,7 +855,6 @@ body {
 }
 
 .music-edge-controller::before { display: none; }
-.music-speaker-pill,
 .music-edge-button {
   border-radius: 0;
   box-shadow: none;
@@ -1134,7 +1115,6 @@ body {
     z-index: 55;
   }
 
-  .portfolio-refinement .music-speaker-pill,
   .portfolio-refinement .music-edge-volume {
     display: none !important;
   }
@@ -1178,8 +1158,8 @@ body {
   border: 0;
   background: transparent;
   box-shadow: none;
-  -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .portfolio-refinement .topbar .brand-wave {
@@ -1307,8 +1287,8 @@ body {
   background:
     linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
     rgba(10, 10, 14, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
   box-shadow:
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
@@ -1321,15 +1301,8 @@ body {
   filter: blur(8px);
 }
 
-.music-speaker-pill,
 .music-edge-button {
   border-radius: 999px !important;
-}
-
-.music-speaker-pill {
-  box-shadow:
-    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
-    inset 0 0 10px rgba(255, 153, 0, 0.12);
 }
 
 .music-edge-button {
@@ -1361,10 +1334,6 @@ body {
 
 .music-edge-controller::after {
   animation: musicFrameShimmer 2.8s ease-in-out infinite;
-}
-
-.music-speaker-pill {
-  animation: musicPillBreathe 2.4s ease-in-out infinite;
 }
 
 .portfolio-refinement .portfolio-copy {
@@ -1601,8 +1570,8 @@ body {
   background:
     linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
     rgba(10, 10, 14, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
   box-shadow:
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
@@ -1646,8 +1615,8 @@ body {
   background:
     linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
     rgba(10, 10, 14, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
   box-shadow:
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
@@ -1789,8 +1758,8 @@ body {
   background:
     linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
     rgba(10, 10, 14, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
   box-shadow:
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
@@ -1923,46 +1892,6 @@ body {
   .portfolio-refinement .cloud-light { animation: none !important; transition: none !important; }
 }
 
-.cloud-banner {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 1rem;
-  padding: 0.85rem 0.95rem;
-  background:
-    radial-gradient(circle at 12% 20%, rgba(255, 153, 0, 0.2), transparent 35%),
-    radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.12), transparent 42%),
-    rgba(255, 255, 255, 0.02);
-}
-
-.cloud-banner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 22% 120%, rgba(255, 255, 255, 0.17), transparent 48%),
-    radial-gradient(ellipse at 68% 120%, rgba(255, 153, 0, 0.22), transparent 48%);
-  animation: cloudDrift 11s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-.cloud-banner-label {
-  position: relative;
-  z-index: 1;
-  font-size: 0.72rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(248, 250, 252, 0.7);
-}
-
-.cloud-banner-icons {
-  position: relative;
-  z-index: 1;
-  margin-top: 0.55rem;
-  display: flex;
-  gap: 0.55rem;
-}
-
 .glow-icon-link {
   display: inline-flex;
   align-items: center;
@@ -1996,20 +1925,6 @@ body {
   opacity: 0.92;
 }
 
-.cloud-banner-views {
-  position: relative;
-  z-index: 1;
-  margin-top: 0.6rem;
-}
-
-.music-frame {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0.9rem;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.28);
-  min-height: 152px;
-}
-
 .music-edge-controller {
   position: fixed;
   left: 0.7rem;
@@ -2025,8 +1940,8 @@ body {
   background:
     linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
     rgba(10, 10, 14, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
   box-shadow:
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
@@ -2061,80 +1976,6 @@ body {
     0 0 calc(20px + (var(--music-vibe) * 20px)) rgba(255, 153, 0, calc(0.24 + (var(--music-vibe) * 0.35))),
     0 0 calc(36px + (var(--music-vibe) * 24px)) rgba(255, 153, 0, calc(0.11 + (var(--music-vibe) * 0.22))),
     inset 0 0 calc(16px + (var(--music-vibe) * 10px)) rgba(255, 153, 0, calc(0.17 + (var(--music-vibe) * 0.2)));
-}
-
-.music-speaker-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.15rem;
-  height: 2.15rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 153, 0, 0.6);
-  background:
-    radial-gradient(circle at 30% 28%, rgba(255, 193, 105, 0.28), transparent 54%),
-    linear-gradient(165deg, rgba(25, 18, 10, 0.95), rgba(12, 10, 8, 0.96));
-  box-shadow:
-    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
-    inset 0 0 10px rgba(255, 153, 0, 0.12);
-  transform: translateY(calc(var(--music-vibe) * -2px)) scale(calc(1 + (var(--music-vibe) * 0.03)));
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-}
-
-.music-speaker-pill.is-playing {
-  box-shadow:
-    0 0 calc(10px + (var(--music-vibe) * 14px)) rgba(255, 153, 0, calc(0.25 + (var(--music-vibe) * 0.4))),
-    inset 0 0 calc(10px + (var(--music-beat) * 8px)) rgba(255, 153, 0, calc(0.14 + (var(--music-beat) * 0.2)));
-}
-
-.music-speaker-pill:hover {
-  transform: translateY(-1px) scale(1.03);
-  border-color: rgba(255, 173, 31, 0.86);
-  box-shadow:
-    0 0 16px rgba(255, 153, 0, 0.42),
-    inset 0 0 11px rgba(255, 153, 0, 0.2);
-}
-
-.speaker-pill-bars {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 14px;
-}
-
-.speaker-pill-bar {
-  width: 2px;
-  border-radius: 999px;
-  height: 6px;
-  background: linear-gradient(180deg, rgba(255, 223, 170, 1), rgba(255, 153, 0, 0.95));
-  box-shadow: 0 0 7px rgba(255, 153, 0, 0.85);
-  transform-origin: bottom center;
-  animation: speakerPillIdle 1.4s ease-in-out infinite;
-}
-
-.speaker-pill-bar.is-playing {
-  animation: speakerPillBeat 0.9s ease-in-out infinite;
-}
-
-.music-edge-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 16px;
-}
-
-
-.music-edge-bar {
-  width: 3px;
-  height: 5px;
-  border-radius: 999px;
-  background: rgb(255, 153, 0);
-  opacity: 0.8;
-  box-shadow: 0 0 8px rgba(255, 153, 0, 0.8);
-}
-
-.music-edge-bar.is-playing {
-  animation: musicBarBeat 0.95s ease-in-out infinite;
 }
 
 .music-edge-button {
@@ -2180,16 +2021,6 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
-}
-
-.music-volume-icon {
-  animation: musicIconIdle 1.5s ease-in-out infinite;
-  transition: transform 140ms ease, filter 140ms ease;
-}
-
-.music-volume-icon.is-playing {
-  transform: scale(calc(1 + (var(--music-vibe) * 0.12)));
-  filter: drop-shadow(0 0 calc(4px + (var(--music-vibe) * 7px)) rgba(255, 153, 0, calc(0.32 + (var(--music-vibe) * 0.36))));
 }
 
 .music-edge-volume input[type="range"] {
@@ -2252,8 +2083,8 @@ body {
   display: grid;
   place-items: center;
   background: rgba(8, 10, 14, 0.2);
-  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   pointer-events: auto;
   animation: preIntroIn 320ms ease both;
 }
@@ -2342,26 +2173,6 @@ body {
 
 .pre-intro-line-idle {
   opacity: 0;
-}
-
-.pre-intro-enter {
-  margin-top: 0.65rem;
-  border: 1px solid rgba(245, 158, 11, 0.55);
-  background: rgba(245, 158, 11, 0.08);
-  color: #fbbf24;
-  border-radius: 999px;
-  padding: 0.38rem 0.85rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: transform 180ms ease, filter 180ms ease, border-color 180ms ease;
-}
-
-.pre-intro-enter:hover {
-  transform: translateY(-1px) scale(1.02);
-  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
-  border-color: rgba(245, 158, 11, 0.9);
 }
 
 .pre-intro-progress {
@@ -2853,107 +2664,10 @@ html:has(.pre-intro) .ask-ai-wrap {
   pointer-events: none;
 }
 
-.ask-ai-fab {
-  position: relative;
-  isolation: isolate;
-  transform: scale(calc(1 + (var(--music-vibe) * 0.03) + (var(--music-beat) * 0.015)));
-  box-shadow:
-    0 0 calc(20px + (var(--music-vibe) * 20px)) rgba(255, 153, 0, calc(0.35 + (var(--music-vibe) * 0.28))),
-    0 0 calc(10px + (var(--music-beat) * 8px)) rgba(255, 205, 128, calc(0.2 + (var(--music-beat) * 0.25)));
-  transition: transform 180ms ease-out, box-shadow 180ms ease-out, filter 180ms ease-out;
-}
-
-.ask-ai-fab::before {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  opacity: 0.95;
-  pointer-events: none;
-}
-
-.ask-ai-fab::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(
-    from var(--snake-angle, 0deg),
-    rgba(255, 153, 0, 0) 0deg,
-    rgba(255, 153, 0, 0) 300deg,
-    rgba(255, 169, 40, 0.98) 334deg,
-    rgba(255, 216, 150, 0.95) 348deg,
-    rgba(255, 153, 0, 0) 360deg
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  animation: askAiSnakeRing 1.9s linear infinite;
-}
-
-.ask-ai-fab:hover {
-  filter: drop-shadow(0 0 12px rgba(255, 153, 0, 0.52));
-}
-
-.ask-ai-panel {
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.45),
-    0 0 calc(14px + (var(--music-vibe) * 16px)) rgba(255, 153, 0, calc(0.16 + (var(--music-vibe) * 0.24))),
-    inset 0 0 calc(8px + (var(--music-beat) * 6px)) rgba(255, 153, 0, calc(0.08 + (var(--music-beat) * 0.16)));
-  transform: translateY(calc((var(--music-vibe) * -1px) + (var(--music-beat) * -1px)));
-  transition: transform 180ms ease-out, box-shadow 180ms ease-out;
-}
-
-.ask-ai-scroll {
-  scroll-behavior: smooth;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
-}
-
-.ask-ai-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.ask-ai-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 153, 0, 0.6);
-  border-radius: 999px;
-}
-
-.ask-ai-msg {
-  animation: askAiMsgFade 260ms ease both;
-}
-
-@keyframes askAiMsgFade {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-    filter: blur(1px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-@keyframes askAiSnakeRing {
-  from {
-    --snake-angle: 0deg;
-  }
-  to {
-    --snake-angle: 360deg;
-  }
-}
-
 @media (max-width: 768px) {
   .pre-intro {
-    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .reveal,
@@ -2972,15 +2686,6 @@ html:has(.pre-intro) .ask-ai-wrap {
     opacity: 0.24;
     filter: blur(24px);
     transition: opacity 260ms ease, filter 260ms ease;
-  }
-
-  :root[data-mobile-lite="true"] .site-video-background {
-    will-change: auto;
-    transition: none;
-  }
-
-  :root[data-mobile-lite="true"] .cloud-light {
-    will-change: auto;
   }
 
   :root[data-mobile-lite="true"] .cloud-light {
@@ -3008,10 +2713,17 @@ html:has(.pre-intro) .ask-ai-wrap {
 
   :root[data-mobile-lite="true"] .topbar,
   :root[data-mobile-lite="true"] .pre-intro,
-  :root[data-mobile-lite="true"] .music-edge-controller,
-  :root[data-mobile-lite="true"] .ask-ai-panel {
-    -webkit-backdrop-filter: blur(8px) saturate(115%);
+  :root[data-mobile-lite="true"] .music-edge-controller {
     backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
+  }
+
+  :root[data-mobile-lite="true"] .topbar {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   :root[data-mobile-lite="true"] .music-edge-controller,
@@ -3021,20 +2733,14 @@ html:has(.pre-intro) .ask-ai-wrap {
       inset 0 0 7px rgba(255, 153, 0, 0.09);
   }
 
-  :root[data-mobile-lite="true"] .music-speaker-pill,
-  :root[data-mobile-lite="true"] .music-speaker-pill.is-playing,
   :root[data-mobile-lite="true"] .music-edge-button,
-  :root[data-mobile-lite="true"] .music-edge-button.is-playing,
-  :root[data-mobile-lite="true"] .ask-ai-fab,
-  :root[data-mobile-lite="true"] .ask-ai-panel {
+  :root[data-mobile-lite="true"] .music-edge-button.is-playing {
     box-shadow:
       0 0 7px rgba(255, 153, 0, 0.14),
       inset 0 0 4px rgba(255, 153, 0, 0.06);
   }
 
-  .ask-ai-wrap,
-  .ask-ai-panel,
-  .ask-ai-fab {
+  .ask-ai-wrap {
     transform: none !important;
   }
 
@@ -3045,31 +2751,6 @@ html:has(.pre-intro) .ask-ai-wrap {
 
   .typewriter-wrap {
     max-width: calc(100vw - 2.4rem);
-  }
-
-  :root[data-mobile-lite="true"] .ask-ai-fab {
-    width: 2.45rem;
-    height: 2.45rem;
-    padding: 0 !important;
-    justify-content: center;
-  }
-
-  :root[data-mobile-lite="true"] .ask-ai-fab span {
-    display: none;
-  }
-
-  :root[data-mobile-lite="true"] .ask-ai-fab .h-5.w-5 {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-
-  :root[data-mobile-lite="true"] .ask-ai-fab {
-    box-shadow: 0 0 8px rgba(255, 153, 0, 0.22);
-  }
-
-  :root[data-mobile-lite="true"] .ask-ai-fab::after {
-    animation-duration: 2.8s;
-    opacity: 0.8;
   }
 
   :root[data-mobile-lite="true"] .reveal {
@@ -3094,12 +2775,6 @@ html:has(.pre-intro) .ask-ai-wrap {
     content-visibility: auto;
     contain-intrinsic-size: 1px 520px;
   }
-}
-
-:root[data-page-visibility="hidden"] .site-shell *,
-:root[data-page-visibility="hidden"] .site-shell::before,
-:root[data-page-visibility="hidden"] .site-shell::after {
-  animation-play-state: paused !important;
 }
 
 /* Final portfolio surface pass: intentionally flat, quiet, and high contrast. */
@@ -3130,8 +2805,8 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 .portfolio-refinement .pre-intro {
   background: rgba(7, 9, 13, 0.98);
-  -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .portfolio-chat .chat-launcher,
@@ -3205,8 +2880,8 @@ html:has(.pre-intro) .ask-ai-wrap {
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
     inset 0 0 18px rgba(255, 153, 0, 0.16);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
 }
 
 .music-edge-controller::before {
@@ -3274,8 +2949,8 @@ html:has(.pre-intro) .ask-ai-wrap {
 /* Final parity pass with the original mobile interaction layer. */
 .portfolio-refinement .pre-intro {
   background: rgba(8, 10, 14, 0.2);
-  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .portfolio-refinement .music-edge-controller {
@@ -3284,8 +2959,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   background:
     linear-gradient(155deg, rgba(255, 173, 31, 0.12), rgba(14, 12, 10, 0.78) 48%, rgba(255, 153, 0, 0.08)),
     rgba(10, 10, 14, 0.78);
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
   backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
   box-shadow:
     0 0 22px rgba(255, 153, 0, 0.24),
     0 0 34px rgba(255, 153, 0, 0.1),
@@ -3341,8 +3016,8 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (max-width: 768px) {
   .portfolio-refinement .pre-intro {
-    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 }
 
@@ -3387,12 +3062,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 /* Active homepage parity: preserve the current dark surface and containers while
    keeping the original opening depth and music interaction layer visible. */
-/* Keep the standard backdrop-filter after its WebKit fallback: reversing
-   them causes the production CSS optimizer to drop Chrome/Firefox's rule. */
 .pre-intro {
-  background: rgba(8, 10, 14, 0.16);
-  -webkit-backdrop-filter: blur(18px) saturate(112%);
-  backdrop-filter: blur(18px) saturate(112%);
+  background: rgba(8, 10, 14, 0.08);
+  backdrop-filter: blur(4px) saturate(108%);
+  -webkit-backdrop-filter: blur(4px) saturate(108%);
 }
 
 .pre-intro::before {
@@ -3454,9 +3127,9 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (max-width: 768px) {
   .pre-intro {
-    background: rgba(8, 10, 14, 0.16);
-    -webkit-backdrop-filter: blur(12px) saturate(112%);
-    backdrop-filter: blur(12px) saturate(112%);
+    background: rgba(8, 10, 14, 0.07);
+    backdrop-filter: blur(3px) saturate(108%);
+    -webkit-backdrop-filter: blur(3px) saturate(108%);
   }
 }
 
@@ -3531,8 +3204,8 @@ html:has(.pre-intro) .ask-ai-wrap {
     0 0 0 1px rgba(255, 153, 0, 0.035),
     0 0 20px rgba(255, 153, 0, 0.12),
     inset 0 0 14px rgba(255, 153, 0, 0.06);
-  -webkit-backdrop-filter: blur(16px) saturate(118%);
   backdrop-filter: blur(16px) saturate(118%);
+  -webkit-backdrop-filter: blur(16px) saturate(118%);
 }
 
 .music-edge-controller::after {
@@ -3572,8 +3245,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   box-shadow:
     0 0 18px rgba(255, 153, 0, 0.12),
     inset 0 0 12px rgba(255, 153, 0, 0.035);
-  -webkit-backdrop-filter: blur(18px) saturate(118%);
   backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
 }
 
 .portfolio-chat .chat-launcher:hover {
@@ -3594,8 +3267,8 @@ html:has(.pre-intro) .ask-ai-wrap {
     0 24px 70px rgba(0, 0, 0, 0.52),
     0 0 28px rgba(255, 153, 0, 0.08),
     inset 0 0 22px rgba(255, 153, 0, 0.025);
-  -webkit-backdrop-filter: blur(24px) saturate(122%);
   backdrop-filter: blur(24px) saturate(122%);
+  -webkit-backdrop-filter: blur(24px) saturate(122%);
 }
 
 .portfolio-chat .chat-top,
@@ -3999,8 +3672,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   box-shadow:
     0 0 24px #ff990026,
     inset 0 1px 0 #ffd49c20;
-  -webkit-backdrop-filter: blur(15px) saturate(118%);
   backdrop-filter: blur(15px) saturate(118%);
+  -webkit-backdrop-filter: blur(15px) saturate(118%);
 }
 
 .music-edge-controller::before,
@@ -4762,8 +4435,8 @@ html:has(.pre-intro) .ask-ai-wrap {
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-    -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .portfolio-refinement .topbar > div:first-child {
@@ -4825,11 +4498,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (max-width: 768px) {
   .edit-page .edit-topbar,
-  .edit-page .login-shell,
   .edit-page .feature-card.edit-section,
   .edit-page .control-deck {
-    -webkit-backdrop-filter: blur(8px) saturate(115%);
     backdrop-filter: blur(8px) saturate(115%);
+    -webkit-backdrop-filter: blur(8px) saturate(115%);
   }
 
   .edit-page .edit-orb,
@@ -4877,7 +4549,6 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 :root[data-mobile-lite="true"] .edit-page .edit-topbar,
-:root[data-mobile-lite="true"] .edit-page .login-shell,
 :root[data-mobile-lite="true"] .edit-page .feature-card.edit-section,
 :root[data-mobile-lite="true"] .edit-page .control-deck {
   box-shadow:
@@ -4891,28 +4562,20 @@ html:has(.pre-intro) .ask-ai-wrap {
   contain-intrinsic-size: 1px 420px;
 }
 
-/* Solar Control Center login: editorial, transparent, and consistent with the
-   public portfolio instead of a generic glossy auth card. */
+/* The unauthenticated editor login is free-form over the page surface. Keep
+   this as the single source of truth for its outer wrapper. */
 .edit-login-shell {
-  overflow: hidden;
+  width: 100%;
+  overflow: visible;
+  padding: 0;
   border: 0;
-  border-left: 0;
-  border-radius: 0 !important;
-  background:
-    radial-gradient(circle at 18% 16%, rgba(255, 153, 0, 0.08), transparent 42%),
-    linear-gradient(135deg, rgba(5, 8, 13, 0.3), rgba(5, 8, 13, 0.08));
+  border-radius: 0;
+  background: transparent;
+  background-image: none;
+  outline: 0;
   box-shadow: none;
-  -webkit-backdrop-filter: blur(4px) saturate(110%);
-  backdrop-filter: blur(4px) saturate(110%);
-}
-
-.edit-login-shell::after {
-  display: none;
-}
-
-.edit-login-shell .edit-orb {
-  opacity: 0.14;
-  filter: blur(46px) saturate(112%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .edit-login-heading {
@@ -4932,20 +4595,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   border-radius: 50%;
   background: transparent;
   box-shadow: none;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.edit-login-kicker {
-  margin-bottom: 0.35rem;
-  color: #ffad35;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  text-transform: uppercase;
 }
 
 .edit-login-title {
@@ -4954,14 +4603,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   font-weight: 750;
   letter-spacing: -0.035em;
   line-height: 1.1;
-}
-
-.edit-login-subtitle {
-  max-width: 25rem;
-  margin-top: 0.45rem;
-  color: rgba(211, 220, 231, 0.72);
-  font-size: 0.78rem;
-  line-height: 1.55;
 }
 
 .edit-login-form {
@@ -5016,8 +4657,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-login-shell {
     padding: 1.35rem !important;
     border-radius: 0 !important;
-    -webkit-backdrop-filter: blur(8px) saturate(112%);
     backdrop-filter: blur(8px) saturate(112%);
+    -webkit-backdrop-filter: blur(8px) saturate(112%);
   }
 
   .edit-login-heading {
@@ -5029,23 +4670,9 @@ html:has(.pre-intro) .ask-ai-wrap {
     font-size: 1.35rem;
   }
 
-  .edit-login-subtitle {
-    font-size: 0.72rem;
-  }
-
   .edit-login-form {
     padding-top: 0.45rem;
   }
-}
-
-:root[data-mobile-lite="true"] .edit-login-shell {
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-:root[data-mobile-lite="true"] .edit-login-shell .edit-orb {
-  display: none;
 }
 
 /* The auth screen follows the portfolio's editorial rhythm: identity first,
@@ -5110,37 +4737,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   color: rgba(218, 227, 238, 0.67);
 }
 
-.edit-login-copy-text {
-  max-width: 29rem;
-  margin-top: 2rem;
-  color: rgba(211, 220, 231, 0.74);
-  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
-  line-height: 1.7;
-}
-
-.edit-login-rule {
-  width: min(100%, 14rem);
-  height: 1px;
-  margin-top: 2.4rem;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.edit-login-rule span {
-  display: block;
-  width: 4.5rem;
-  height: 1px;
-  background: #ff9900;
-  box-shadow: 0 0 14px rgba(255, 153, 0, 0.7);
-}
-
-.edit-login-note {
-  margin-top: 1.1rem;
-  color: rgba(177, 190, 205, 0.55);
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
 .edit-login-panel {
   width: min(100%, 29rem);
   justify-self: end;
@@ -5188,22 +4784,6 @@ html:has(.pre-intro) .ask-ai-wrap {
     line-height: 0.94;
   }
 
-  .edit-login-copy-text {
-    max-width: 24rem;
-    margin-top: 1rem;
-    font-size: 0.86rem;
-    line-height: 1.55;
-  }
-
-  .edit-login-rule {
-    margin-top: 1.2rem;
-  }
-
-  .edit-login-note {
-    margin-top: 0.65rem;
-    font-size: 0.58rem;
-  }
-
   .edit-login-panel {
     width: 100%;
     justify-self: stretch;
@@ -5239,8 +4819,16 @@ html:has(.pre-intro) .ask-ai-wrap {
     radial-gradient(circle at 50% 48%, rgba(255, 166, 62, 0.1), transparent 21rem),
     radial-gradient(circle at 50% 50%, rgba(1, 3, 7, 0.16), rgba(1, 3, 7, 0.76) 70%),
     rgba(1, 3, 7, 0.7);
-  animation: edit-solar-reveal-out 760ms cubic-bezier(0.22, 1, 0.36, 1) 1.05s forwards;
   pointer-events: auto;
+}
+
+.edit-solar-reveal[data-active="false"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.edit-solar-reveal-fading {
+  animation: edit-solar-reveal-out 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .edit-solar-reveal-visual {
@@ -5321,47 +4909,10 @@ html:has(.pre-intro) .ask-ai-wrap {
   border-color: rgba(255, 239, 210, 0.58);
 }
 
-.edit-solar-orbit,
 .edit-solar-halo {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-}
-
-.edit-solar-orbit {
-  inset: 9%;
-  border: 1px solid rgba(255, 226, 177, 0.22);
-  transform: rotate(-32deg) scaleY(0.46);
-  animation: edit-solar-orbit 5.5s linear infinite;
-}
-
-.edit-solar-orbit::after {
-  content: "";
-  position: absolute;
-  top: 4%;
-  right: 14%;
-  width: 0.38rem;
-  height: 0.38rem;
-  border-radius: 50%;
-  background: #ffe4b6;
-  box-shadow: 0 0 14px #ffb64e;
-}
-
-.edit-solar-orbit-two {
-  inset: 17%;
-  border-color: rgba(255, 190, 104, 0.18);
-  transform: rotate(46deg) scaleY(0.34);
-  animation-duration: 7s;
-  animation-direction: reverse;
-}
-
-.edit-solar-orbit-two::after {
-  top: auto;
-  right: auto;
-  bottom: 4%;
-  left: 12%;
-  width: 0.25rem;
-  height: 0.25rem;
 }
 
 .edit-solar-halo {
@@ -5376,23 +4927,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   border-color: rgba(255, 255, 255, 0.05);
   animation-duration: 11s;
   animation-direction: reverse;
-}
-
-.edit-solar-reveal-label {
-  color: #ffe1ad;
-  font-size: 0.66rem;
-  font-weight: 750;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  animation: edit-solar-copy-in 900ms ease 260ms both;
-}
-
-.edit-solar-reveal-status {
-  color: rgba(221, 228, 237, 0.55);
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  animation: edit-solar-copy-in 900ms ease 360ms both;
 }
 
 .edit-solar-skip {
@@ -5420,7 +4954,7 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 .edit-login-stage {
-  transition: opacity 720ms ease, transform 720ms ease, filter 720ms ease;
+  transition: opacity 1100ms ease, transform 1100ms ease, filter 1100ms ease;
 }
 
 @keyframes edit-solar-reveal-out {
@@ -5451,10 +4985,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   50% { opacity: 1; transform: scale(1.08); }
 }
 
-@keyframes edit-solar-orbit {
-  to { transform: rotate(328deg) scaleY(0.46); }
-}
-
 @keyframes edit-solar-halo {
   0%, 100% { transform: scale(0.94) rotate(0); opacity: 0.5; }
   50% { transform: scale(1.06) rotate(18deg); opacity: 0.9; }
@@ -5466,12 +4996,12 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 @media (max-width: 760px) {
-  .edit-solar-reveal-visual {
-    width: min(82vw, 21rem);
+  .edit-solar-reveal-fading {
+    animation-duration: 1100ms;
   }
 
-  .edit-solar-reveal-status {
-    font-size: 0.56rem;
+  .edit-solar-reveal-visual {
+    width: min(82vw, 21rem);
   }
 
   .edit-solar-skip {
@@ -5481,14 +5011,12 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 @media (prefers-reduced-motion: reduce) {
   .edit-solar-reveal,
+  .edit-solar-reveal-fading,
   .edit-solar-reveal-visual,
   .edit-solar-reveal-visual::before,
   .edit-solar-reveal-visual::after,
   .edit-solar-aura,
-  .edit-solar-orbit,
   .edit-solar-halo,
-  .edit-solar-reveal-label,
-  .edit-solar-reveal-status,
   .edit-solar-skip {
     animation: none !important;
   }
@@ -5497,6 +5025,7 @@ html:has(.pre-intro) .ask-ai-wrap {
     opacity: 1;
     filter: none;
     transform: none;
+    transition: none;
   }
 }
 
@@ -5551,24 +5080,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   transform: translateY(-0.02rem);
 }
 
-.edit-login-back-icon {
-  display: inline-grid;
-  width: 1.65rem;
-  height: 1.65rem;
-  place-items: center;
-  border: 1px solid rgba(255, 190, 104, 0.26);
-  border-radius: 50%;
-  color: #ffbd68;
-  font-size: 0.88rem;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
-}
-
-.edit-login-back:hover .edit-login-back-icon {
-  border-color: rgba(255, 205, 142, 0.72);
-  background: rgba(255, 153, 0, 0.1);
-  transform: translateX(-2px);
-}
-
 .edit-login-identity {
   margin-bottom: 1.15rem;
   color: #ff9900;
@@ -5595,13 +5106,6 @@ html:has(.pre-intro) .ask-ai-wrap {
 .edit-login-panel {
   width: min(100%, 26rem);
   justify-self: end;
-}
-
-.edit-login-shell {
-  padding: 0 !important;
-  background: transparent;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }
 
 .edit-login-shell > .relative {
@@ -5922,25 +5426,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   }
 }
 
-/* Keep the auth surface atmospheric rather than card-shaped. The extra
-   breathing room also protects the aura's soft corona from being clipped. */
-.edit-login-shell {
-  overflow: visible !important;
-  padding: 1.15rem 0.85rem 1.3rem !important;
-  border: 0 !important;
-  background:
-    linear-gradient(145deg, rgba(18, 25, 35, 0.22), rgba(5, 9, 15, 0.08));
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  backdrop-filter: blur(14px) saturate(120%);
-}
-
-.edit-login-shell .edit-orb {
-  opacity: 0.07;
-}
-
 .edit-login-heading {
   margin-bottom: 2.35rem;
 }
@@ -5987,8 +5472,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   box-shadow:
     inset 0 1px 0 rgba(255, 245, 221, 0.12),
     0 10px 24px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(14px) saturate(125%);
   backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
 }
 
 .edit-login-submit:hover:not(:disabled),
@@ -6017,17 +5502,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-login-heading {
     margin-bottom: 2rem;
   }
-}
-
-/* Minimal final auth treatment: larger title, nearly weightless glass, and a
-   quiet text-led action instead of a filled CTA block. */
-.edit-login-shell {
-  background: rgba(10, 16, 24, 0.045);
-  box-shadow:
-    0 18px 46px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.018);
-  -webkit-backdrop-filter: blur(22px) saturate(118%);
-  backdrop-filter: blur(22px) saturate(118%);
 }
 
 .edit-login-title {
@@ -6065,8 +5539,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   letter-spacing: 0.055em;
   text-transform: none;
   box-shadow: inset 0 1px 0 rgba(255, 245, 221, 0.06);
-  -webkit-backdrop-filter: blur(18px) saturate(120%);
   backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
 }
 
 .edit-login-submit:hover:not(:disabled),
@@ -6097,21 +5571,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   .edit-login-submit {
     width: 100%;
   }
-}
-
-/* Free-form editor login: the page is the surface, not a card. */
-.edit-login-shell {
-  overflow: visible !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
-.edit-login-shell .edit-orb {
-  display: none;
 }
 
 .edit-login-heading {
@@ -6187,8 +5646,8 @@ html:has(.pre-intro) .ask-ai-wrap {
   letter-spacing: 0.075em;
   text-transform: none;
   box-shadow: none;
-  -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   transition: color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
@@ -6239,6 +5698,10 @@ html:has(.pre-intro) .ask-ai-wrap {
 }
 
 @media (max-width: 760px) {
+  .edit-background-spark-canvas {
+    opacity: 0.32;
+  }
+
   .edit-login-mark {
     width: 4.65rem;
     height: 4.65rem;
@@ -6255,6 +5718,26 @@ html:has(.pre-intro) .ask-ai-wrap {
     gap: 1rem;
     margin-bottom: 2.2rem;
   }
+
+  /* Keep mobile Safari from zooming the page when a compact editor field gets
+     focus. The desktop scale stays intentionally compact. */
+  .edit-page input:not([type="file"]),
+  .edit-page textarea,
+  .edit-page select {
+    font-size: 16px !important;
+  }
+
+  .edit-login-sparks {
+    inset: -2.85rem;
+  }
+
+  .edit-login-sparks > span {
+    width: 0.1rem;
+    box-shadow:
+      0 0 0.3rem rgba(255, 255, 235, 0.95),
+      0 0 0.65rem rgba(255, 202, 91, 0.85),
+      0 0 0.95rem rgba(255, 115, 0, 0.62);
+  }
 }
 
 /* Interactive eclipse mark: hover changes light only, while a click changes
@@ -6270,6 +5753,9 @@ html:has(.pre-intro) .ask-ai-wrap {
   background: transparent;
   color: inherit;
   cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
   transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 280ms ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -6493,31 +5979,6 @@ html:has(.pre-intro) .ask-ai-wrap {
   transform-origin: center;
 }
 
-@media (max-width: 768px), (pointer: coarse) {
-  .edit-login-mark {
-    /* Keep repeated taps on the eclipse from becoming a browser
-       double-tap-zoom gesture, without disabling pinch zoom on the page. */
-    touch-action: manipulation;
-  }
-
-  .edit-login-sparks {
-    inset: -3.55rem;
-    contain: layout style paint;
-  }
-
-  .edit-login-sparks > span {
-    width: 0.11rem;
-    box-shadow:
-      0 0 0.28rem rgba(255, 255, 235, 0.82),
-      0 0 0.58rem rgba(255, 202, 91, 0.7);
-    filter: none;
-  }
-
-  .edit-login-mark .edit-login-aura::before {
-    filter: none;
-  }
-}
-
 .edit-login-sparks.edit-login-spark-burst-a > span {
   animation: edit-login-spark-burst-a var(--spark-duration, 620ms) cubic-bezier(0.16, 0.8, 0.28, 1) var(--spark-delay) both;
 }
@@ -6591,717 +6052,142 @@ html:has(.pre-intro) .ask-ai-wrap {
   transform: none !important;
 }
 
-/* -------------------------------------------------------------------------
-   Authenticated control center
-   A quieter companion to the public portfolio: warm hairline borders,
-   charcoal glass, and a compact editorial rhythm. This stays scoped to the
-   authenticated shell so the landing and login experiences retain their
-   existing atmosphere.
-   ------------------------------------------------------------------------- */
-.edit-control-center {
-  --edit-ink: #e8e1d7;
-  --edit-muted: #a59d91;
-  --edit-faint: #746e67;
-  --edit-line: rgba(224, 190, 139, 0.2);
-  --edit-line-strong: rgba(235, 198, 143, 0.38);
-  --edit-glass: rgba(13, 16, 21, 0.78);
-  --edit-glass-deep: rgba(7, 10, 14, 0.64);
-  --edit-warm: #d6a566;
-  color: var(--edit-ink);
-  background: #080b0f;
-}
-
-.edit-control-center .site-video-background {
-  opacity: 0.72;
-  filter: blur(10px) saturate(0.9) brightness(0.6) contrast(0.94);
-  transform: scale(1.04);
-}
-
-.edit-control-center .site-video-shade {
-  background:
-    linear-gradient(180deg, rgba(5, 8, 12, 0.24), rgba(5, 8, 12, 0.48)),
-    radial-gradient(circle at 50% 12%, rgba(176, 128, 70, 0.05), transparent 44%);
-}
-
-.edit-control-center .site-shell::before,
-.edit-control-center .site-shell::after {
-  opacity: 0.28;
-  filter: blur(48px);
-}
-
-.edit-control-center .edit-page::before,
-.edit-control-center::before {
-  opacity: 0.28;
-}
-
-.edit-control-center .cloud-light {
-  opacity: 0.28;
-  filter: blur(64px) saturate(90%);
-}
-
-.edit-control-center .edit-background-spark-canvas {
-  opacity: 0.1;
-}
-
-.edit-control-center .site-content-layer > .mx-auto {
-  width: min(100% - 2rem, 72rem);
-  max-width: 72rem;
-  padding-top: 2.25rem;
-  padding-bottom: 3.75rem;
-}
-
-.edit-control-center .edit-topbar {
-  top: 0.8rem;
-  border: 1px solid var(--edit-line);
-  border-radius: 0.8rem;
-  background: rgba(12, 15, 20, 0.78);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 236, 205, 0.06),
-    0 14px 34px rgba(0, 0, 0, 0.24);
-  -webkit-backdrop-filter: blur(20px) saturate(105%);
-  backdrop-filter: blur(20px) saturate(105%);
-}
-
-.edit-control-center .edit-topbar::before {
-  background: radial-gradient(circle at 18% 10%, rgba(214, 165, 102, 0.08), transparent 38%);
-  filter: blur(26px);
-  opacity: 1;
-}
-
-.edit-control-center .edit-topbar .relative {
-  min-height: 2.35rem;
-}
-
-.edit-control-center .edit-topbar a {
-  color: var(--edit-ink);
-}
-
-.edit-control-center .edit-topbar a:first-child > span:first-child {
-  border-color: var(--edit-line);
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.edit-control-center .edit-topbar a:first-child svg {
-  color: var(--edit-warm);
-}
-
-.edit-control-center .edit-topbar a:first-child .text-neutral-400 {
-  color: var(--edit-faint);
-}
-
-.edit-control-center .edit-topbar > .relative > a:not(:first-child),
-.edit-control-center .edit-topbar > .relative > button {
-  border-color: var(--edit-line);
-  border-radius: 0.45rem;
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--edit-muted);
-  box-shadow: none;
-}
-
-.edit-control-center .edit-topbar > .relative > a:not(:first-child):hover,
-.edit-control-center .edit-topbar > .relative > button:hover:not(:disabled) {
-  border-color: var(--edit-line-strong);
-  background: rgba(214, 165, 102, 0.08);
-  color: var(--edit-ink);
-}
-
-.edit-control-center .edit-topbar > .relative > button {
-  border-color: rgba(191, 123, 110, 0.28);
-  background: rgba(104, 49, 45, 0.13);
-  color: #caa9a1;
-}
-
-.edit-control-center .control-deck {
-  border: 1px solid var(--edit-line);
-  border-radius: 0.8rem;
-  background: rgba(12, 15, 20, 0.73);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 236, 205, 0.05),
-    0 18px 38px rgba(0, 0, 0, 0.24);
-  -webkit-backdrop-filter: blur(20px) saturate(105%);
-  backdrop-filter: blur(20px) saturate(105%);
-}
-
-.edit-control-center .control-deck .deck-glow {
-  opacity: 0.12;
-  filter: blur(42px);
-}
-
-.edit-control-center .control-deck .deck-glow.one {
-  background: rgba(214, 165, 102, 0.62);
-}
-
-.edit-control-center .control-deck .deck-glow.two {
-  background: rgba(206, 194, 171, 0.28);
-}
-
-.edit-control-center .control-deck .text-awsOrange,
-.edit-control-center .control-deck svg {
-  color: var(--edit-warm);
-}
-
-.edit-control-center .control-deck .rounded-full {
-  border-color: var(--edit-line);
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--edit-muted);
-}
-
-.edit-control-center .deck-link {
-  min-height: 2.1rem;
-  border: 1px solid rgba(224, 190, 139, 0.16);
-  border-radius: 0.45rem;
-  background: rgba(255, 255, 255, 0.025);
-  padding: 0.45rem 0.7rem;
-  color: var(--edit-muted);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.035em;
-  box-shadow: none;
-}
-
-.edit-control-center .deck-link:hover,
-.edit-control-center .deck-link:focus-visible {
-  border-color: var(--edit-line-strong);
-  background: rgba(214, 165, 102, 0.08);
-  color: var(--edit-ink);
-  transform: translateY(-1px);
-}
-
-.edit-control-center .feature-card.edit-section {
-  overflow: visible;
-  border: 1px solid var(--edit-line);
-  border-radius: 0.8rem;
-  background: var(--edit-glass);
-  padding: 1.35rem;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 236, 205, 0.045),
-    0 16px 34px rgba(0, 0, 0, 0.2);
-  -webkit-backdrop-filter: blur(18px) saturate(105%);
-  backdrop-filter: blur(18px) saturate(105%);
-}
-
-.edit-control-center .feature-card.edit-section::after {
-  display: none;
-}
-
-.edit-control-center .feature-card.edit-section > h2,
-.edit-control-center .feature-card.edit-section > div > h2,
-.edit-control-center .feature-card.edit-section h2 {
-  color: var(--edit-ink);
-  font-size: 0.76rem;
-  font-weight: 650;
-  letter-spacing: 0.14em;
-}
-
-.edit-control-center .feature-card.edit-section > p,
-.edit-control-center .feature-card.edit-section .text-neutral-500 {
-  color: var(--edit-faint);
-}
-
-.edit-control-center .feature-card.edit-section > form > .space-y-4 > div > p,
-.edit-control-center .feature-card.edit-section > form > div > p,
-.edit-control-center .feature-card.edit-section form p.text-\[11px\],
-.edit-control-center .feature-card.edit-section form p.text-\[10px\] {
-  color: var(--edit-muted);
-}
-
-.edit-control-center .feature-card.edit-section > form > div.rounded-xl,
-.edit-control-center .feature-card.edit-section form > div.rounded-xl,
-.edit-control-center .feature-card.edit-section > form.rounded-xl,
-.edit-control-center .feature-card.edit-section form[class*="rounded-xl"] {
-  border-color: rgba(224, 190, 139, 0.14);
-  border-radius: 0.6rem;
-  background: rgba(5, 8, 12, 0.34);
-  box-shadow: inset 0 1px 0 rgba(255, 236, 205, 0.025);
-}
-
-.edit-control-center .feature-card.edit-section .drag-card,
-.edit-control-center .feature-card.edit-section > div > .rounded-xl {
-  border-color: rgba(224, 190, 139, 0.14);
-  border-radius: 0.6rem;
-  background: rgba(8, 11, 16, 0.48);
-  box-shadow: none;
-}
-
-.edit-control-center .feature-card.edit-section .drag-card:hover,
-.edit-control-center .feature-card.edit-section > div > .rounded-xl:hover {
-  border-color: rgba(224, 190, 139, 0.27);
-  background: rgba(18, 19, 23, 0.58);
-}
-
-.edit-control-center .feature-card.edit-section .drag-card .text-neutral-500 {
-  color: #777067;
-}
-
-.edit-control-center .feature-card.edit-section .drag-card .text-neutral-200,
-.edit-control-center .feature-card.edit-section .drag-card .text-neutral-300 {
-  color: #cfc7bb;
-}
-
-.edit-control-center label > span {
-  color: var(--edit-muted);
-}
-
-.edit-control-center input:not([type="file"]),
-.edit-control-center textarea,
-.edit-control-center select {
-  min-height: 2.35rem;
-  border: 1px solid rgba(224, 190, 139, 0.16);
-  border-radius: 0.45rem;
-  background: rgba(4, 7, 11, 0.58);
-  padding: 0.55rem 0.7rem;
-  color: var(--edit-ink);
-  font-size: 0.84rem;
-  line-height: 1.45;
-  box-shadow: inset 0 1px 0 rgba(255, 236, 205, 0.025);
-}
-
-.edit-control-center textarea {
-  min-height: 6rem;
-  resize: vertical;
-}
-
-.edit-control-center input:not([type="file"])::placeholder,
-.edit-control-center textarea::placeholder {
-  color: rgba(165, 157, 145, 0.48);
-}
-
-.edit-control-center input:not([type="file"]):focus,
-.edit-control-center textarea:focus,
-.edit-control-center select:focus {
-  border-color: rgba(235, 198, 143, 0.62);
-  background: rgba(7, 10, 14, 0.76);
-  box-shadow: 0 0 0 1px rgba(214, 165, 102, 0.16);
-}
-
-.edit-control-center input[type="file"] {
-  min-height: 2.35rem;
-  border: 1px solid rgba(224, 190, 139, 0.16);
-  border-radius: 0.45rem;
-  background: rgba(4, 7, 11, 0.48);
-  color: var(--edit-muted);
-  font-size: 0.76rem;
-}
-
-.edit-control-center input[type="file"]::file-selector-button {
-  margin-right: 0.55rem;
-  border: 1px solid rgba(224, 190, 139, 0.2);
-  border-radius: 0.3rem;
-  background: rgba(214, 165, 102, 0.14);
-  padding: 0.3rem 0.55rem;
-  color: #d7c4aa;
-  font-size: 0.72rem;
-}
-
-.edit-control-center button {
-  border-radius: 0.45rem;
-  box-shadow: none;
-}
-
-.edit-control-center button.bg-awsOrange {
-  border: 1px solid rgba(235, 198, 143, 0.38);
-  background: rgba(193, 143, 75, 0.78);
-  color: #17130f;
-  font-weight: 650;
-}
-
-.edit-control-center button.bg-awsOrange:hover:not(:disabled) {
-  background: rgba(214, 165, 102, 0.9);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
-}
-
-.edit-control-center button.border-white\/20,
-.edit-control-center button.border-white\/15 {
-  border-color: var(--edit-line);
-  background: rgba(255, 255, 255, 0.025);
-  color: var(--edit-muted);
-}
-
-.edit-control-center button.border-white\/20:hover:not(:disabled),
-.edit-control-center button.border-white\/15:hover:not(:disabled) {
-  border-color: var(--edit-line-strong);
-  background: rgba(214, 165, 102, 0.07);
-  color: var(--edit-ink);
-}
-
-.edit-control-center .text-awsOrange {
-  color: var(--edit-warm);
-}
-
-.edit-control-center .text-awsOrange:hover {
-  color: #e7bd82;
-}
-
-.edit-control-center .text-red-400 {
-  color: #c4867d;
-}
-
-.edit-control-center .text-green-300 {
-  color: #a4bea4;
-}
-
-.edit-control-center [class*="border-red-500"] {
-  border-color: rgba(191, 123, 110, 0.3);
-  background: rgba(104, 49, 45, 0.16);
-}
-
-.edit-control-center [class*="border-green-500"] {
-  border-color: rgba(133, 167, 135, 0.28);
-  background: rgba(57, 90, 62, 0.16);
-}
-
-.edit-control-center .drag-lane-active {
-  border-radius: 0.6rem;
-  outline: 1px dashed rgba(214, 165, 102, 0.32);
-  background: rgba(214, 165, 102, 0.045);
-}
-
-.edit-control-center .drag-card.drag-active {
-  border-color: rgba(235, 198, 143, 0.5);
-  background: rgba(214, 165, 102, 0.1);
-}
-
-.edit-control-center .drag-card.drag-target {
-  border-color: rgba(235, 198, 143, 0.62);
-  box-shadow: 0 0 0 1px rgba(214, 165, 102, 0.14);
-}
-
-.edit-control-center .edit-section > .pt-3,
-.edit-control-center > .site-content-layer .pt-3 {
-  color: var(--edit-faint);
-}
-
-.edit-control-center > .site-content-layer a[href="/home"].hover\:text-awsOrange:hover {
-  color: var(--edit-warm);
-}
-
-.edit-control-center :focus-visible {
-  outline: 2px solid rgba(235, 198, 143, 0.64);
-  outline-offset: 2px;
-}
-
-@media (max-width: 767px) {
-  .edit-control-center .site-content-layer > .mx-auto {
-    width: min(100% - 1.1rem, 72rem);
-    padding-top: 1.35rem;
-    padding-bottom: 2.5rem;
+/* These overrides intentionally sit after the shared spark rules so the
+   compact phone treatment is not overwritten by the desktop defaults above. */
+@media (max-width: 760px) {
+  .edit-page:not(.edit-control-center) .edit-login-sparks {
+    inset: -3.4rem;
   }
 
-  .edit-control-center .edit-topbar {
-    top: 0.45rem;
-    padding: 0.55rem 0.65rem;
-  }
-
-  .edit-control-center .edit-topbar .relative {
-    flex-wrap: wrap;
-  }
-
-  .edit-control-center .edit-topbar a:first-child {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
-
-  .edit-control-center .edit-topbar > .relative > a:not(:first-child),
-  .edit-control-center .edit-topbar > .relative > button {
-    flex: 1 1 0;
-    justify-content: center;
-    min-height: 2.1rem;
-  }
-
-  .edit-control-center .control-deck,
-  .edit-control-center .feature-card.edit-section {
-    border-radius: 0.68rem;
-  }
-
-  .edit-control-center .control-deck {
-    padding: 0.9rem;
-  }
-
-  .edit-control-center .control-deck .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .edit-control-center .feature-card.edit-section {
-    padding: 1rem;
-  }
-
-  .edit-control-center .feature-card.edit-section > form > div.rounded-xl,
-  .edit-control-center .feature-card.edit-section form > div.rounded-xl {
-    padding: 0.85rem;
+  .edit-page:not(.edit-control-center) .edit-login-sparks > span {
+    width: 0.1rem;
+    box-shadow:
+      0 0 0.3rem rgba(255, 255, 235, 0.95),
+      0 0 0.7rem rgba(255, 202, 91, 0.9),
+      0 0 1rem rgba(255, 115, 0, 0.68);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .edit-control-center .site-video-background {
-    transform: none;
+/* Android home surface: keep the same immediate blurred atmosphere as the
+   editor without bringing back the heavier desktop cloud motion. */
+@media (max-width: 768px) {
+  .site-shell:not(.edit-page) .site-video-background {
+    opacity: 0.82;
+    transform: scale(1.06);
+    filter: blur(11px) saturate(0.96) brightness(0.66) contrast(0.92);
+    will-change: auto;
+  }
+
+  .site-shell:not(.edit-page)::before {
+    opacity: 0.48 !important;
+    filter: blur(42px) !important;
+    transform: none !important;
+  }
+
+  .site-shell:not(.edit-page)::after {
+    opacity: 0.28 !important;
+    filter: blur(58px) !important;
+    transform: none !important;
   }
 }
 
-/* Editorial dashboard lead: give the authenticated workspace the same
-   authored first impression as the login surface before the data sections. */
-.edit-control-center .edit-dashboard-hero {
-  position: relative;
-  display: grid;
-  min-height: 23rem;
-  grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
-  gap: 2rem;
-  overflow: hidden;
-  align-items: center;
-  padding: clamp(2rem, 5vw, 4.25rem);
-  border: 1px solid rgba(224, 190, 139, 0.24);
-  border-radius: 0.95rem;
-  background:
-    radial-gradient(circle at 15% 18%, rgba(214, 165, 102, 0.1), transparent 34%),
-    linear-gradient(118deg, rgba(10, 13, 18, 0.82), rgba(10, 13, 18, 0.46));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 236, 205, 0.08),
-    0 24px 54px rgba(0, 0, 0, 0.28);
-  -webkit-backdrop-filter: blur(22px) saturate(108%);
-  backdrop-filter: blur(22px) saturate(108%);
+/* Keep below-the-fold layout out of the first composite while preserving the
+   same painted result once a section enters the viewport. */
+.portfolio-page-content > section[id] {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
 }
 
-.edit-control-center .edit-dashboard-hero::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  pointer-events: none;
-  opacity: 0.36;
-  background:
-    linear-gradient(90deg, transparent 0 49.8%, rgba(224, 190, 139, 0.13) 50%, transparent 50.2%),
-    linear-gradient(0deg, transparent 0 49.8%, rgba(224, 190, 139, 0.1) 50%, transparent 50.2%);
-  background-size: 4.5rem 4.5rem;
-  mask-image: linear-gradient(135deg, rgba(0, 0, 0, 0.7), transparent 70%);
+/* Some older Android WebViews can partially paint text inside an auto-visible
+   section while it is entering the viewport. Keep the award list fully
+   paintable on narrow phones; the section is small, so this costs very little. */
+@media (max-width: 640px) {
+  .portfolio-page-content {
+    padding-bottom: calc(7.5rem + env(safe-area-inset-bottom));
+  }
+
+  .portfolio-page-content #achievements {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+    padding-bottom: 0.75rem;
+  }
+
+  .portfolio-page-content #achievements,
+  .portfolio-page-content #achievements .reveal,
+  .portfolio-page-content #achievements p {
+    overflow: visible;
+  }
 }
 
-.edit-control-center .edit-dashboard-hero-copy,
-.edit-control-center .edit-dashboard-hero-orbit {
-  position: relative;
-  z-index: 1;
+.site-video-background,
+.site-video-shade {
+  contain: paint;
+  backface-visibility: hidden;
 }
 
-.edit-control-center .edit-dashboard-eyebrow {
-  margin-bottom: 1.1rem;
-  color: var(--edit-warm);
-  font-size: 0.62rem;
-  font-weight: 750;
-  letter-spacing: 0.2em;
-  line-height: 1;
-  text-transform: uppercase;
+html[data-mobile-lite] .site-shell::before,
+html[data-mobile-lite] .site-shell::after,
+html[data-mobile-lite] .cloud-light {
+  will-change: auto;
 }
 
-.edit-control-center .edit-dashboard-hero h1 {
-  max-width: 9.5ch;
-  color: #f6efe5;
-  font-size: clamp(3.2rem, 7vw, 6.6rem);
-  font-weight: 650;
-  letter-spacing: -0.085em;
-  line-height: 0.87;
-}
-
-.edit-control-center .edit-dashboard-hero h1 span {
-  display: block;
-  color: rgba(224, 231, 240, 0.62);
-}
-
-.edit-control-center .edit-dashboard-description {
-  max-width: 30rem;
-  margin-top: 1.45rem;
-  color: rgba(218, 210, 199, 0.62);
-  font-size: 0.86rem;
-  line-height: 1.65;
-}
-
-.edit-control-center .edit-dashboard-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.4rem;
-  margin-top: 2rem;
-}
-
-.edit-control-center .edit-dashboard-stats > div {
-  display: grid;
-  gap: 0.28rem;
-  min-width: 5.5rem;
-}
-
-.edit-control-center .edit-dashboard-stats strong {
-  color: #e8e1d7;
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-}
-
-.edit-control-center .edit-dashboard-stats span {
-  color: var(--edit-faint);
-  font-size: 0.58rem;
-  font-weight: 650;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.edit-control-center .edit-dashboard-hero-orbit {
-  display: grid;
-  min-height: 15rem;
-  place-items: center;
+.site-shell:not(.edit-page) .pre-intro {
   isolation: isolate;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-.edit-control-center .edit-dashboard-orbit-glow {
-  position: absolute;
-  width: 13rem;
-  height: 13rem;
-  border-radius: 50%;
-  filter: blur(32px);
-  opacity: 0.42;
-}
-
-.edit-control-center .edit-dashboard-orbit-glow-one {
-  background: rgba(214, 165, 102, 0.3);
-  transform: translate(-1.4rem, -1rem);
-}
-
-.edit-control-center .edit-dashboard-orbit-glow-two {
-  background: rgba(159, 177, 202, 0.14);
-  transform: translate(2.3rem, 1.8rem);
-}
-
-.edit-control-center .edit-dashboard-aura {
-  position: relative;
-  z-index: 1;
-  width: clamp(8.5rem, 15vw, 12rem);
-  height: clamp(8.5rem, 15vw, 12rem);
-  filter: drop-shadow(0 0 22px rgba(214, 165, 102, 0.22));
-}
-
-.edit-control-center .edit-dashboard-orbit-label {
-  position: absolute;
-  right: 0.2rem;
-  bottom: 0.2rem;
-  color: rgba(224, 190, 139, 0.58);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 767px) {
-  .edit-control-center .edit-dashboard-hero {
-    min-height: 0;
-    grid-template-columns: 1fr;
-    gap: 1.2rem;
-    padding: 1.6rem 1.2rem;
-  }
-
-  .edit-control-center .edit-dashboard-hero h1 {
-    font-size: clamp(3rem, 15vw, 5rem);
-  }
-
-  .edit-control-center .edit-dashboard-hero-orbit {
-    min-height: 11rem;
-  }
-
-  .edit-control-center .edit-dashboard-stats {
-    gap: 0.9rem;
-    margin-top: 1.5rem;
-  }
-}
-
-/* Route readiness layer. The page remains mounted underneath so a slow
-   request never creates a blank preview, while this branded layer owns the
-   initial transition and its recoverable error state. */
-.app-route-content {
-  min-height: 100%;
-  transition: opacity 420ms ease, filter 420ms ease;
-}
-
-.app-route-content[data-route-loading="true"] {
-  opacity: 0.72;
-}
-
-.global-page-loader {
-  position: fixed;
-  z-index: 200;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
+.site-shell:not(.edit-page) .pre-intro::before {
+  z-index: 0;
   background:
-    radial-gradient(circle at 50% 42%, rgba(255, 153, 0, 0.14), transparent 23rem),
-    linear-gradient(180deg, rgba(5, 8, 13, 0.78), rgba(5, 8, 13, 0.9));
-  -webkit-backdrop-filter: blur(10px) saturate(112%);
-  backdrop-filter: blur(10px) saturate(112%);
+    linear-gradient(rgba(8, 10, 14, 0.16), rgba(8, 10, 14, 0.16)),
+    radial-gradient(ellipse at 12% 28%, rgba(255, 153, 0, 0.16), transparent 38%),
+    radial-gradient(ellipse at 86% 24%, rgba(86, 125, 174, 0.14), transparent 42%),
+    radial-gradient(ellipse at 52% 92%, rgba(255, 153, 0, 0.08), transparent 42%);
+  opacity: 0.92;
+  mix-blend-mode: normal;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.site-shell:not(.edit-page) .pre-intro-core {
+  z-index: 1;
+  filter: none !important;
   opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition: opacity 420ms ease, visibility 420ms ease;
 }
 
-.global-page-loader[data-active="false"] {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+/* Keep the intro text and progress line sharp. Blur the layers underneath it
+   directly so the effect survives browsers that do not backdrop-filter a
+   pseudo-element reliably. */
+html:has(.pre-intro) .site-shell:not(.edit-page) .site-video-background {
+  filter: blur(14px) saturate(92%);
+  transform: scale(1.035);
+  transition: filter 280ms ease, transform 280ms ease;
 }
 
-.global-page-loader.edit-solar-reveal {
-  z-index: 200;
-  padding: 1.5rem;
-  animation: none;
+html:has(.pre-intro) .site-shell:not(.edit-page) .site-content-layer > :not(.pre-intro) {
+  filter: blur(14px) saturate(92%);
+  transform: scale(1.012);
+  opacity: 0.9;
+  transition: filter 280ms ease, transform 280ms ease, opacity 280ms ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .global-page-loader,
-  .app-route-content {
-    transition: none;
-  }
-
-}
-
-/* Android Chromium can keep a backdrop-filter layer alive after its source
-   video repaints. The branded loader is already an intentional surface, so
-   keep it opaque on touch devices instead of blurring the page underneath. */
-@media (max-width: 640px), (pointer: coarse) {
-  .global-page-loader {
-    background:
-      radial-gradient(circle at 50% 42%, rgba(255, 153, 0, 0.16), transparent 16rem),
-      linear-gradient(180deg, #070a0f 0%, #05080d 100%);
-    -webkit-backdrop-filter: none;
+@media (max-width: 768px) {
+  .site-shell:not(.edit-page) .pre-intro::before {
     backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
-  .app-route-content[data-route-loading="true"] {
-    opacity: 0.92;
+  html:has(.pre-intro) .site-shell:not(.edit-page) .site-video-background,
+  html:has(.pre-intro) .site-shell:not(.edit-page) .site-content-layer > :not(.pre-intro) {
+    filter: blur(10px) saturate(92%);
   }
+}
 
-  .pre-intro {
-    background: rgba(8, 10, 14, 0.16);
-    -webkit-backdrop-filter: blur(12px) saturate(112%);
-    backdrop-filter: blur(12px) saturate(112%);
-  }
-
-  .pre-intro .pre-intro-core {
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .pre-intro ~ * {
-    background: transparent;
-  }
-
-  /* Low-end Android needs the glass layer during the intentional intro. Keep
-     the effect scoped to the loader surface so it cannot blur the page after
-     the intro has been released. */
-  :root[data-mobile-lite="true"] .global-page-loader,
-  :root[data-mobile-lite="true"] .pre-intro {
-    background: rgba(8, 10, 14, 0.2);
-    -webkit-backdrop-filter: blur(12px) saturate(112%);
-    backdrop-filter: blur(12px) saturate(112%);
-  }
-
-  :root[data-mobile-lite="true"] .topbar,
-  .topbar {
-    background: transparent !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-  }
-
+.edit-login-submit:disabled {
+  cursor: wait;
+  opacity: 0.62;
+  transform: none !important;
+  filter: none !important;
 }

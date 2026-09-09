@@ -1,9 +1,12 @@
-import { effectBudget, getPerformanceProfile } from "@/lib/adaptive-performance";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRight, Cloud, Eye, EyeOff, Gauge, GripVertical, Sparkles } from "lucide-react";
-import AmbientBackgroundVideo from "@/components/AmbientBackgroundVideo";
-import { usePageLoading } from "@/components/PageLoading";
+import { ArrowUpRight, Eye, EyeOff, ExternalLink, GripVertical, LogOut } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
+import "./admin-dashboard.css";
+
+const EDIT_SOLAR_INTRO_MOBILE_DURATION_MS = 3000;
+const EDIT_SOLAR_INTRO_DESKTOP_DURATION_MS = 3000;
+const EDIT_SOLAR_INTRO_MOBILE_FADE_MS = 1100;
+const EDIT_SOLAR_INTRO_DESKTOP_FADE_MS = 420;
 
 type Profile = {
   id: number;
@@ -87,6 +90,7 @@ type ApiError = {
 };
 
 type SortableSection = "experience" | "leadership" | "achievements" | "taglines";
+type EditorSection = "profile" | "projects" | "experience" | "leadership" | "taglines" | "achievements" | "resume" | "site-media";
 type DragItem = {
   section: SortableSection;
   id: number;
@@ -111,16 +115,24 @@ function PortfolioSurface({
   children,
   backgroundBurstCycle = 0,
   backgroundSparkIntensity = 0,
-  backgroundBurstOrigin = null,
 }: {
-  children?: ReactNode;
+  children: ReactNode;
   backgroundBurstCycle?: number;
   backgroundSparkIntensity?: number;
-  backgroundBurstOrigin?: { x: number; y: number } | null;
 }) {
   return (
     <>
-      <AmbientBackgroundVideo />
+      <video
+        className="site-video-background"
+        src="/assets/solar-eclipse-background-pingpong.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       <div className="site-video-shade" aria-hidden="true" />
       <div className="site-content-layer">
         <div className="cloud-light one" />
@@ -129,7 +141,6 @@ function PortfolioSurface({
         <BackgroundSparkBurst
           burstCycle={backgroundBurstCycle}
           intensity={backgroundSparkIntensity}
-          burstOrigin={backgroundBurstOrigin}
         />
         {children}
       </div>
@@ -155,17 +166,13 @@ type AmbientParticle = {
 function BackgroundSparkBurst({
   burstCycle,
   intensity = 0,
-  burstOrigin = null,
 }: {
   burstCycle: number;
   intensity?: number;
-  burstOrigin?: { x: number; y: number } | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<AmbientParticle[]>([]);
   const viewportRef = useRef({ width: 0, height: 0, pixelRatio: 1 });
-  const burstOriginRef = useRef<{ x: number; y: number } | null>(null);
-  const mobileViewportRef = useRef(false);
   const wakeRendererRef = useRef<(() => void) | null>(null);
   const rendererRunningRef = useRef(false);
   const animationFrameRef = useRef<number | null>(null);
@@ -176,15 +183,13 @@ function BackgroundSparkBurst({
     const context = canvas?.getContext("2d");
     if (!canvas || !context) return;
 
+    const mobileQuery = window.matchMedia("(max-width: 760px)");
+    let isMobile = mobileQuery.matches;
     const resize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
-      const isMobile = getPerformanceProfile().tier !== "full";
-      mobileViewportRef.current = isMobile;
-      // A full-DPR canvas is disproportionately expensive on phones. The
-      // particles still read as sharp at 1x, while the page keeps scrolling
-      // without competing with a multi-megapixel repaint.
-      const pixelRatio = effectBudget().canvasDpr;
+      isMobile = mobileQuery.matches;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5);
       viewportRef.current = { width, height, pixelRatio };
       canvas.width = Math.floor(width * pixelRatio);
       canvas.height = Math.floor(height * pixelRatio);
@@ -198,31 +203,25 @@ function BackgroundSparkBurst({
 
     let lastTimestamp = performance.now();
     let lastDrawTimestamp = 0;
-    let pageVisible = !document.hidden;
     const draw = (timestamp: number) => {
-      if (!pageVisible) {
-        rendererRunningRef.current = false;
-        animationFrameRef.current = null;
-        return;
-      }
-      const isMobile = getPerformanceProfile().tier !== "full";
-      const frameInterval = effectBudget().frameMs;
-      if (lastDrawTimestamp && timestamp - lastDrawTimestamp < frameInterval) {
+      const elapsed = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+      // Keep the phone compositor from painting a full-screen glow field at
+      // 60fps. The burst remains animated, but the canvas only draws about
+      // 30fps on small touch devices.
+      if (isMobile && timestamp - lastDrawTimestamp < 32) {
         animationFrameRef.current = window.requestAnimationFrame(draw);
         return;
       }
       lastDrawTimestamp = timestamp;
-      const deltaSeconds = Math.min(0.05, Math.max(0.001, (timestamp - lastTimestamp) / 1000));
-      lastTimestamp = timestamp;
+      const deltaSeconds = Math.min(0.05, Math.max(0.001, elapsed / 1000));
       const { width, height } = viewportRef.current;
       context.clearRect(0, 0, width, height);
-      context.globalCompositeOperation = isMobile ? "source-over" : "lighter";
+      context.globalCompositeOperation = "lighter";
 
       const activeParticles: AmbientParticle[] = [];
       for (const particle of particlesRef.current) {
         particle.life += deltaSeconds;
-        const lifeLimit = particle.spreadDuration + (isMobile ? 0.8 : 1.35);
-        if (particle.life > lifeLimit) continue;
         activeParticles.push(particle);
 
         const spreadTime = Math.max(0, particle.life);
@@ -255,30 +254,21 @@ function BackgroundSparkBurst({
               Math.max(0, Math.sin(particle.life * (2.2 + particle.driftSpeed) + particle.phase)),
               5
             );
-        const fadeOut = Math.min(1, (lifeLimit - particle.life) / 0.8);
-        const alpha = shimmer * particle.brightness * fadeOut;
+        const alpha = shimmer * particle.brightness;
         const tailX = x - Math.sin(windTime + particle.phase) * particle.trail;
         const tailY = y - Math.cos(windTime * 0.73 + particle.phase * 1.7) * particle.trail;
 
-        if (isMobile) {
-          // Small square glints are substantially cheaper than a stroke plus
-          // arc per particle, while the easing still preserves the burst.
-          const size = Math.max(0.8, particle.size);
-          context.fillStyle = `rgba(255, 226, 157, ${alpha * 0.78})`;
-          context.fillRect(x - size / 2, y - size / 2, size, size);
-        } else {
-          context.lineWidth = particle.size;
-          context.strokeStyle = `rgba(255, 153, 32, ${alpha * 0.72})`;
-          context.beginPath();
-          context.moveTo(tailX, tailY);
-          context.lineTo(x, y);
-          context.stroke();
+        context.lineWidth = particle.size;
+        context.strokeStyle = `rgba(255, 153, 32, ${alpha * 0.72})`;
+        context.beginPath();
+        context.moveTo(tailX, tailY);
+        context.lineTo(x, y);
+        context.stroke();
 
-          context.fillStyle = `rgba(255, 248, 211, ${Math.min(1, alpha * particle.brightness)})`;
-          context.beginPath();
-          context.arc(x, y, particle.size * 0.75, 0, Math.PI * 2);
-          context.fill();
-        }
+        context.fillStyle = `rgba(255, 248, 211, ${Math.min(1, alpha * particle.brightness)})`;
+        context.beginPath();
+        context.arc(x, y, particle.size * 0.75, 0, Math.PI * 2);
+        context.fill();
       }
 
       particlesRef.current = activeParticles;
@@ -292,24 +282,11 @@ function BackgroundSparkBurst({
 
     wakeRendererRef.current = () => {
       if (rendererRunningRef.current) return;
-      if (!pageVisible) return;
       rendererRunningRef.current = true;
       lastTimestamp = performance.now();
       animationFrameRef.current = window.requestAnimationFrame(draw);
     };
 
-    const handleVisibility = () => {
-      pageVisible = !document.hidden;
-      if (!pageVisible && animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-        rendererRunningRef.current = false;
-      } else if (pageVisible && particlesRef.current.length > 0) {
-        wakeRendererRef.current?.();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       if (animationFrameRef.current !== null) {
         window.cancelAnimationFrame(animationFrameRef.current);
@@ -318,7 +295,6 @@ function BackgroundSparkBurst({
       rendererRunningRef.current = false;
       particlesRef.current = [];
       window.removeEventListener("resize", resize);
-      document.removeEventListener("visibilitychange", handleVisibility);
       context.clearRect(0, 0, viewportRef.current.width, viewportRef.current.height);
     };
   }, []);
@@ -328,24 +304,24 @@ function BackgroundSparkBurst({
     lastBurstCycleRef.current = burstCycle;
 
     const { width, height } = viewportRef.current;
-    if (!width || !height) return;
-    if (burstOrigin) burstOriginRef.current = burstOrigin;
     const isInitialFill = particlesRef.current.length === 0;
-    const isMobile = mobileViewportRef.current;
-    const particleCount = isMobile
-      ? isInitialFill
-        ? Math.round(96 + Math.min(1, intensity) * 36)
-        : Math.round(22 + Math.min(1, intensity) * 18)
-      : isInitialFill
-        ? Math.round(1100 + Math.min(1, intensity) * 320)
+    const isMobile = width <= 760;
+    const particleCount = isInitialFill
+      ? isMobile
+        ? Math.round(150 + Math.min(1, intensity) * 40)
+        : Math.round(1100 + Math.min(1, intensity) * 320)
+      : isMobile
+        ? Math.round(44 + Math.min(1, intensity) * 70)
         : Math.round(180 + Math.min(1, intensity) * 280);
     const seed = (burstCycle + 1) * 7919;
     const seeded = (value: number) => {
       const sample = Math.sin(value * 12.9898 + seed) * 43758.5453;
       return sample - Math.floor(sample);
     };
-    const sourceX = burstOriginRef.current?.x ?? width * 0.6;
-    const sourceY = burstOriginRef.current?.y ?? height * 0.36;
+    const solarMark = document.querySelector<HTMLElement>(".edit-login-mark");
+    const solarBounds = solarMark?.getBoundingClientRect();
+    const sourceX = solarBounds ? solarBounds.left + solarBounds.width / 2 : width * 0.6;
+    const sourceY = solarBounds ? solarBounds.top + solarBounds.height / 2 : height * 0.36;
     const newParticles: AmbientParticle[] = Array.from(
       { length: particleCount },
       (_, index) => {
@@ -356,29 +332,35 @@ function BackgroundSparkBurst({
           y: sourceY + (seeded(index + 31) - 0.5) * height * 0.04,
           settleX: seeded(index + 40) * width,
           settleY: seeded(index + 50) * height,
-          spreadDuration: 2.4 + seeded(index + 60) * 1.4,
-          drift: 2.5 + seeded(index + 80) * 8.5,
+           spreadDuration: isMobile
+             ? 1.35 + seeded(index + 60) * 0.9
+             : 2.4 + seeded(index + 60) * 1.4,
+           drift: isMobile
+             ? 2.5 + seeded(index + 80) * 6.5
+             : 2.5 + seeded(index + 80) * 8.5,
           driftSpeed: 0.18 + seeded(index + 90) * 0.36,
           phase: seeded(index + 100) * Math.PI * 2,
-          size: 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
-          trail: 0.3 + seeded(index + 120) * 1.2,
+           size: isMobile
+             ? 0.8 + seeded(index + 110) * 1.35 + Math.min(1, intensity) * 0.45
+             : 0.45 + seeded(index + 110) * 1.25 + Math.min(1, intensity) * 0.3,
+           trail: isMobile
+             ? 0.6 + seeded(index + 120) * 1.4
+             : 0.3 + seeded(index + 120) * 1.2,
           life: -seeded(index + 130) * 0.18,
-          brightness: 0.62 + Math.min(1, intensity) * 0.3 + seeded(index + 140) * 0.2,
+           brightness: isMobile
+             ? 0.88 + Math.min(1, intensity) * 0.18 + seeded(index + 140) * 0.2
+             : 0.62 + Math.min(1, intensity) * 0.3 + seeded(index + 140) * 0.2,
         };
       }
     );
 
-    const maxParticles = effectBudget().particles;
+    const maxParticles = isMobile ? 420 : 2200;
     particlesRef.current = [
       ...particlesRef.current,
       ...newParticles,
     ].slice(-maxParticles);
     wakeRendererRef.current?.();
-  }, [burstCycle, intensity, burstOrigin]);
-
-  useEffect(() => {
-    burstOriginRef.current = burstOrigin;
-  }, [burstOrigin]);
+  }, [burstCycle, intensity]);
 
   return (
     <canvas
@@ -390,30 +372,22 @@ function BackgroundSparkBurst({
 }
 
 export default function EditPage() {
-  const { currentRoute, markPageReady, markPageError } = usePageLoading();
   const [auth, setAuth] = useState<boolean | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [loggingIn, setLoggingIn] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [solarIntroActive, setSolarIntroActive] = useState(true);
+  const [solarIntroFading, setSolarIntroFading] = useState(false);
   const [loginAuraMomentum, setLoginAuraMomentum] = useState(0);
   const [loginAuraClickTick, setLoginAuraClickTick] = useState(0);
-  const [isTouchViewport, setIsTouchViewport] = useState(false);
-  const [backgroundBurstOrigin, setBackgroundBurstOrigin] = useState<{ x: number; y: number } | null>(null);
   const [dragItem, setDragItem] = useState<DragItem>(null);
   const [dragOverItem, setDragOverItem] = useState<DragItem>(null);
-  const [deckScrolling, setDeckScrolling] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 768px), (pointer: coarse)");
-    const update = () => setIsTouchViewport(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
+  const [activeEditorSection, setActiveEditorSection] = useState<EditorSection>("profile");
 
   useEffect(() => {
     if (loginAuraMomentum <= 0) return;
@@ -502,7 +476,47 @@ export default function EditPage() {
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const [socialFile, setSocialFile] = useState<File | null>(null);
 
-  async function loadData(): Promise<{ ok: boolean; message?: string }> {
+  useEffect(() => {
+    async function bootstrapAuth() {
+      const res = await fetch("/api/edit/me", { credentials: "include" }).catch(() => null);
+      if (res?.ok) {
+        setAuth(true);
+        await loadData();
+        return;
+      }
+      setAuth(false);
+    }
+
+    void bootstrapAuth();
+  }, []);
+
+  useEffect(() => {
+    if (auth !== false) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSolarIntroActive(false);
+      return;
+    }
+
+    const isMobileViewport = window.matchMedia("(max-width: 760px)").matches;
+    const holdDuration = isMobileViewport
+      ? EDIT_SOLAR_INTRO_MOBILE_DURATION_MS
+      : EDIT_SOLAR_INTRO_DESKTOP_DURATION_MS;
+    const fadeDuration = isMobileViewport
+      ? EDIT_SOLAR_INTRO_MOBILE_FADE_MS
+      : EDIT_SOLAR_INTRO_DESKTOP_FADE_MS;
+    const fadeTimer = window.setTimeout(() => setSolarIntroFading(true), holdDuration);
+    const hideTimer = window.setTimeout(
+      () => setSolarIntroActive(false),
+      holdDuration + fadeDuration,
+    );
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [auth]);
+
+  async function loadData() {
     try {
       const [p, proj, exp, lead, ach, tgs] = await Promise.all([
         apiJson<Profile>("/api/edit/profile"),
@@ -560,61 +574,11 @@ export default function EditPage() {
       if (message.toLowerCase().includes("unauthorized")) {
         setAuth(false);
         setError("Session expired. Please sign in again.");
-        return { ok: true };
+        return;
       }
       setError(message);
-      return { ok: false, message };
     }
-    return { ok: true };
   }
-
-  useEffect(() => {
-    if (!currentRoute) return;
-
-    let cancelled = false;
-
-    async function bootstrapAuth() {
-      try {
-        const res = await fetch("/api/edit/me", {
-          credentials: "include",
-          signal: AbortSignal.timeout(8000),
-        });
-
-        if (!res.ok) {
-          if (res.status === 401 || res.status === 403) {
-            setAuth(false);
-            if (!cancelled) markPageReady(currentRoute);
-            return;
-          }
-
-          throw new Error(`Unable to check editor access (${res.status})`);
-        }
-
-        setAuth(true);
-        const result = await loadData();
-        if (cancelled) return;
-
-        if (result.ok) {
-          markPageReady(currentRoute);
-        } else {
-          markPageError(
-            currentRoute,
-            result.message || "The editor could not finish loading.",
-            () => window.location.reload(),
-          );
-        }
-      } catch (cause) {
-        if (cancelled) return;
-        const message = cause instanceof Error ? cause.message : "Unable to prepare the editor.";
-        markPageError(currentRoute, message, () => window.location.reload());
-      }
-    }
-
-    void bootstrapAuth();
-    return () => {
-      cancelled = true;
-    };
-  }, [currentRoute, markPageError, markPageReady]);
 
   async function withSave(task: () => Promise<void>, message: string) {
     setSaving(true);
@@ -790,47 +754,11 @@ export default function EditPage() {
     return "";
   }
 
-  function smoothScrollToId(id: string) {
-    const target = document.getElementById(id);
-    if (!target) return;
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const targetY = target.getBoundingClientRect().top + window.scrollY - 96;
-
-    if (prefersReducedMotion) {
-      window.scrollTo(0, targetY);
-      return;
-    }
-
-    const startY = window.scrollY;
-    const distance = targetY - startY;
-    const duration = 850;
-    const start = performance.now();
-
-    setDeckScrolling(true);
-
-    const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-    const step = (now: number) => {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / duration);
-      const eased = easeInOutCubic(t);
-      window.scrollTo(0, startY + distance * eased);
-
-      if (t < 1) {
-        requestAnimationFrame(step);
-      } else {
-        window.setTimeout(() => setDeckScrolling(false), 120);
-      }
-    };
-
-    requestAnimationFrame(step);
-  }
-
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (loggingIn) return;
     setLoginError("");
+    setLoggingIn(true);
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
@@ -852,6 +780,8 @@ export default function EditPage() {
       await loadData();
     } catch {
       setLoginError("Login failed");
+    } finally {
+      setLoggingIn(false);
     }
   }
 
@@ -864,33 +794,46 @@ export default function EditPage() {
     setLoginError("");
   }
 
-  if (auth === null) {
-    return (
-      <main className="edit-page site-shell min-h-screen text-white">
-        <PortfolioSurface>
-        </PortfolioSurface>
-      </main>
-    );
-  }
-
-  if (auth === false) {
+  if (auth !== true) {
     const starIntensity = Math.min(1, loginAuraClickTick / 40);
-    const sparkCount = loginAuraClickTick >= 10
-      ? isTouchViewport
-        ? Math.min(28, 6 + loginAuraMomentum + Math.floor(loginAuraClickTick / 2))
-        : Math.min(180, 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2)
-      : 0;
-    const backgroundBurstCycle = Math.floor(loginAuraClickTick / 10);
+    const compactLogin =
+      typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches;
+    const mobileSparkActive = compactLogin ? loginAuraClickTick > 0 : loginAuraClickTick >= 10;
+    const sparkCount =
+      mobileSparkActive
+        ? Math.min(
+            compactLogin ? 48 : 180,
+            compactLogin
+              ? 10 + loginAuraMomentum * 2 + loginAuraClickTick
+              : 12 + loginAuraMomentum * 4 + loginAuraClickTick * 2
+          )
+        : 0;
+    const backgroundBurstCycle = compactLogin
+      ? loginAuraClickTick
+      : Math.floor(loginAuraClickTick / 10);
 
     return (
-      <main className="edit-page site-shell min-h-screen text-white">
+      <main className={`edit-page site-shell min-h-screen text-white ${solarIntroActive ? "solar-intro-playing" : ""}`}>
         <PortfolioSurface
           backgroundBurstCycle={backgroundBurstCycle}
           backgroundSparkIntensity={starIntensity}
-          backgroundBurstOrigin={backgroundBurstOrigin}
         >
+          {solarIntroActive && (
+             <div className={`edit-solar-reveal ${solarIntroFading ? "edit-solar-reveal-fading" : ""}`} role="status" aria-live="polite">
+              <div className="edit-solar-reveal-visual" aria-hidden="true">
+                <span className="edit-solar-halo edit-solar-halo-one" />
+                <span className="edit-solar-halo edit-solar-halo-two" />
+                <SolarAura className="edit-solar-aura" state="idle" showOrbits={false} />
+              </div>
+              <button type="button" className="edit-solar-skip" onClick={() => setSolarIntroActive(false)}>
+                Portfolio/Edit
+              </button>
+            </div>
+          )}
+
           <div
-            className="edit-login-stage mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6 lg:px-8"
+            className={`edit-login-stage mx-auto flex min-h-screen max-w-6xl items-center px-4 py-12 sm:px-6 lg:px-8 ${solarIntroActive ? "edit-login-stage-muted" : ""}`}
+            aria-hidden={solarIntroActive}
           >
             <div className="edit-login-copy">
               <a href="/" className="edit-login-back">
@@ -904,20 +847,13 @@ export default function EditPage() {
             </div>
 
             <div className="edit-login-panel">
-              <div className="login-shell edit-login-shell w-full fade-rise">
-                <div className="edit-orb one" />
-                <div className="edit-orb two" />
+              <div className="edit-login-shell w-full fade-rise">
                 <div className="relative z-10">
                   <div className="edit-login-heading">
                     <button
                       type="button"
                       className={`edit-login-mark ${loginAuraMomentum > 0 ? "has-momentum" : ""}`}
-                      onClick={(event) => {
-                        const rect = event.currentTarget.getBoundingClientRect();
-                        setBackgroundBurstOrigin({
-                          x: rect.left + rect.width / 2,
-                          y: rect.top + rect.height / 2,
-                        });
+                      onClick={() => {
                         setLoginAuraMomentum((momentum) => Math.min(14, momentum + 2));
                         setLoginAuraClickTick((tick) => tick + 1);
                       }}
@@ -1018,8 +954,8 @@ export default function EditPage() {
                     </label>
 
                     {loginError && <p className="edit-login-error" role="alert">{loginError}</p>}
-                    <button type="submit" className="edit-login-submit">
-                      <span>Enter Edit Mode</span>
+                    <button type="submit" className="edit-login-submit" disabled={loggingIn} aria-busy={loggingIn}>
+                      <span>{loggingIn ? "Checking access…" : "Enter Edit Mode"}</span>
                       <ArrowUpRight className="edit-login-submit-icon" aria-hidden="true" />
                     </button>
                   </form>
@@ -1036,114 +972,78 @@ export default function EditPage() {
     projects.length + experience.length + leadership.length + achievements.length + taglines.length;
 
   return (
-    <main className={`edit-page edit-control-center site-shell min-h-screen text-white ${deckScrolling ? "deck-scrolling" : ""}`}>
+    <main className="edit-page edit-control-center site-shell min-h-screen text-white">
       <PortfolioSurface>
-        <div className="mx-auto max-w-5xl space-y-8 px-4 py-10 sm:px-6 md:space-y-10 md:py-14">
-          <header className="topbar edit-topbar rounded-2xl px-4 py-3 md:px-5">
-          <div className="edit-orb one" />
-          <div className="edit-orb two" />
-          <div className="relative z-10 flex w-full items-center justify-between gap-3">
-            <a href="/home" className="flex items-center gap-2.5 text-white">
-              <span className="rounded-lg border border-white/20 bg-black/35 p-1.5">
-                <Cloud className="h-5 w-5 text-awsOrange" />
-              </span>
+        <div className="edit-admin-shell mx-auto px-4 sm:px-6">
+          <header className="edit-topbar">
+            <a href="/home" className="edit-admin-identity" aria-label="View public portfolio">
+              <span className="edit-admin-mark" aria-hidden="true" />
               <span>
-                <span className="block text-xs uppercase tracking-[0.18em] text-neutral-400">Control Center</span>
-                <span className="block font-semibold leading-tight">Portfolio Edit</span>
+                <span>Mark Andrei</span>
+                <small>Portfolio editor</small>
               </span>
             </a>
-            <a
-              href="/home"
-              className="rounded-lg border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-medium text-neutral-200 transition hover:border-awsOrange/60 hover:text-awsOrange"
-            >
-              View site
-            </a>
-            <button
-              type="button"
-              onClick={() => void handleLogout()}
-              className="rounded-lg border border-red-400/35 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-200 transition hover:border-red-300/70 hover:text-red-100"
-            >
-              Logout
-            </button>
-          </div>
+            <div className="edit-admin-status" aria-live="polite">
+              <span className={saving ? "is-saving" : ""} aria-hidden="true" />
+              {saving ? "Saving changes" : success ? "Changes saved" : "All changes synced"}
+            </div>
+            <div className="edit-admin-actions">
+              <a href="/home" className="edit-action-secondary">
+                <span>View portfolio</span>
+                <ExternalLink aria-hidden="true" />
+              </a>
+              <button type="button" onClick={() => void handleLogout()} className="edit-action-quiet" aria-label="Log out">
+                <LogOut aria-hidden="true" />
+                <span>Logout</span>
+              </button>
+            </div>
           </header>
 
         {(error || success) && (
-          <div className={`space-y-2 ${dragItem?.section === "experience" ? "drag-lane-active" : ""}`}>
-            {error && <p className="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
-            {success && <p className="rounded border border-green-500/40 bg-green-500/10 px-3 py-2 text-sm text-green-300">{success}</p>}
+          <div className="edit-notices" role="status" aria-live="polite">
+            {error && <p className="edit-notice is-error">{error}</p>}
+            {success && <p className="edit-notice is-success">{success}</p>}
           </div>
         )}
 
-        <section className="edit-dashboard-hero" aria-labelledby="edit-dashboard-title">
-          <div className="edit-dashboard-hero-copy">
-            <p className="edit-dashboard-eyebrow">Mark Andrei / Portfolio</p>
-            <h1 id="edit-dashboard-title">
-              Shape the story
-              <span>behind the work.</span>
-            </h1>
-            <p className="edit-dashboard-description">
-              A quiet control room for the ideas, projects, and proof behind the public profile.
-            </p>
-            <div className="edit-dashboard-stats" aria-label="Portfolio status">
-              <div>
-                <strong>{totalContentItems}</strong>
-                <span>content records</span>
-              </div>
-              <div>
-                <strong>{projects.length}</strong>
-                <span>projects live</span>
-              </div>
-              <div>
-                <strong>{profile?.updatedAt ? new Date(profile.updatedAt).toLocaleDateString() : "Ready"}</strong>
-                <span>last update</span>
-              </div>
-            </div>
+        <section className="edit-dashboard-intro" aria-labelledby="edit-dashboard-title">
+          <div>
+            <p>Portfolio / Edit mode</p>
+            <h1 id="edit-dashboard-title">Shape what people see.</h1>
           </div>
-          <div className="edit-dashboard-hero-orbit" aria-hidden="true">
-            <span className="edit-dashboard-orbit-glow edit-dashboard-orbit-glow-one" />
-            <span className="edit-dashboard-orbit-glow edit-dashboard-orbit-glow-two" />
-            <SolarAura small state="idle" showOrbits={false} className="edit-dashboard-aura" />
-            <span className="edit-dashboard-orbit-label">Control / Ready</span>
-          </div>
+          <p>{totalContentItems} content records · {projects.length} projects live · {profile?.updatedAt ? `Updated ${new Date(profile.updatedAt).toLocaleDateString()}` : "Ready to edit"}</p>
         </section>
 
-        <section className="control-deck rounded-2xl p-5">
-          <div className="deck-glow one" />
-          <div className="deck-glow two" />
-          <div className="relative z-10">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Gauge className="h-4 w-4 text-awsOrange" />
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-300">Control Deck</p>
-              </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[11px] text-neutral-300">
-                <Sparkles className="h-3.5 w-3.5 text-awsOrange" />
-                {totalContentItems} content records managed
-              </div>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-4">
-              {[
-                { id: "resume", label: "Resume" },
-                { id: "profile", label: "Profile" },
-                { id: "projects", label: "Projects" },
-                { id: "experience", label: "Experience" },
-                { id: "leadership", label: "Leadership" },
-                { id: "taglines", label: "Taglines" },
-                { id: "achievements", label: "Achievements" }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="deck-link"
-                  onClick={() => smoothScrollToId(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+        <div className="edit-admin-layout">
+          <nav className="edit-admin-nav" aria-label="Portfolio sections">
+            <p>Content</p>
+            {([
+              ["profile", "Profile", "Identity & links"],
+              ["projects", "Projects", `${projects.length} published`],
+              ["experience", "Experience", `${experience.length} entries`],
+              ["leadership", "Leadership", `${leadership.length} entries`],
+              ["taglines", "Taglines", `${taglines.length} rotating`],
+              ["achievements", "Achievements", `${achievements.length} entries`],
+              ["resume", "Resume", "PDF document"],
+              ["site-media", "Site media", "Icons & sharing"],
+            ] as [EditorSection, string, string][]).map(([id, label, meta]) => (
+              <button
+                key={id}
+                type="button"
+                className={activeEditorSection === id ? "is-active" : ""}
+                aria-current={activeEditorSection === id ? "page" : undefined}
+                onClick={() => {
+                  setActiveEditorSection(id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                <span>{label}</span>
+                <small>{meta}</small>
+              </button>
+            ))}
+          </nav>
+
+          <div className="edit-workspace" data-active-section={activeEditorSection}>
 
         <section id="resume" className="feature-card edit-section space-y-4">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Resume (PDF)</h2>
@@ -2058,6 +1958,8 @@ export default function EditPage() {
             Back to site
           </a>
         </p>
+          </div>
+        </div>
         </div>
       </PortfolioSurface>
     </main>

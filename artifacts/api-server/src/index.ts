@@ -1,13 +1,8 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { getSessionSecret } from "./lib/session";
 
-const rawPort = process.env["PORT"] || "3000";
-
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+const rawPort = process.env["PORT"] ?? "5000";
 
 const port = Number(rawPort);
 
@@ -15,11 +10,24 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, process.env.HOST || "0.0.0.0", (err) => {
+logger.info(
+  {
+    commit: process.env.RENDER_GIT_COMMIT?.trim() || process.env.APP_COMMIT_SHA?.trim() || "unknown",
+    configuration: {
+      database: Boolean(process.env.DATABASE_URL?.trim()),
+      ai: Boolean(process.env.GROQ_API_KEY?.trim()),
+      admin: Boolean(process.env.ADMIN_USERNAME?.trim() && process.env.ADMIN_PASSWORD?.trim()),
+      session: Boolean(getSessionSecret()),
+    },
+  },
+  "Runtime configuration loaded",
+);
+
+app.listen(port, "0.0.0.0", (err) => {
   if (err) {
     logger.error({ err }, "Error listening on port");
     process.exit(1);
   }
 
-  logger.info({ port }, "Server listening");
+  logger.info({ host: "0.0.0.0", port }, "Server listening");
 });

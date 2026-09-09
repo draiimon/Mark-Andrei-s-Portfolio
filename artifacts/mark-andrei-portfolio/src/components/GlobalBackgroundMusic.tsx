@@ -1,7 +1,7 @@
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { getPerformanceProfile, effectBudget, subscribePerformance } from "@/lib/adaptive-performance";
 import type { ResolvedMusic } from "@/lib/music";
+import { isLowPowerDevice, shouldUseMobileLiteStyles } from "@/lib/performance";
 
 type GlobalBackgroundMusicProps = {
   music: ResolvedMusic | null;
@@ -142,7 +142,7 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   const startVibeLoop = () => {
     if (rafRef.current) return;
     const loop = (ts: number) => {
-      const frameInterval = effectBudget().frameMs;
+      const frameInterval = lowPowerRef.current ? 66 : isMobileRef.current ? 40 : 16;
       if (lastRenderTsRef.current && ts - lastRenderTsRef.current < frameInterval) {
         rafRef.current = window.requestAnimationFrame(loop);
         return;
@@ -205,12 +205,21 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
   };
 
   useEffect(() => {
-    const update = () => {
-      isMobileRef.current = getPerformanceProfile().coarsePointer.matches;
-      lowPowerRef.current = getPerformanceProfile().tier === "lightweight";
+    const updateMobileFlag = () => {
+      isMobileRef.current = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+       lowPowerRef.current = isLowPowerDevice();
+       if (shouldUseMobileLiteStyles()) {
+        document.documentElement.setAttribute("data-mobile-lite", "true");
+      } else {
+        document.documentElement.removeAttribute("data-mobile-lite");
+      }
     };
-    update();
-    return subscribePerformance(update);
+    updateMobileFlag();
+    window.addEventListener("resize", updateMobileFlag);
+    return () => {
+      window.removeEventListener("resize", updateMobileFlag);
+      document.documentElement.removeAttribute("data-mobile-lite");
+    };
   }, []);
 
   useEffect(() => {
@@ -264,10 +273,6 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       }
     };
 
-    const handleEnterProfile = () => {
-      void tryPlay(true);
-    };
-
     const onPlay = () => {
       setIsPlaying(true);
       if (userGestureRef.current) {
@@ -286,6 +291,9 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       setBeat(0);
     };
     const isEditorRoute = EDITOR_ROUTE_RE.test(window.location.pathname);
+    const handleEnterProfile = () => {
+      void tryPlay(true);
+    };
     const handleEditorInteraction = () => {
       void tryPlay(true);
     };
@@ -293,14 +301,14 @@ export default function GlobalBackgroundMusic({ music }: GlobalBackgroundMusicPr
       if (!document.hidden && !audio.paused) startVibeLoop();
     };
 
-    window.addEventListener("portfolio:enter-profile", handleEnterProfile);
     if (isEditorRoute) {
       // Attempt autoplay for the editor. Browsers that block unprompted audio
       // will resume it on the first real interaction and unlock analysis.
-      if (!getPerformanceProfile().constrainedNetwork) void tryPlay();
+      void tryPlay();
       window.addEventListener("pointerdown", handleEditorInteraction, { once: true, passive: true });
       window.addEventListener("keydown", handleEditorInteraction, { once: true });
     }
+    window.addEventListener("portfolio:enter-profile", handleEnterProfile);
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
     document.addEventListener("visibilitychange", onVisibilityChange);

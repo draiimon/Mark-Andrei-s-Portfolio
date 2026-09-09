@@ -1,6 +1,6 @@
 import express, { Router, type Request, type Response } from "express";
-import cookieParser from "cookie-parser";
 import { pool } from "@workspace/db";
+import { getSessionSecret } from "../lib/session";
 
 type Profile = Record<string, unknown> & { id: number; viewCount: number };
 type Project = {
@@ -326,7 +326,7 @@ async function persistViewCount() {
 const dbReady = pool ? hydrateFromDatabase() : Promise.resolve();
 
 function isAdmin(req: Request) {
-  return req.cookies?.portfolio_admin === "true";
+  return req.signedCookies?.portfolio_admin === "true";
 }
 
 function unauthorized(res: Response) {
@@ -438,7 +438,6 @@ function replaceItem<T extends { id: number }>(items: T[], id: number, patch: Pa
 }
 
 const router = Router();
-router.use(cookieParser());
 router.use(async (_req, _res, next) => {
   try {
     await dbReady;
@@ -449,12 +448,25 @@ router.use(async (_req, _res, next) => {
 });
 
 router.post("/admin/login", (req, res) => {
-  const username = process.env.ADMIN_USERNAME || "draiimon";
-  const password = process.env.ADMIN_PASSWORD || "Mason@0905";
+  const username = process.env.ADMIN_USERNAME?.trim();
+  const password = process.env.ADMIN_PASSWORD?.trim();
+  if (!username || !password) {
+    req.log.error("Admin credentials are not configured");
+    return res.status(503).json({ error: "Admin login is not configured" });
+  }
   if (req.body?.username !== username || req.body?.password !== password) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
-  res.cookie("portfolio_admin", "true", { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production" });
+  if (!getSessionSecret()) {
+    req.log.error("SESSION_SECRET is not configured");
+    return res.status(503).json({ error: "Admin session is not configured" });
+  }
+  res.cookie("portfolio_admin", "true", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    signed: true,
+  });
   return res.json({ ok: true });
 });
 
@@ -465,7 +477,12 @@ router.post("/admin/logout", (_req, res) => {
 
 router.get("/edit/me", (req, res) => {
   if (!isAdmin(req)) return unauthorized(res);
-  return res.json({ username: process.env.ADMIN_USERNAME || "draiimon" });
+  const username = process.env.ADMIN_USERNAME?.trim();
+  if (!username) {
+    req.log.error("Admin credentials are not configured");
+    return res.status(503).json({ error: "Admin login is not configured" });
+  }
+  return res.json({ username });
 });
 
 router.get("/public/portfolio", async (_req, res) => {
@@ -648,8 +665,9 @@ router.post("/chat", async (req, res) => {
   ) {
     return res.status(400).json({ error: "Invalid message" });
   }
-  if (!process.env.GROQ_API_KEY) {
-    console.error("[chat] GROQ_API_KEY is not available to the API runtime");
+  const groqApiKey = process.env.GROQ_API_KEY?.trim();
+  if (!groqApiKey) {
+    req.log.error("GROQ_API_KEY is not available to the API runtime");
     return res.status(503).json({ error: "Assistant unavailable" });
   }
 
@@ -673,7 +691,7 @@ Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqApiKey}` },
       body: JSON.stringify({
         model: "openai/gpt-oss-120b",
         messages: [{ role: "system", content: systemPrompt }, ...messages],
@@ -683,7 +701,7 @@ Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
       signal: AbortSignal.timeout(25_000),
     });
     if (!response.ok) {
-      console.error(`[chat] Groq request returned HTTP ${response.status}`);
+      req.log.error({ statusCode: response.status }, "Groq request returned an error");
       return res.status(502).json({ error: "Assistant temporarily unavailable" });
     }
     const data = (await response.json()) as { choices?: Array<{ message?: { content?: unknown } }> };
@@ -691,7 +709,7 @@ Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
     if (typeof reply !== "string" || !reply.trim()) return res.status(502).json({ error: "No reply received" });
     return res.json({ reply });
   } catch (error) {
-    console.error("[chat] Groq request failed before a reply was received", error instanceof Error ? error.message : "unknown error");
+    req.log.error({ err: error }, "Groq request failed before a reply was received");
     return res.status(503).json({ error: "Assistant temporarily unavailable" });
   }
 });

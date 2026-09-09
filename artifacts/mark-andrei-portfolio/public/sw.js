@@ -1,84 +1,48 @@
-const CACHE_VERSION = "portfolio-cache-v2";
-const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const DATA_CACHE = `${CACHE_VERSION}-data`;
-const SHELL = [
-  "/",
-  "/site.webmanifest",
-  "/favicon.svg",
-  "/solar-eclipse-logo.svg",
-  "/apple-touch-icon.png",
-  "/icon-192.png",
-  "/icon-512.png",
-  "/assets/solar-eclipse-background-pingpong.mp4",
-];
+const CACHE_NAME = "mark-andrei-static-v3-20260909";
+const MEDIA_PATHS = ["/assets/", "/uploads/"];
+const CACHEABLE_DESTINATIONS = new Set(["script", "style", "font", "image", "video", "audio"]);
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) =>
-      Promise.all(SHELL.map((url) => cache.add(url).catch(() => undefined))),
-    ).then(() => self.skipWaiting()),
-  );
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key.startsWith("portfolio-cache-") && !key.startsWith(CACHE_VERSION))
-          .map((key) => caches.delete(key)),
-      ),
-    ).then(() => self.clients.claim()),
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
   );
 });
 
-async function networkFirst(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  try {
-    const response = await fetch(request);
-    if (response.ok) await cache.put(request, response.clone());
-    return response;
-  } catch {
-    const cached = await cache.match(request);
-    if (cached) return cached;
-    throw new Error("offline");
-  }
+function isCacheable(request, url) {
+  return (
+    request.method === "GET" &&
+    url.origin === self.location.origin &&
+    !url.pathname.startsWith("/api/") &&
+    !url.pathname.endsWith("/sw.js") &&
+    (MEDIA_PATHS.some((path) => url.pathname.startsWith(path)) ||
+      CACHEABLE_DESTINATIONS.has(request.destination))
+  );
 }
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
-  if (request.method !== "GET") return;
-
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return;
+  if (!isCacheable(request, url)) return;
 
-  if (url.pathname === "/api/public/portfolio") {
-    event.respondWith(networkFirst(request, DATA_CACHE));
-    return;
-  }
-
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request).catch(async () => {
-        const cache = await caches.open(STATIC_CACHE);
-        return (await cache.match(request)) || (await cache.match("/"));
-      }),
-    );
-    return;
-  }
-
-  if (["script", "style", "font", "image", "video", "manifest"].includes(request.destination)) {
-    event.respondWith(
-      caches.match(request).then((cached) => {
-        const update = fetch(request).then(async (response) => {
-          if (response.ok) {
-            const cache = await caches.open(STATIC_CACHE);
-            await cache.put(request, response.clone());
-          }
+  const isMedia = MEDIA_PATHS.some((path) => url.pathname.startsWith(path));
+  event.respondWith(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const cached = await cache.match(request);
+      const refresh = fetch(request)
+        .then((response) => {
+          if (response.ok) void cache.put(request, response.clone());
           return response;
-        }).catch(() => cached);
-        return cached || update;
-      }),
-    );
-  }
+        })
+        .catch(() => cached);
+
+      return isMedia && cached ? cached : cached ? cached : refresh;
+    }),
+  );
 });

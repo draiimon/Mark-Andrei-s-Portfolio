@@ -1,56 +1,58 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Dependencies
+node_modules/
+**/node_modules/
 
-# compiled output
-dist
-tmp
-out-tsc
+# Build output and caches
+dist/
+**/dist/
+build/
+coverage/
+.cache/
+.local/
+.upm/
 *.tsbuildinfo
-.expo
-.expo-shared
+*.log
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
 
-# dependencies
-node_modules
-.pnpm-store/
-.next/
-
-# Local environment secrets
+# Local environment and secrets
 .env
 .env.*
 !.env.example
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Replit, agent, and assistant workspace state
+.agents/
+.config/
+.replit.local
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# Historical captures and imported working files
+attached_assets/
+screenshots/
+.migration-backup/
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-
-# System Files
+# Editors and operating-system files
+.idea/
+.vscode/
+*.iml
+*.suo
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# Package-manager and tool logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Replit
-.cache/
-.local/
+# Test and local tooling output
+.nyc_output/
+.sass-cache/
+.eslintcache
+.stylelintcache
+*.orig
