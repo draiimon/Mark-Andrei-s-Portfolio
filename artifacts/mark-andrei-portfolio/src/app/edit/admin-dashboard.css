@@ -621,7 +621,35 @@
   .edit-dashboard-intro h1 { font-size: clamp(2.35rem, 12vw, 3.15rem); }
   .edit-dashboard-intro > p { max-width: 28ch; line-height: 1.55; }
 
-  .edit-admin-nav { margin-inline: -0.9rem; padding-inline: 0.9rem; }
+  .edit-admin-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+    margin-inline: -0.9rem;
+    padding: 0.65rem 0.9rem;
+    overflow: visible;
+  }
+
+  .edit-admin-nav > p {
+    grid-column: 1 / -1;
+    padding: 0.15rem 0.2rem 0.25rem;
+  }
+
+  .edit-admin-nav button {
+    width: auto;
+    min-height: 3.1rem;
+    padding: 0.5rem 0.65rem 0.5rem 0.8rem;
+    text-align: left;
+  }
+
+  .edit-admin-nav button small {
+    display: block;
+    overflow: hidden;
+    color: #777a80;
+    font-size: 0.58rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
   .edit-control-center .feature-card.edit-section > h2,
   .edit-control-center .feature-card.edit-section > div:first-child h2 { font-size: 1.55rem; }
