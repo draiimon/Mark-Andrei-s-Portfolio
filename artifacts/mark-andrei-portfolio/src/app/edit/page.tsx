@@ -1,7 +1,15 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRight, Cloud, Eye, EyeOff, ExternalLink, GripVertical, LogOut } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode, type InputHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { ArrowUp, ArrowDown, ArrowUpRight, Cloud, Eye, EyeOff, ExternalLink, GripVertical, LogOut } from "lucide-react";
 import SolarAura from "@/components/SolarAura";
 import "./admin-dashboard.css";
+
+function EditorInput(props: InputHTMLAttributes<HTMLInputElement>) {
+  if (props.type === "checkbox") return <input {...props} />;
+  return <label className="edit-field"><span>{props.placeholder}</span><input {...props} /></label>;
+}
+function EditorTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <label className="edit-field"><span>{props.placeholder}</span><textarea {...props} /></label>;
+}
 
 const EDIT_SOLAR_INTRO_MOBILE_DURATION_MS = 3000;
 const EDIT_SOLAR_INTRO_DESKTOP_DURATION_MS = 3000;
@@ -466,6 +474,12 @@ export default function EditPage() {
   const [editorHasSelectedSection, setEditorHasSelectedSection] = useState(false);
 
   useEffect(() => {
+    if (!success) return;
+    const timer = window.setTimeout(() => setSuccess(""), 3500);
+    return () => window.clearTimeout(timer);
+  }, [success]);
+
+  useEffect(() => {
     if (loginAuraMomentum <= 0) return;
 
     const timer = window.setTimeout(() => {
@@ -622,7 +636,9 @@ export default function EditPage() {
     };
   }, [auth]);
 
-  async function loadData() {
+  const lastProfileForm = useRef<Record<string, string> | null>(null);
+
+  async function loadData(resetProfile = false) {
     try {
       const [p, proj, exp, lead, ach, tgs] = await Promise.all([
         apiJson<Profile>("/api/edit/profile"),
@@ -639,7 +655,7 @@ export default function EditPage() {
       setAchievements(ach || []);
       setTaglines(tgs || []);
       if (p) {
-        setProfileForm({
+        const nextProfileForm = {
           fullName: p.fullName || "",
           headline: p.headline || "",
           location: p.location || "",
@@ -672,9 +688,18 @@ export default function EditPage() {
           footerCenterText: p.footerCenterText || "",
           footerRightText: p.footerRightText || "",
           aiBehaviorPrompt: p.aiBehaviorPrompt || ""
+        };
+        const previousSnapshot = lastProfileForm.current;
+        setProfileForm(current => {
+          if (resetProfile || !previousSnapshot) return nextProfileForm;
+          return Object.fromEntries(Object.entries(nextProfileForm).map(([key, value]) => [
+            key, current[key as keyof typeof current] !== previousSnapshot[key] ? current[key as keyof typeof current] : value
+          ])) as typeof current;
         });
+        lastProfileForm.current = nextProfileForm;
       }
       setError("");
+      return true;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load data";
       if (message.toLowerCase().includes("unauthorized")) {
@@ -683,17 +708,19 @@ export default function EditPage() {
         return;
       }
       setError(message);
+      return false;
     }
   }
 
   async function withSave(task: () => Promise<void>, message: string) {
+    if (saving) return;
     setSaving(true);
     setError("");
     setSuccess("");
     try {
       await task();
-      setSuccess(message);
-      await loadData();
+      const refreshed = await loadData();
+      setSuccess(refreshed ? message : `${message} Reload the editor to fetch the latest content.`);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Save failed";
       if (message.toLowerCase().includes("unauthorized")) {
@@ -708,12 +735,11 @@ export default function EditPage() {
   }
 
   async function uploadSiteMedia(key: "favicon" | "social", file: File) {
-    const formData = new FormData();
-    formData.append("key", key);
-    formData.append("file", file);
-    const res = await fetch("/api/edit/site-media", {
+    if (file.size > 5 * 1024 * 1024) throw new Error("Choose an image smaller than 5 MB.");
+    const res = await fetch(`/api/edit/site-media?key=${key}`, {
       method: "POST",
-      body: formData,
+      headers: { "Content-Type": file.type || "application/octet-stream" },
+      body: file,
       credentials: "include"
     });
     if (!res.ok) {
@@ -786,15 +812,16 @@ export default function EditPage() {
   }
 
   async function persistOrder(section: SortableSection, idsInOrder: number[]) {
-    await Promise.all(
-      idsInOrder.map((id, index) =>
-        apiJson(`/api/edit/${section}/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sortOrder: index + 1 })
-        })
-      )
-    );
+    try {
+      await apiJson(`/api/edit/${section}/reorder`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: idsInOrder })
+      });
+    } catch (error) {
+      await loadData();
+      throw error;
+    }
   }
 
   function handleDrop(section: SortableSection, targetId: number) {
@@ -837,6 +864,20 @@ export default function EditPage() {
     if (section === "leadership") return leadership.map((v) => v.id);
     if (section === "achievements") return achievements.map((v) => v.id);
     return taglines.map((v) => v.id);
+  }
+
+  function renderOrderControls(section: SortableSection, id: number) {
+    const ids = idsForSection(section);
+    const index = ids.indexOf(id);
+    const move = (offset: number) => {
+      const next = [...ids];
+      [next[index], next[index + offset]] = [next[index + offset], next[index]];
+      void withSave(() => persistOrder(section, next), "Order updated.");
+    };
+    return <span className="edit-order-actions">
+      <button type="button" aria-label="Move up" disabled={saving || index === 0} onClick={() => move(-1)}><ArrowUp size={16} /></button>
+      <button type="button" aria-label="Move down" disabled={saving || index === ids.length - 1} onClick={() => move(1)}><ArrowDown size={16} /></button>
+    </span>;
   }
 
   function dragShiftClass(section: SortableSection, itemId: number) {
@@ -892,7 +933,8 @@ export default function EditPage() {
   }
 
   async function handleLogout() {
-    await fetch("/api/admin/logout", { method: "POST", credentials: "include" }).catch(() => {});
+    try { await apiJson("/api/admin/logout", { method: "POST" }); }
+    catch { setError("Logout failed. Please retry."); return; }
     setAuth(false);
     setUsername("");
     setPassword("");
@@ -1087,6 +1129,14 @@ export default function EditPage() {
     );
   }
 
+  if (!profile) return (
+    <main className="edit-page site-shell min-h-screen text-white">
+      <PortfolioSurface><div className="mx-auto max-w-4xl px-4 py-16" role="status">
+        {error ? <><p role="alert">{error}</p><button type="button" onClick={() => void loadData()}>Retry loading portfolio</button></> : "Loading portfolio editor…"}
+      </div></PortfolioSurface>
+    </main>
+  );
+
   return (
     <main className="edit-page edit-control-center site-shell min-h-screen text-white">
       <PortfolioSurface
@@ -1157,8 +1207,8 @@ export default function EditPage() {
 
         {(error || success) && (
           <div className="edit-notices" role="status" aria-live="polite">
-            {error && <p className="edit-notice is-error">{error}</p>}
-            {success && <p className="edit-notice is-success">{success}</p>}
+            {error && <p className="edit-notice is-error" role="alert">{error}</p>}
+            {success && <p className="edit-notice is-success"><span>{success}</span><button type="button" aria-label="Dismiss notification" onClick={() => setSuccess("")}>×</button></p>}
           </div>
         )}
 
@@ -1264,7 +1314,7 @@ export default function EditPage() {
         </section>
 
         <div className="edit-admin-layout" data-has-selected-section={editorHasSelectedSection ? "true" : "false"}>
-          <div className="edit-workspace" data-active-section={activeEditorSection}>
+          <div className="edit-workspace" aria-busy={saving} data-active-section={activeEditorSection}>
 
         <section id="resume" className="feature-card edit-section space-y-4">
           {activeEditorSection !== "resume" && (
@@ -1276,6 +1326,7 @@ export default function EditPage() {
               e.preventDefault();
               if (!resumeFile) return;
               void withSave(async () => {
+                if (resumeFile.size > 10 * 1024 * 1024) throw new Error("Choose a PDF smaller than 10 MB.");
                 if (resumeFile.type !== "application/pdf") throw new Error("Please choose a PDF resume.");
                 const res = await fetch("/api/edit/resume", {
                   method: "POST",
@@ -1293,6 +1344,7 @@ export default function EditPage() {
           >
             <input
               type="file"
+              aria-label="Resume PDF"
               accept=".pdf,application/pdf"
               onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
                 className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
@@ -1307,7 +1359,7 @@ export default function EditPage() {
           {activeEditorSection !== "site-media" && (
             <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-300">Site Media Uploads</h2>
           )}
-          <p className="text-xs text-neutral-500">Uploads are saved in database and applied to tab icon + social preview.</p>
+          <p className="text-xs text-neutral-500">PNG, JPEG, WebP, GIF or ICO · up to 5 MB. Saved images appear in the tab icon and social preview.</p>
           <div className="grid gap-3 md:grid-cols-2">
             <form
               className="space-y-2 rounded-xl border border-white/10 bg-black/25 p-3"
@@ -1325,7 +1377,8 @@ export default function EditPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-400">Favicon</p>
               <input
                 type="file"
-                accept="image/*"
+                aria-label="Favicon image"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon,image/vnd.microsoft.icon"
                 onChange={(e) => setFaviconFile(e.target.files?.[0] ?? null)}
                 className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
               />
@@ -1350,7 +1403,8 @@ export default function EditPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-400">Social Preview</p>
               <input
                 type="file"
-                accept="image/*"
+                aria-label="Social preview image"
+                accept="image/png,image/jpeg,image/webp,image/gif,image/x-icon,image/vnd.microsoft.icon"
                 onChange={(e) => setSocialFile(e.target.files?.[0] ?? null)}
                 className="block w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-neutral-300 file:mr-2 file:rounded file:border-0 file:bg-awsOrange file:px-3 file:py-1 file:text-black file:text-sm"
               />
@@ -1669,9 +1723,11 @@ export default function EditPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end">
+            <div className="edit-save-bar flex items-center justify-end gap-3">
+              <span className="text-xs text-neutral-400">Changes appear on the portfolio after saving.</span>
+              <button type="button" disabled={saving} onClick={() => { if (confirm("Reset unsaved profile changes?")) void loadData(true); }} className="text-neutral-300">Reset</button>
               <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-5 py-2.5 text-sm font-semibold text-black disabled:opacity-60">
-                Save profile
+                {saving ? "Saving…" : "Save profile"}
               </button>
             </div>
           </form>
@@ -1704,14 +1760,14 @@ export default function EditPage() {
                       }, "Project updated.");
                     }}
                   >
-                    <input value={editProjectForm.name} onChange={(e) => setEditProjectForm((f) => ({ ...f, name: e.target.value }))} placeholder="Name" className="w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-white" />
-                    <input value={editProjectForm.tagline} onChange={(e) => setEditProjectForm((f) => ({ ...f, tagline: e.target.value }))} placeholder="Tagline" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <textarea value={editProjectForm.description} onChange={(e) => setEditProjectForm((f) => ({ ...f, description: e.target.value }))} placeholder="Description" rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editProjectForm.techStack} onChange={(e) => setEditProjectForm((f) => ({ ...f, techStack: e.target.value }))} placeholder="Tech stack" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editProjectForm.link} onChange={(e) => setEditProjectForm((f) => ({ ...f, link: e.target.value }))} placeholder="Live demo URL" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editProjectForm.githubUrl} onChange={(e) => setEditProjectForm((f) => ({ ...f, githubUrl: e.target.value }))} placeholder="GitHub URL" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editProjectForm.name} onChange={(e) => setEditProjectForm((f) => ({ ...f, name: e.target.value }))} placeholder="Name" className="w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-white" />
+                    <EditorInput value={editProjectForm.tagline} onChange={(e) => setEditProjectForm((f) => ({ ...f, tagline: e.target.value }))} placeholder="Tagline" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorTextarea value={editProjectForm.description} onChange={(e) => setEditProjectForm((f) => ({ ...f, description: e.target.value }))} placeholder="Description" rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editProjectForm.techStack} onChange={(e) => setEditProjectForm((f) => ({ ...f, techStack: e.target.value }))} placeholder="Tech stack" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editProjectForm.link} onChange={(e) => setEditProjectForm((f) => ({ ...f, link: e.target.value }))} placeholder="Live demo URL" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editProjectForm.githubUrl} onChange={(e) => setEditProjectForm((f) => ({ ...f, githubUrl: e.target.value }))} placeholder="GitHub URL" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
                     <label className="flex items-center gap-2 text-neutral-300">
-                      <input type="checkbox" checked={editProjectForm.highlight} onChange={(e) => setEditProjectForm((f) => ({ ...f, highlight: e.target.checked }))} />
+                      <EditorInput type="checkbox" checked={editProjectForm.highlight} onChange={(e) => setEditProjectForm((f) => ({ ...f, highlight: e.target.checked }))} />
                       Featured project
                     </label>
                     <div className="flex gap-2">
@@ -1765,14 +1821,14 @@ export default function EditPage() {
               }, "Project added.");
             }}
           >
-            <input type="text" placeholder="Project name" value={newProject.name} onChange={(e) => setNewProject((p) => ({ ...p, name: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-white" />
-            <input type="text" placeholder="Tagline" value={newProject.tagline} onChange={(e) => setNewProject((p) => ({ ...p, tagline: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <textarea placeholder="Description" value={newProject.description} onChange={(e) => setNewProject((p) => ({ ...p, description: e.target.value }))} rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="Tech stack" value={newProject.techStack} onChange={(e) => setNewProject((p) => ({ ...p, techStack: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="Live demo URL" value={newProject.link} onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="GitHub URL" value={newProject.githubUrl} onChange={(e) => setNewProject((p) => ({ ...p, githubUrl: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Project name" value={newProject.name} onChange={(e) => setNewProject((p) => ({ ...p, name: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/35 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Tagline" value={newProject.tagline} onChange={(e) => setNewProject((p) => ({ ...p, tagline: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorTextarea placeholder="Description" value={newProject.description} onChange={(e) => setNewProject((p) => ({ ...p, description: e.target.value }))} rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Tech stack" value={newProject.techStack} onChange={(e) => setNewProject((p) => ({ ...p, techStack: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Live demo URL" value={newProject.link} onChange={(e) => setNewProject((p) => ({ ...p, link: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="GitHub URL" value={newProject.githubUrl} onChange={(e) => setNewProject((p) => ({ ...p, githubUrl: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <label className="flex items-center gap-2 text-neutral-300">
-              <input type="checkbox" checked={newProject.highlight} onChange={(e) => setNewProject((p) => ({ ...p, highlight: e.target.checked }))} />
+              <EditorInput type="checkbox" checked={newProject.highlight} onChange={(e) => setNewProject((p) => ({ ...p, highlight: e.target.checked }))} />
               Featured project
             </label>
             <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-4 py-2 text-sm font-medium text-black disabled:opacity-60">
@@ -1811,6 +1867,7 @@ export default function EditPage() {
                     <GripVertical className="h-3.5 w-3.5" />
                     Drag to reorder
                   </span>
+                  {renderOrderControls("experience", item.id)}
                 </div>
                 {editingExperienceId === item.id ? (
                   <form
@@ -1827,12 +1884,12 @@ export default function EditPage() {
                       }, "Experience updated.");
                     }}
                   >
-                    <input value={editExperienceForm.role} onChange={(e) => setEditExperienceForm((v) => ({ ...v, role: e.target.value }))} placeholder="Role" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editExperienceForm.company} onChange={(e) => setEditExperienceForm((v) => ({ ...v, company: e.target.value }))} placeholder="Company" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editExperienceForm.period} onChange={(e) => setEditExperienceForm((v) => ({ ...v, period: e.target.value }))} placeholder="Period" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <textarea value={editExperienceForm.summary} onChange={(e) => setEditExperienceForm((v) => ({ ...v, summary: e.target.value }))} placeholder="Summary" rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editExperienceForm.role} onChange={(e) => setEditExperienceForm((v) => ({ ...v, role: e.target.value }))} placeholder="Role" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editExperienceForm.company} onChange={(e) => setEditExperienceForm((v) => ({ ...v, company: e.target.value }))} placeholder="Company" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editExperienceForm.period} onChange={(e) => setEditExperienceForm((v) => ({ ...v, period: e.target.value }))} placeholder="Period" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorTextarea value={editExperienceForm.summary} onChange={(e) => setEditExperienceForm((v) => ({ ...v, summary: e.target.value }))} placeholder="Summary" rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
                     <div className="flex gap-2 text-xs">
-                      <button type="submit" className="rounded-lg bg-awsOrange px-3 py-1.5 font-medium text-black">Save</button>
+                      <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-3 py-1.5 font-medium text-black">Save</button>
                       <button type="button" className="rounded-lg border border-white/20 px-3 py-1.5 text-neutral-300" onClick={() => setEditingExperienceId(null)}>Cancel</button>
                     </div>
                   </form>
@@ -1877,10 +1934,10 @@ export default function EditPage() {
               }, "Experience added.");
             }}
           >
-            <input type="text" placeholder="Role" value={newExperience.role} onChange={(e) => setNewExperience((v) => ({ ...v, role: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="Company" value={newExperience.company} onChange={(e) => setNewExperience((v) => ({ ...v, company: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="Period" value={newExperience.period} onChange={(e) => setNewExperience((v) => ({ ...v, period: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <textarea placeholder="Summary" value={newExperience.summary} onChange={(e) => setNewExperience((v) => ({ ...v, summary: e.target.value }))} rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Role" value={newExperience.role} onChange={(e) => setNewExperience((v) => ({ ...v, role: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Company" value={newExperience.company} onChange={(e) => setNewExperience((v) => ({ ...v, company: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Period" value={newExperience.period} onChange={(e) => setNewExperience((v) => ({ ...v, period: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorTextarea placeholder="Summary" value={newExperience.summary} onChange={(e) => setNewExperience((v) => ({ ...v, summary: e.target.value }))} rows={2} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-4 py-2 text-sm font-medium text-black disabled:opacity-60">
               Add experience
             </button>
@@ -1917,6 +1974,7 @@ export default function EditPage() {
                     <GripVertical className="h-3.5 w-3.5" />
                     Drag to reorder
                   </span>
+                  {renderOrderControls("leadership", item.id)}
                 </div>
                 {editingLeadershipId === item.id ? (
                   <form
@@ -1933,11 +1991,11 @@ export default function EditPage() {
                       }, "Leadership updated.");
                     }}
                   >
-                    <input value={editLeadershipForm.org} onChange={(e) => setEditLeadershipForm((v) => ({ ...v, org: e.target.value }))} placeholder="Organization" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editLeadershipForm.role} onChange={(e) => setEditLeadershipForm((v) => ({ ...v, role: e.target.value }))} placeholder="Role" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-                    <input value={editLeadershipForm.period} onChange={(e) => setEditLeadershipForm((v) => ({ ...v, period: e.target.value }))} placeholder="Period" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editLeadershipForm.org} onChange={(e) => setEditLeadershipForm((v) => ({ ...v, org: e.target.value }))} placeholder="Organization" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editLeadershipForm.role} onChange={(e) => setEditLeadershipForm((v) => ({ ...v, role: e.target.value }))} placeholder="Role" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editLeadershipForm.period} onChange={(e) => setEditLeadershipForm((v) => ({ ...v, period: e.target.value }))} placeholder="Period" className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
                     <div className="flex gap-2 text-xs">
-                      <button type="submit" className="rounded-lg bg-awsOrange px-3 py-1.5 font-medium text-black">Save</button>
+                      <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-3 py-1.5 font-medium text-black">Save</button>
                       <button type="button" className="rounded-lg border border-white/20 px-3 py-1.5 text-neutral-300" onClick={() => setEditingLeadershipId(null)}>Cancel</button>
                     </div>
                   </form>
@@ -1982,9 +2040,9 @@ export default function EditPage() {
               }, "Leadership entry added.");
             }}
           >
-            <input type="text" placeholder="Organization" value={newLeadership.org} onChange={(e) => setNewLeadership((v) => ({ ...v, org: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="Role" value={newLeadership.role} onChange={(e) => setNewLeadership((v) => ({ ...v, role: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
-            <input type="text" placeholder="Period" value={newLeadership.period} onChange={(e) => setNewLeadership((v) => ({ ...v, period: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Organization" value={newLeadership.org} onChange={(e) => setNewLeadership((v) => ({ ...v, org: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Role" value={newLeadership.role} onChange={(e) => setNewLeadership((v) => ({ ...v, role: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Period" value={newLeadership.period} onChange={(e) => setNewLeadership((v) => ({ ...v, period: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-4 py-2 text-sm font-medium text-black disabled:opacity-60">
               Add leadership
             </button>
@@ -2021,10 +2079,12 @@ export default function EditPage() {
                     <GripVertical className="h-3.5 w-3.5" />
                     Drag to reorder
                   </span>
+                  {renderOrderControls("taglines", item.id)}
                 </div>
                 <div className="grid gap-2">
-                  <input
+                  <EditorInput
                     type="text"
+                    placeholder="Tagline"
                     value={item.text}
                     onChange={(e) =>
                       setTaglines((all) => all.map((t) => (t.id === item.id ? { ...t, text: e.target.value } : t)))
@@ -2078,7 +2138,7 @@ export default function EditPage() {
               }, "Tagline added.");
             }}
           >
-            <input
+            <EditorInput
               type="text"
               placeholder="Tagline text"
               value={newTagline.text}
@@ -2121,6 +2181,7 @@ export default function EditPage() {
                     <GripVertical className="h-3.5 w-3.5" />
                     Drag to reorder
                   </span>
+                  {renderOrderControls("achievements", item.id)}
                 </div>
                 {editingAchievementId === item.id ? (
                   <form
@@ -2138,9 +2199,9 @@ export default function EditPage() {
                       }, "Achievement updated.");
                     }}
                   >
-                    <input value={editAchievementText} onChange={(e) => setEditAchievementText(e.target.value)} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+                    <EditorInput value={editAchievementText} onChange={(e) => setEditAchievementText(e.target.value)} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
                     <div className="flex gap-2 text-xs">
-                      <button type="submit" className="rounded-lg bg-awsOrange px-3 py-1.5 font-medium text-black">Save</button>
+                      <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-3 py-1.5 font-medium text-black">Save</button>
                       <button type="button" className="rounded-lg border border-white/20 px-3 py-1.5 text-neutral-300" onClick={() => setEditingAchievementId(null)}>Cancel</button>
                     </div>
                   </form>
@@ -2183,7 +2244,7 @@ export default function EditPage() {
               }, "Achievement added.");
             }}
           >
-            <input type="text" placeholder="Achievement text" value={newAchievement.text} onChange={(e) => setNewAchievement((v) => ({ ...v, text: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
+            <EditorInput type="text" placeholder="Achievement text" value={newAchievement.text} onChange={(e) => setNewAchievement((v) => ({ ...v, text: e.target.value }))} className="w-full rounded-lg border border-white/15 bg-black/45 px-3 py-2 text-white" />
             <button type="submit" disabled={saving} className="rounded-lg bg-awsOrange px-4 py-2 text-sm font-medium text-black disabled:opacity-60">
               Add achievement
             </button>

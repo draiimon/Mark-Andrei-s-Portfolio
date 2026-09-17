@@ -128,11 +128,11 @@ export default function Home() {
         if (cancelled || !data) return;
          startTransition(() => {
            setProfile({ ...portfolioSnapshot.profile, ...data.profile });
-           if (Array.isArray(data.projects) && data.projects.length) setProjects(data.projects);
-           if (Array.isArray(data.experience) && data.experience.length) setExperience(data.experience);
-           if (Array.isArray(data.leadership) && data.leadership.length) setLeadership(data.leadership);
-           if (Array.isArray(data.achievements) && data.achievements.length) setAchievements(data.achievements);
-           if (Array.isArray(data.taglines) && data.taglines.length) setTaglines(data.taglines);
+           if (Array.isArray(data.projects)) setProjects(data.projects);
+           if (Array.isArray(data.experience)) setExperience(data.experience);
+           if (Array.isArray(data.leadership)) setLeadership(data.leadership);
+           if (Array.isArray(data.achievements)) setAchievements(data.achievements);
+           if (Array.isArray(data.taglines)) setTaglines(data.taglines);
          });
       })
       .catch(() => undefined);

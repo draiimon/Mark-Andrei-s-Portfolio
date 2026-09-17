@@ -1,4 +1,6 @@
-import express, { type Express } from "express";
+import express, { type Express, type ErrorRequestHandler } from "express";
+import { EditorError } from "./lib/editor";
+import { pool } from "@workspace/db";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import fs from "node:fs/promises";
@@ -55,6 +57,22 @@ app.head("/", (_req, res) => {
 });
 
 app.use("/api", router);
+
+const apiErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
+  if (!req.path.startsWith("/api/")) return next(error);
+  req.log.error({ err: error }, "API request failed");
+  const status = error instanceof EditorError ? error.status
+    : error.type === "entity.too.large" ? 413
+    : error.type === "entity.parse.failed" ? 400
+    : ["ECONNREFUSED", "ETIMEDOUT", "ENOTFOUND", "EACCES", "57P01", "53300"].includes(error.code) ? 503 : 500;
+  const message = error instanceof EditorError ? error.message
+    : status === 413 ? "File or request is too large. Images: 5 MB; resume: 10 MB."
+    : status === 400 ? "Invalid JSON request."
+    : status === 503 ? "Storage is temporarily unavailable. Please retry."
+    : "The request could not be completed. Please retry; the server logged the error.";
+  res.status(status).json({ error: message });
+};
+app.use(apiErrorHandler);
 
 const staticRoot = process.env.STATIC_ROOT?.trim();
 if (staticRoot) {
@@ -122,7 +140,21 @@ if (staticRoot) {
     }
 
     try {
-      const indexHtml = await fs.readFile(indexPath, "utf8");
+      let indexHtml = await fs.readFile(indexPath, "utf8");
+      if (pool) {
+        try {
+          const result = await pool.query('SELECT "socialImageUrl" FROM "Profile" ORDER BY "id" LIMIT 1');
+          const image = result.rows[0]?.socialImageUrl;
+          if (typeof image === "string" && image && (/^https?:\/\//i.test(image) || /^\/(?!\/)/.test(image))) {
+            const absolute = image.startsWith("/") ? `${siteUrl}${image}` : image;
+            const escaped = absolute.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+            indexHtml = indexHtml.replace(/(<meta (?:property="og:image(?::secure_url)?"|name="twitter:image") content=")[^"]*("\s*\/>)/g, `$1${escaped}$2`)
+              .replace(/\s*<meta property="og:image:(?:type|width|height)"[^>]*>/g, "");
+          }
+        } catch (error) {
+          req.log.error({ err: error }, "Could not load social preview metadata");
+        }
+      }
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       res.type("html").send(indexHtml.replaceAll("__SITE_URL__", siteUrl));
     } catch (error) {

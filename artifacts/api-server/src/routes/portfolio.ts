@@ -1,6 +1,7 @@
 import express, { Router, type Request, type Response } from "express";
 import { pool } from "@workspace/db";
 import { getSessionSecret } from "../lib/session";
+import { collections, database, EditorError, updateRow, validate, type Collection } from "../lib/editor";
 
 type Profile = Record<string, unknown> & { id: number; viewCount: number };
 type Project = {
@@ -164,7 +165,7 @@ const taglines: Tagline[] = [
   { id: 5, text: "improves delivery through automation.", sortOrder: 5 },
 ];
 
-async function hydrateFromDatabase() {
+async function hydrateFromDatabase(profileOnly = false) {
   if (!pool) return;
 
   const profileResult = await pool.query<Record<string, unknown>>(
@@ -180,6 +181,7 @@ async function hydrateFromDatabase() {
         : String(savedProfile.updatedAt ?? profile.updatedAt),
     });
   }
+  if (profileOnly) return;
 
   const [
     projectResult,
@@ -229,101 +231,16 @@ async function hydrateFromDatabase() {
   taglines.splice(0, taglines.length, ...taglineResult.rows.map((row) => ({ ...row, id: Number(row.id), sortOrder: Number(row.sortOrder) })));
 }
 
-type SqlClient = {
-  query: (text: string, values?: unknown[]) => Promise<{ rowCount: number | null; rows: Array<Record<string, unknown>> }>;
-};
-
-async function syncCollection(
-  client: SqlClient,
-  table: "Project" | "Experience" | "Leadership" | "Achievement" | "Tagline",
-  columns: readonly string[],
-  rows: Array<Record<string, unknown>>,
-) {
-  const existing = await client.query(`SELECT "id" FROM "${table}"`);
-  const ids = rows.map((row) => Number(row.id));
-
-  for (const row of rows) {
-    const now = new Date();
-    const insertColumns = ["id", ...columns, "createdAt", "updatedAt"];
-    const placeholders = insertColumns.map((_, index) => `$${index + 1}`).join(", ");
-    const values = [...insertColumns.slice(0, -2).map((column) => row[column]), now, now];
-    const updates = [
-      ...columns.map((column) => `"${column}" = EXCLUDED."${column}"`),
-      `"updatedAt" = NOW()`,
-    ].join(", ");
-    await client.query(
-      `INSERT INTO "${table}" (${insertColumns.map((column) => `"${column}"`).join(", ")})
-       VALUES (${placeholders})
-       ON CONFLICT ("id") DO UPDATE SET ${updates}, "updatedAt" = NOW()`,
-      values,
-    );
-  }
-
-  if (ids.length === 0) {
-    await client.query(`DELETE FROM "${table}"`);
-    return;
-  }
-
-  await client.query(`DELETE FROM "${table}" WHERE NOT ("id" = ANY($1::int[]))`, [ids]);
-  void existing;
-}
-
-async function persistState() {
-  if (!pool) return;
-
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-
-    const profileColumns = [
-      "fullName", "headline", "location", "email", "phone", "github",
-      "linkedinUrl", "facebookUrl", "discordUrl", "instagramUrl", "spotifyUrl",
-      "musicUrl", "cloudinaryCloudName", "cloudinaryUploadPreset", "objective",
-      "about", "skills", "viewCount", "availability", "brandName", "heroTagline",
-      "tabTitle", "faviconUrl", "socialImageUrl", "featuredLabel", "experienceTitle",
-      "leadershipTitle", "achievementsTitle", "contactLabel", "footerCenterText",
-      "footerRightText", "aiBehaviorPrompt",
-    ] as const;
-    const profileValues = profileColumns.map((column) => profile[column]);
-    const profileUpdate = profileColumns.map((column, index) => `"${column}" = $${index + 1}`).join(", ");
-    const profileResult = await client.query(
-      `UPDATE "Profile" SET ${profileUpdate}, "updatedAt" = NOW() WHERE "id" = $${profileValues.length + 1}`,
-      [...profileValues, profile.id],
-    );
-    if (profileResult.rowCount === 0) {
-      const now = new Date();
-      const insertColumns = ["id", ...profileColumns, "createdAt", "updatedAt"];
-      await client.query(
-        `INSERT INTO "Profile" (${insertColumns.map((column) => `"${column}"`).join(", ")})
-         VALUES (${insertColumns.map((_, index) => `$${index + 1}`).join(", ")})`,
-        [profile.id, ...profileValues, now, now],
-      );
-    }
-
-    await syncCollection(client, "Project", ["name", "tagline", "description", "techStack", "link", "githubUrl", "highlight"], projects);
-    await syncCollection(client, "Experience", ["role", "company", "period", "summary", "sortOrder"], experience);
-    await syncCollection(client, "Leadership", ["org", "role", "period", "sortOrder"], leadership);
-    await syncCollection(client, "Achievement", ["text", "sortOrder"], achievements);
-    await syncCollection(client, "Tagline", ["text", "sortOrder"], taglines);
-
-    await client.query("COMMIT");
-  } catch (error) {
-    await client.query("ROLLBACK").catch(() => {});
-    throw error;
-  } finally {
-    client.release();
-  }
-}
-
 async function persistViewCount() {
   if (!pool) return;
-  await pool.query(
-    `UPDATE "Profile" SET "viewCount" = $1, "updatedAt" = NOW() WHERE "id" = $2`,
-    [profile.viewCount, profile.id],
+  const result = await pool.query(
+    `UPDATE "Profile" SET "viewCount" = "viewCount" + 1 WHERE "id" = $1 RETURNING "viewCount"`,
+    [profile.id],
   );
+  if (result.rows[0]) profile.viewCount = result.rows[0].viewCount;
 }
 
-const dbReady = pool ? hydrateFromDatabase() : Promise.resolve();
+
 
 function isAdmin(req: Request) {
   return req.signedCookies?.portfolio_admin === "true";
@@ -336,12 +253,6 @@ function unauthorized(res: Response) {
 function idFrom(req: Request) {
   const id = Number(req.params.id);
   return Number.isInteger(id) ? id : null;
-}
-
-function cleanUrl(value: unknown) {
-  if (value == null || String(value).trim() === "") return null;
-  const valueString = String(value).trim();
-  return /^https?:\/\//i.test(valueString) ? valueString : `https://${valueString}`;
 }
 
 function escapeHtml(value: unknown) {
@@ -430,17 +341,14 @@ function shouldIgnoreView(req: Request) {
   return ignoredIps.has(normalizedIp(req.ip ?? ""));
 }
 
-function replaceItem<T extends { id: number }>(items: T[], id: number, patch: Partial<T>) {
-  const index = items.findIndex((item) => item.id === id);
-  if (index === -1) return false;
-  items[index] = { ...items[index], ...patch };
-  return true;
-}
-
 const router = Router();
 router.use(async (_req, _res, next) => {
   try {
-    await dbReady;
+    if (_req.path.startsWith("/edit/") && !isAdmin(_req)) { unauthorized(_res); return; }
+    if (_req.path.startsWith("/edit/") && _req.path !== "/edit/me") database();
+    if (pool && (_req.path === "/public/portfolio" || _req.path === "/public/site-meta" || _req.path === "/chat" || _req.path === "/resume" || _req.path === "/edit/profile")) {
+      await hydrateFromDatabase(_req.path === "/edit/profile" || _req.path === "/public/site-meta");
+    }
     next();
   } catch (error) {
     next(error);
@@ -464,7 +372,8 @@ router.post("/admin/login", (req, res) => {
   res.cookie("portfolio_admin", "true", {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: req.secure,
+    maxAge: 8 * 60 * 60 * 1000,
     signed: true,
   });
   return res.json({ ok: true });
@@ -486,26 +395,20 @@ router.get("/edit/me", (req, res) => {
 });
 
 router.get("/public/portfolio", async (_req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=15, stale-while-revalidate=60");
+  res.setHeader("Cache-Control", "no-store");
   return res.json({ profile, projects, experience, leadership, achievements, taglines });
 });
 
 router.get("/public/site-meta", (_req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
-  return res.json({ tabTitle: profile.tabTitle, faviconUrl: "/solar-eclipse-logo.svg" });
+  res.setHeader("Cache-Control", "no-store");
+  return res.json({ tabTitle: profile.tabTitle, faviconUrl: profile.faviconUrl || "/solar-eclipse-logo.svg", socialImageUrl: profile.socialImageUrl });
 });
-router.get("/public/site-media/:key", (req, res) => {
-  if (req.params.key === "favicon") return res.redirect("/solar-eclipse-logo.svg");
-  const key = req.params.key === "favicon" ? "faviconUrl" : "socialImageUrl";
-  const value = profile[key];
-  const ownMediaPath = `/api/public/site-media/${req.params.key}`;
-  if (typeof value === "string" && value) {
-    if (value === ownMediaPath || value.startsWith(`${ownMediaPath}?`)) {
-      return res.status(404).json({ error: "Media not found" });
-    }
-    return res.redirect(value);
-  }
-  return res.status(404).json({ error: "Media not found" });
+router.get("/public/site-media/:key", async (req, res) => {
+  if (!["favicon", "social"].includes(String(req.params.key))) throw new EditorError(404, "Media not found");
+  const result = await database().query('SELECT "contentType", "content" FROM "SiteMedia" WHERE "key" = $1', [req.params.key]);
+  if (!result.rows[0]) throw new EditorError(404, "Media not found");
+  res.set({ "Content-Type": result.rows[0].contentType, "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff" });
+  return res.send(result.rows[0].content);
 });
 router.post("/public/views", async (req, res) => {
   if (shouldIgnoreView(req)) {
@@ -522,75 +425,95 @@ router.get("/edit/profile", (req, res) => {
 });
 router.post("/edit/profile", async (req, res) => {
   if (!isAdmin(req)) return unauthorized(res);
-  Object.assign(profile, req.body ?? {}, { id: profile.id, viewCount: Number(req.body?.viewCount ?? profile.viewCount), updatedAt: new Date().toISOString() });
-  await persistState();
-  return res.json(profile);
+  const patch = validate(req.body, "profile");
+  const saved = await updateRow("Profile", profile.id, patch);
+  Object.assign(profile, saved);
+  return res.json(saved);
 });
 
-function collectionRoutes<T extends { id: number }>(
-  path: string,
-  items: T[],
-  create: (body: Record<string, unknown>, id: number) => T,
-) {
-  router.get(`/edit/${path}`, (req, res) => {
+for (const section of Object.keys(collections) as Collection[]) {
+  const { table } = collections[section];
+  router.get(`/edit/${section}`, async (req, res) => {
     if (!isAdmin(req)) return unauthorized(res);
-    return res.json([...items].sort((a, b) => Number((a as T & { sortOrder?: number }).sortOrder ?? 0) - Number((b as T & { sortOrder?: number }).sortOrder ?? 0)));
+    const order = section === "projects" ? '"highlight" DESC, "createdAt" DESC, "id" ASC' : '"sortOrder" ASC, "createdAt" ASC, "id" ASC';
+    return res.json((await database().query(`SELECT * FROM "${table}" ORDER BY ${order}`)).rows);
   });
-  router.post(`/edit/${path}`, async (req, res) => {
+  router.post(`/edit/${section}`, async (req, res) => {
     if (!isAdmin(req)) return unauthorized(res);
-    const item = create(req.body ?? {}, Math.max(0, ...items.map((entry) => entry.id)) + 1);
-    items.push(item);
-    await persistState();
-    return res.status(201).json(item);
+    const patch = validate(req.body, section, true);
+    const keys = Object.keys(patch);
+    const result = await database().query(`INSERT INTO "${table}" (${keys.map(key => '\"' + key + '\"').join(', ')}, "updatedAt") VALUES (${keys.map((_, i) => '$' + (i + 1)).join(', ')}, NOW()) RETURNING *`, Object.values(patch));
+    return res.status(201).json(result.rows[0]);
   });
-  router.patch(`/edit/${path}/:id`, async (req, res) => {
+  router.patch(`/edit/${section}/:id`, async (req, res) => {
     if (!isAdmin(req)) return unauthorized(res);
     const id = idFrom(req);
-    if (id === null || !replaceItem(items, id, req.body ?? {})) return res.status(404).json({ error: "Not found" });
-    await persistState();
-    return res.json(items.find((item) => item.id === id));
+    if (!id || id < 0) throw new EditorError(400, "Invalid item ID.");
+    return res.json(await updateRow(table, id, validate(req.body, section)));
   });
-  router.delete(`/edit/${path}/:id`, async (req, res) => {
+  router.delete(`/edit/${section}/:id`, async (req, res) => {
     if (!isAdmin(req)) return unauthorized(res);
     const id = idFrom(req);
-    const index = id === null ? -1 : items.findIndex((item) => item.id === id);
-    if (index < 0) return res.status(404).json({ error: "Not found" });
-    items.splice(index, 1);
-    await persistState();
+    if (!id || id < 0) throw new EditorError(400, "Invalid item ID.");
+    const result = await database().query(`DELETE FROM "${table}" WHERE "id" = $1 RETURNING "id"`, [id]);
+    if (!result.rowCount) throw new EditorError(404, "Item not found.");
     return res.json({ ok: true });
+  });
+  if (section !== "projects") router.post(`/edit/${section}/reorder`, async (req, res) => {
+    if (!isAdmin(req)) return unauthorized(res);
+    const ids = req.body?.ids;
+    if (!Array.isArray(ids) || !ids.length || ids.some(id => !Number.isInteger(id) || id < 1) || new Set(ids).size !== ids.length) throw new EditorError(400, "Supply unique item IDs in order.");
+    const client = await database().connect();
+    try {
+      await client.query("BEGIN");
+      const current = await client.query(`SELECT "id" FROM "${table}" FOR UPDATE`);
+      if (current.rows.length !== ids.length || current.rows.some(row => !ids.includes(row.id))) throw new EditorError(409, "The list changed. Refresh before reordering.");
+      await client.query(`UPDATE "${table}" AS item SET "sortOrder" = ordering.position::int, "updatedAt" = NOW() FROM unnest($1::int[]) WITH ORDINALITY AS ordering(id, position) WHERE item."id" = ordering.id`, [ids]);
+      await client.query("COMMIT");
+      return res.json({ ok: true });
+    } catch (error) { await client.query("ROLLBACK"); throw error; }
+    finally { client.release(); }
   });
 }
 
-collectionRoutes("projects", projects, (body, id) => ({
-  id,
-  name: String(body.name ?? "Untitled project"),
-  tagline: String(body.tagline ?? ""),
-  description: String(body.description ?? ""),
-  techStack: String(body.techStack ?? ""),
-  link: cleanUrl(body.link),
-  githubUrl: cleanUrl(body.githubUrl),
-  highlight: Boolean(body.highlight),
-}));
-collectionRoutes("experience", experience, (body, id) => ({ id, role: String(body.role ?? ""), company: String(body.company ?? ""), period: String(body.period ?? ""), summary: String(body.summary ?? ""), sortOrder: Number(body.sortOrder ?? id) }));
-collectionRoutes("leadership", leadership, (body, id) => ({ id, org: String(body.org ?? ""), role: String(body.role ?? ""), period: String(body.period ?? ""), sortOrder: Number(body.sortOrder ?? id) }));
-collectionRoutes("achievements", achievements, (body, id) => ({ id, text: String(body.text ?? ""), sortOrder: Number(body.sortOrder ?? id) }));
-collectionRoutes("taglines", taglines, (body, id) => ({ id, text: String(body.text ?? ""), sortOrder: Number(body.sortOrder ?? id) }));
-collectionRoutes("gallery", [], (body, id) => ({ id, ...(body as object) }));
-
-router.post("/edit/site-media", async (req, res) => {
+router.post("/edit/site-media", express.raw({ type: "image/*", limit: "5mb" }), async (req, res) => {
   if (!isAdmin(req)) return unauthorized(res);
-  const key = req.body?.key === "favicon" ? "faviconUrl" : "socialImageUrl";
-  const url = `/api/public/site-media/${key === "faviconUrl" ? "favicon" : "social"}`;
-  profile[key] = url;
-  await persistState();
-  return res.json({ ok: true, url });
+  const key = req.query.key;
+  if (key !== "favicon" && key !== "social") throw new EditorError(400, "Choose favicon or social media.");
+  const contentType = req.get("content-type")?.split(";")[0] || "";
+  const bytes = req.body;
+  const signatures: Record<string, boolean> = Buffer.isBuffer(bytes) ? {
+    "image/png": bytes.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10])),
+    "image/jpeg": bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255,
+    "image/webp": bytes.subarray(0,4).toString() === "RIFF" && bytes.subarray(8,12).toString() === "WEBP",
+    "image/gif": /^GIF8[79]a$/.test(bytes.subarray(0,6).toString()),
+    "image/x-icon": bytes.subarray(0,4).equals(Buffer.from([0,0,1,0])),
+    "image/vnd.microsoft.icon": bytes.subarray(0,4).equals(Buffer.from([0,0,1,0])),
+  } : {};
+  if (!signatures[contentType]) throw new EditorError(400, "Upload a valid PNG, JPEG, WebP, GIF or ICO image (maximum 5 MB).");
+  const url = `/api/public/site-media/${key}?v=${Date.now()}`;
+  const column = key === "favicon" ? "faviconUrl" : "socialImageUrl";
+  const client = await database().connect();
+  try {
+    await client.query("BEGIN");
+    // Legacy media rows were imported without advancing their serial sequence.
+    // This two-key table uses a short write lock to allocate a collision-free ID.
+    await client.query('LOCK TABLE "SiteMedia" IN SHARE ROW EXCLUSIVE MODE');
+    await client.query('INSERT INTO "SiteMedia" ("id", "key", "contentType", "content", "updatedAt") SELECT COALESCE(MAX("id"), 0) + 1, $1, $2, $3, NOW() FROM "SiteMedia" WHERE true ON CONFLICT ("key") DO UPDATE SET "contentType" = EXCLUDED."contentType", "content" = EXCLUDED."content", "updatedAt" = NOW()', [key, contentType, bytes]);
+    const updated = await client.query(`UPDATE "Profile" SET "${column}" = $1, "updatedAt" = NOW() WHERE "id" = $2`, [url, profile.id]);
+    if (!updated.rowCount) throw new EditorError(409, "Profile not found.");
+    await client.query("COMMIT");
+    profile[column] = url;
+    return res.json({ ok: true, url });
+  } catch (error) { await client.query("ROLLBACK"); throw error; }
+  finally { client.release(); }
 });
 router.post(
   "/edit/resume",
   express.raw({ type: ["application/pdf", "application/octet-stream"], limit: "10mb" }),
   async (req, res) => {
     if (!isAdmin(req)) return unauthorized(res);
-    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+    if (!Buffer.isBuffer(req.body) || req.body.subarray(0, 5).toString() !== "%PDF-") {
       return res.status(400).json({ error: "Upload a non-empty PDF file" });
     }
 
@@ -686,6 +609,8 @@ router.post("/chat", async (req, res) => {
     },
   };
   const systemPrompt = `You are the AI assistant for Mark Andrei Castillo's portfolio. Speak professionally, naturally, and concisely. You are an AI guide, not Andrei. Answer directly in 2-4 short sentences unless the user asks for a list or a more detailed explanation. Use Markdown selectively and cleanly: keep normal conversational answers as paragraphs, use short bullet lists when the user asks for bullets or when listing several distinct works, and use bold only for useful emphasis such as names, project titles, or labels. Do not add decorative headings or formatting to every reply. The portfolio website itself is one of Andrei's projects: he built and maintains this site and its portfolio systems. If someone asks whether Andrei made or built this portfolio/site, answer yes and briefly explain that it is his own project. The portfolio content below is the current source of truth and may change over time, so use it for every answer. Do not rely on memory or invent employers, certifications, metrics, skills, dates, project details, or infrastructure. If a detail is not present in the current content, say that it is not listed and suggest contacting Andrei. Never claim that you performed an action or have access to information outside this content.
+
+Editor-provided response preferences: ${String(profile.aiBehaviorPrompt || "Keep answers concise and professional.")}
 
 Current portfolio content: ${JSON.stringify(currentPortfolio)}`;
   try {

@@ -6111,6 +6111,17 @@ html:has(.pre-intro) .ask-ai-wrap {
 
 /* Keep below-the-fold layout out of the first composite while preserving the
    same painted result once a section enters the viewport. */
+:root {
+  --portfolio-content-width: 56rem;
+  --portfolio-gutter: 1rem;
+}
+@media (min-width: 640px) {
+  :root { --portfolio-gutter: 1.5rem; }
+}
+.portfolio-page-content {
+  max-width: var(--portfolio-content-width);
+  padding-inline: var(--portfolio-gutter);
+}
 .portfolio-page-content > section[id] {
   content-visibility: auto;
   contain-intrinsic-size: auto 420px;
